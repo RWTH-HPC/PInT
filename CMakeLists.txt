@@ -19,6 +19,6 @@ llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 
 # Link against libraries
-add_executable (HPC-pattern-tool hpctool.cpp)
+add_executable (HPC-pattern-tool hpcpatterntool.cpp)
 target_link_libraries (HPC-pattern-tool clangTooling)
 target_link_libraries (HPC-pattern-tool ${llvm_libs})
