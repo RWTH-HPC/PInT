@@ -6,8 +6,16 @@ SET (CMAKE_CXX_COMPILER /rwthfs/rz/SW/UTIL/clang/4.0.1/bin/clang++)
 
 add_compile_options (-std=c++14)
 
+# Find Clang and LLVM
+find_package(Clang REQUIRED)
+find_package(Clang REQUIRED clangTooling libClang)
 
-# FIND LLVM for linking it later
+message (STATUS "Found clang ${CLANG_VERSION_STRING}")
+
+include_directories(${CLANG_INCLUDE_DIRS})
+add_definitions(${CLANG_DEFINITIONS})
+
+
 find_package (LLVM REQUIRED CONFIG)
 
 message (STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -19,6 +27,5 @@ llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 
 # Link against libraries
-add_executable (HPC-pattern-tool hpcpatterntool.cpp)
-target_link_libraries (HPC-pattern-tool clangTooling)
-target_link_libraries (HPC-pattern-tool ${llvm_libs})
+add_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp)
+target_link_libraries (HPC-pattern-tool ${llvm_libs} clangTooling clangFrontendTool)
