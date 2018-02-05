@@ -8,5 +8,11 @@
  */
 int main (int argc, char** argv)
 {
-	std::cout << "Hello!" << std::endl;
+	std::cout << "HPC Pattern Tool" << std::endl;
+
+	/* TODO add argument check */ 
+	if (argc > 1)
+	{
+		clang::tooling::runToolOnCode(new FindHPCPatternAction, argv[1]);
+	}
 }
