@@ -29,3 +29,6 @@ llvm_map_components_to_libnames(llvm_libs support core irreader)
 # Link against libraries
 add_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp FindHPCPatternConsumer.cpp) 
 target_link_libraries (HPC-pattern-tool ${llvm_libs} clangTooling clangFrontendTool)
+
+# Export compile commands
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
