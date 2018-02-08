@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FindHPCPatternConsumer.h"
-#include "clang/Frontend/FrontendAction.h"
+#include "clang/Frontend/FrontendActions.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Tooling/Tooling.h"
@@ -9,7 +9,7 @@
 #include <iostream>
 
 
-class FindHPCPatternAction : public clang::ASTFrontendAction 
+class FindHPCPatternAction : public clang::SyntaxOnlyAction 
 {
 public:
 	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
