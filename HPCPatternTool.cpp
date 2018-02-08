@@ -1,6 +1,8 @@
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
 #include "FindHPCPatternAction.h"
+#include "clang/Tooling/CommonOptionsParser.h"
+#include "llvm/Support/CommandLine.h"
 
 /*! \brief Tool entry point.
  *
@@ -9,6 +11,12 @@
 int main (int argc, char** argv)
 {
 	std::cout << "HPC Pattern Tool" << std::endl;
+
+	/* TODO
+	 * Parse Command Line Options
+	 * Create ClangTool
+	 * Define Tool Category
+	 */
 
 	/* TODO add argument check */ 
 	if (argc > 1)
