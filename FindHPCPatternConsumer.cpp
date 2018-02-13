@@ -15,11 +15,13 @@ void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	/* TODO find out why there is no output */
 	Context.PrintStats();
 
-	std::cout << "List of raw comments (" << RawComments.size() << "):" << std::endl;
+	std::cout << "List of raw comments contains " << RawComments.size() << " entries." << std::endl;
 
+	/*
 	for (RawComment = RawComments.begin(); RawComment != RawComments.end(); RawComment++)
 	{
 		llvm::StringRef RawText = (*RawComment)->getRawText(SrcManager);
 		std::cout << RawText.str() << std::endl;
 	}
+	*/
 }
