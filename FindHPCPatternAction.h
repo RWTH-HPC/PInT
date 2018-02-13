@@ -12,5 +12,5 @@
 class FindHPCPatternAction : public clang::SyntaxOnlyAction 
 {
 public:
-	std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
+	virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
 };
