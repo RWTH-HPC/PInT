@@ -4,23 +4,21 @@
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "llvm/Support/CommandLine.h"
 
+
+static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options");
+
+static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
+
 /*! \brief Tool entry point.
  *
  * The tool's entry point which calls the FrontEndAction on the code
  */
-int main (int argc, char** argv)
+int main (int argc, const char** argv)
 {
 	std::cout << "HPC Pattern Tool" << std::endl;
 
-	/* TODO
-	 * Parse Command Line Options
-	 * Create ClangTool
-	 * Define Tool Category
-	 */
+	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
 
-	/* TODO add argument check */ 
-	if (argc > 1)
-	{
-		clang::tooling::runToolOnCode(new FindHPCPatternAction, argv[1]);
-	}
+	clang::tooling::ClangTool HPCPatternTool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
+	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<FindHPCPatternAction>().get());
 }
