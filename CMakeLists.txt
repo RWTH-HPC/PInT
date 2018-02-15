@@ -1,34 +1,27 @@
 cmake_minimum_required (VERSION 2.6)
 project (HPC-pattern-tool)
 
-SET (CMAKE_C_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang)
-SET (CMAKE_CXX_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++)
+set (CMAKE_C_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang)
+set (CMAKE_CXX_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++)
+set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_EXTENSIONS OFF)
+set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-add_compile_options (-std=c++14 -fno-rtti)
-
-# Find Clang and LLVM
 find_package(Clang REQUIRED)
 find_package(Clang REQUIRED clangTooling libClang)
-
 message (STATUS "Found clang ${CLANG_VERSION_STRING}")
 
-include_directories(${CLANG_INCLUDE_DIRS})
-add_definitions(${CLANG_DEFINITIONS})
-
-
 find_package (LLVM REQUIRED CONFIG)
-
 message (STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message (STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+include(AddLLVM)
 
-include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
+include_directories(${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-
-# Link against libraries
-add_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp FindHPCPatternConsumer.cpp) 
+add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp FindHPCPatternConsumer.cpp) 
 target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic clangTooling clangFrontendTool)
 
-# Export compile commands
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
