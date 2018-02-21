@@ -16,8 +16,6 @@ static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpM
  */
 int main (int argc, const char** argv)
 {
-	std::cout << CLANG_INCLUDE_DIR << std::endl;
-
 	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
 
 	clang::tooling::ClangTool HPCPatternTool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
