@@ -1,5 +1,9 @@
 #include "FindHPCPatternAction.h"
 
+#include <iostream>
+#include "FindHPCPatternConsumer.h"
+
+
 
 std::unique_ptr<clang::ASTConsumer> FindHPCPatternAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
 {

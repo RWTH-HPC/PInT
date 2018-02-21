@@ -1,5 +1,13 @@
 #include "FindHPCPatternConsumer.h"
 
+#include <iostream>
+
+#include "clang/AST/RawCommentList.h"
+#include "llvm/ADT/StringRef.h"
+#include "clang/Basic/SourceManager.h"
+
+
+
 void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Context) 
 {
 	/* Traverse the AST for comments and parse them */
@@ -17,11 +25,9 @@ void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 
 	std::cout << "List of raw comments contains " << RawComments.size() << " entries." << std::endl;
 
-	/*
 	for (RawComment = RawComments.begin(); RawComment != RawComments.end(); RawComment++)
 	{
 		llvm::StringRef RawText = (*RawComment)->getRawText(SrcManager);
 		std::cout << RawText.str() << std::endl;
 	}
-	*/
 }
