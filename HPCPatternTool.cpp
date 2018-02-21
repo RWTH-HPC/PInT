@@ -3,6 +3,7 @@
 #include "FindHPCPatternAction.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "llvm/Support/CommandLine.h"
+#include "clang/Tooling/ArgumentsAdjusters.h"
 
 
 static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options");
@@ -15,7 +16,14 @@ static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpM
  */
 int main (int argc, const char** argv)
 {
-	std::cout << "HPC Pattern Tool" << std::endl;
+	std::cout << CLANG_INCLUDE_DIR << std::endl;
+
+	/* Construct the ArgumentAdjuster that includes the resource dir needed for compilation to the compiler frontend call */
+	clang::tooling::ArgumentsAdjuster ClangIncludeAdjuster;
+	clang::tooling::CommandLineArguments IncludeArguments;
+	IncludeArguments.push_back("-resource-dir");
+	IncludeArguments.push_back(CLANG_INCLUDE_DIR);
+	ClangIncludeAdjuster = clang::tooling::getInsertArgumentAdjuster(IncludeArguments, clang::tooling::ArgumentInsertPosition::END); 
 
 	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
 
