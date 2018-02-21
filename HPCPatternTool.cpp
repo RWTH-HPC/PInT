@@ -18,6 +18,10 @@ int main (int argc, const char** argv)
 {
 	std::cout << CLANG_INCLUDE_DIR << std::endl;
 
+	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
+
+	clang::tooling::ClangTool HPCPatternTool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
+	
 	/* Construct the ArgumentAdjuster that includes the resource dir needed for compilation to the compiler frontend call */
 	clang::tooling::ArgumentsAdjuster ClangIncludeAdjuster;
 	clang::tooling::CommandLineArguments IncludeArguments;
@@ -25,8 +29,7 @@ int main (int argc, const char** argv)
 	IncludeArguments.push_back(CLANG_INCLUDE_DIR);
 	ClangIncludeAdjuster = clang::tooling::getInsertArgumentAdjuster(IncludeArguments, clang::tooling::ArgumentInsertPosition::END); 
 
-	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
+	HPCPatternTool.appendArgumentsAdjuster(ClangIncludeAdjuster);
 
-	clang::tooling::ClangTool HPCPatternTool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
 	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<FindHPCPatternAction>().get());
 }
