@@ -27,8 +27,7 @@ void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	{
 		llvm::ArrayRef<clang::RawComment*>::iterator RCmt;
 
-		Decl->dump();
-		std::cout << "List of raw comments attachted to this declaration:" << std::endl;
+		std::cout << "List of raw comments in this translation unit:" << std::endl;
 
 		for (RCmt = RCmts.begin(); RCmt != RCmts.end(); RCmt++)
 		{
