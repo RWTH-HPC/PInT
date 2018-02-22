@@ -16,19 +16,20 @@ static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpM
  */
 int main (int argc, const char** argv)
 {
-	clang::tooling::CommonOptionsParser OptionsParser(argc, argv, HPCPatternToolCategory);
+	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 
-	clang::tooling::ClangTool HPCPatternTool(OptionsParser.getCompilations(), OptionsParser.getSourcePathList());
+	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), OptsParser.getSourcePathList());
 	
  	/* Construct the ArgumentAdjuster that includes the resource dir needed for compilation to the compiler frontend call´*/
-	clang::tooling::ArgumentsAdjuster ClangIncludeAdjuster;
-	clang::tooling::CommandLineArguments IncludeArguments;
-	IncludeArguments.push_back("-fparse-all-comments");
-	IncludeArguments.push_back("-resource-dir");
-	IncludeArguments.push_back(CLANG_INCLUDE_DIR);
-	ClangIncludeAdjuster = clang::tooling::getInsertArgumentAdjuster(IncludeArguments, clang::tooling::ArgumentInsertPosition::END); 
+	clang::tooling::ArgumentsAdjuster ClangInclAdj;
+	clang::tooling::CommandLineArguments InclArgs;
+	InclArgs.push_back("-fparse-all-comments");
+	InclArgs.push_back("-resource-dir");
+	InclArgs.push_back(CLANG_INCLUDE_DIR);
+	ClangInclAdj = clang::tooling::getInsertArgumentAdjuster(InclArgs, clang::tooling::ArgumentInsertPosition::END); 
 
-	HPCPatternTool.appendArgumentsAdjuster(ClangIncludeAdjuster);
+	/* Add the arguments adjuster to the adjuster chain */
+	HPCPatternTool.appendArgumentsAdjuster(ClangInclAdj);
 
 	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<FindHPCPatternAction>().get());
 }

@@ -10,17 +10,17 @@
 
 
 
-void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Ctxt) 
+void FindHPCPatternConsumer::HandleTranslationUnit(clang::ASTContext &Context) 
 {
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
-	Visitor.TraverseDecl(Ctxt.getTranslationUnitDecl());
+	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
 
 	/* Print raw comment list for checking */
 #ifdef PRINT_DEBUG
-	clang::SourceManager& SrcMgr = Ctxt.getSourceManager();
+	clang::SourceManager& SrcMgr = Context.getSourceManager();
 
-	clang::RawCommentList &RCmtLst = Ctxt.getRawCommentList();
+	clang::RawCommentList &RCmtLst = Context.getRawCommentList();
 	llvm::ArrayRef<clang::RawComment*> RCmts = RCmtLst.getComments();
 	
 	if (!RCmts.empty())
