@@ -12,6 +12,12 @@ set (CLANG_INCLUDE_DIR "/rwthfs/rz/SW/UTIL/clang/5.0.1/lib64/clang/5.0.1" CACHE 
 	"Dirrectory where the clang system library header files are located")
 add_definitions (-DCLANG_INCLUDE_DIR="${CLANG_INCLUDE_DIR}")
 
+set (PRINT_DEBUG_INFORMATION OFF CACHE BOOL
+	"Toogle output of AST Information and RAW Comment List")
+if (PRINT_DEBUG_INFORMATION)
+	add_definitions (-DPRINT_DEBUG)
+endif ()
+
 find_package(Clang REQUIRED)
 find_package(Clang REQUIRED clangTooling libClang)
 message (STATUS "Found clang ${CLANG_VERSION_STRING}")
@@ -26,6 +32,6 @@ include_directories(${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp FindHPCPatternConsumer.cpp) 
-target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic clangTooling clangFrontendTool)
+add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp FindHPCPatternAction.cpp FindHPCPatternConsumer.cpp FindHPCPatternVisitor.cpp) 
+target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic libclang clangTooling clangFrontendTool)
 
