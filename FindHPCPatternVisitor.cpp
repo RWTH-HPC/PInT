@@ -3,22 +3,16 @@
 #include "Debug.h"
 
 #include <iostream> 
-#include "clang/AST/RawCommentList.h"
 #include "llvm/ADT/StringRef.h"
-#include "clang/Basic/SourceManager.h"
 
-bool FindHPCPatternVisitor::VisitDecl(clang::Decl *Decl)
-{
-	clang::ASTContext& Ctxt = Decl->getASTContext();
-	clang::SourceManager& SrcMgr = Ctxt.getSourceManager();
+bool FindHPCPatternVisitor::VisitPragmaCommentDecl(clang::PragmaCommentDecl *CmtDecl)
+{	
+#ifdef PRINT_DEBUG
+	CmtDecl->dump();
+#endif
 
-	clang::RawComment* RCmt = Ctxt.getRawCommentForDeclNoCache(Decl);
-	if (RCmt)
-	{
-		Decl->dump();
-		std::cout << RCmt->getRawText(SrcMgr).str() << std::endl;
-	}
+	llvm::StringRef arg = CmtDecl->getArg();
+	std::cout << arg.str() << std::endl;
 
-	/* continue */
 	return true;
 }

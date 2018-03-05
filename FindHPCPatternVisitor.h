@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	bool VisitDecl(clang::Decl *Decl);
+	bool VisitPragmaCommentDecl(clang::PragmaCommentDecl *CmtDecl);
 
 private:
 	clang::ASTContext *Context;
