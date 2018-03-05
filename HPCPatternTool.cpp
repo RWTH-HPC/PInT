@@ -23,6 +23,7 @@ int main (int argc, const char** argv)
 	clang::tooling::ArgumentsAdjuster ParseCmtsAdj;
 	clang::tooling::CommandLineArguments ParseCmts;
 	ParseCmts.push_back("-fparse-all-comments");
+	ParseCmts.push_back("-fms-extensions");
 	ParseCmtsAdj = clang::tooling::getInsertArgumentAdjuster(ParseCmts, clang::tooling::ArgumentInsertPosition::END);
 	HPCPatternTool.appendArgumentsAdjuster(ParseCmtsAdj);	
 
