@@ -4,6 +4,7 @@
 
 #include <iostream> 
 #include "llvm/ADT/StringRef.h"
+#include "ParallelPattern.h"
 
 bool FindHPCPatternVisitor::VisitPragmaCommentDecl(clang::PragmaCommentDecl *CmtDecl)
 {	
@@ -13,6 +14,8 @@ bool FindHPCPatternVisitor::VisitPragmaCommentDecl(clang::PragmaCommentDecl *Cmt
 
 	llvm::StringRef arg = CmtDecl->getArg();
 	std::cout << arg.str() << std::endl;
-
+	
+	ParallelPattern pattern = ParallelPattern(arg.str());
+	
 	return true;
 }
