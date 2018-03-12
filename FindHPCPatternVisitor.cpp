@@ -22,9 +22,22 @@ bool FindHPCPatternVisitor::VisitPragmaCommentDecl(clang::PragmaCommentDecl *Cmt
 
 bool FindHPCPatternVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
+	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace()) 
+	{
 #ifdef PRINT_DEBUG
-	CallExpr->dump();
-#endif 
+		CallExpr->dumpPretty(*Context);
+#endif
+		
+		if (CallExpr->getDirectCallee()->isDefined())
+		{
+			FindHPCPatternVisitor RecVisitor(Context);
+			RecVisitor.VisitDecl(CallExpr->getDirectCallee()->getDefinition());
+		}
+		else
+		{
+			std::cout << "Function is not defined!" << std::endl;
+		}	
+	}
 
 	return true;
 }
