@@ -2,9 +2,10 @@
 
 #include <string>
 #include <regex>
+#include <vector>
 
 
-enum DesignSpace { FindingConcurrency, AlgorithmStructure, SupportingStructure, ImplementationMechanism };
+enum DesignSpace { Unknown, FindingConcurrency, AlgorithmStructure, SupportingStructure, ImplementationMechanism };
 
 
 extern std::regex ParallelPatternRegex;
@@ -16,5 +17,8 @@ public:
 	
 	DesignSpace DesignSp;
 	std::string PatternName;
-	std::string PatternIdentifier;
+	std::string PatternID;
 };
+
+
+DesignSpace StrToDesignSpace(std::string str);
