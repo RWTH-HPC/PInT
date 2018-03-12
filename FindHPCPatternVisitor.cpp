@@ -19,3 +19,12 @@ bool FindHPCPatternVisitor::VisitPragmaCommentDecl(clang::PragmaCommentDecl *Cmt
 	
 	return true;
 }
+
+bool FindHPCPatternVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
+{
+#ifdef PRINT_DEBUG
+	CallExpr->dump();
+#endif 
+
+	return true;
+}
