@@ -19,21 +19,23 @@ int main (int argc, const char** argv)
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), OptsParser.getSourcePathList());
 
-	/* Add Arguments Adjuster for parsing of all comments */
-	clang::tooling::ArgumentsAdjuster ParseCmtsAdj;
-	clang::tooling::CommandLineArguments ParseCmts;
-	ParseCmts.push_back("-fparse-all-comments");
-	ParseCmts.push_back("-fms-extensions");
-	ParseCmtsAdj = clang::tooling::getInsertArgumentAdjuster(ParseCmts, clang::tooling::ArgumentInsertPosition::END);
-	HPCPatternTool.appendArgumentsAdjuster(ParseCmtsAdj);	
+	/* Declare vector of command line arguments */
+	clang::tooling::CommandLineArguments Arguments;
 
- 	/* Construct the ArgumentAdjuster that includes the resource dir needed for compilation to the compiler frontend call´*/
-	clang::tooling::ArgumentsAdjuster ClangInclAdj;
-	clang::tooling::CommandLineArguments InclArgs;
-	InclArgs.push_back("-resource-dir");
-	InclArgs.push_back(CLANG_INCLUDE_DIR);
-	ClangInclAdj = clang::tooling::getInsertArgumentAdjuster(InclArgs, clang::tooling::ArgumentInsertPosition::END); 
-	HPCPatternTool.appendArgumentsAdjuster(ClangInclAdj);
+	/* Add Arguments for parsing of all comments */
+	Arguments.push_back("-fparse-all-comments");
+	Arguments.push_back("-fms-extensions");
+
+	/* Add Arguments to prevent inlining */
+	Arguments.push_back("-fno-inline");
+	
+	/* Add arguments to include system headers */
+	Arguments.push_back("-resource-dir");
+	Arguments.push_back(CLANG_INCLUDE_DIR);
+
+	
+	clang::tooling::ArgumentsAdjuster ArgsAdjuster = clang::tooling::getInsertArgumentAdjuster(Arguments, clang::tooling::ArgumentInsertPosition::END);
+	HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);	
 
 	/* Run the tool with options and source files provided */
 	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<FindHPCPatternAction>().get());
