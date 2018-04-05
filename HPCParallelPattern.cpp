@@ -14,16 +14,15 @@ HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 	std::smatch MatchRes;
 	std::regex_search(PatternName, MatchRes, BeginParallelPatternRegex);
 
-	this->DesignSp = StrToDesignSpace(MatchRes[2].str());
-	this->PatternName = MatchRes[3].str();
-	this->PatternID = MatchRes[4].str();
+	this->DesignSp = StrToDesignSpace(MatchRes[1].str());
+	this->PatternName = MatchRes[2].str();
+	this->PatternID = MatchRes[3].str();
 
 #ifdef PRINT_DEBUG
 	std::cout << "Matching " << MatchRes[0].str() << std::endl;
-	std::cout << MatchRes[1].str() << std::endl;
-	std::cout << "Pattern Design Space: " << MatchRes[2].str() << std::endl;
-	std::cout << "Pattern Name: " << MatchRes[3].str() << std::endl;
-	std::cout << "Pattern Identifier: " << MatchRes[4].str() << std::endl;
+	std::cout << "Pattern Design Space: " << MatchRes[1].str() << std::endl;
+	std::cout << "Pattern Name: " << MatchRes[2].str() << std::endl;
+	std::cout << "Pattern Identifier: " << MatchRes[3].str() << std::endl;
 #endif
 }
 
