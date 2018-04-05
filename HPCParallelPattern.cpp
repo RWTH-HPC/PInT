@@ -1,4 +1,4 @@
-#include "ParallelPattern.h"
+#include "HPCParallelPattern.h"
 
 #include <iostream>
 

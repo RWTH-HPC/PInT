@@ -1,6 +1,7 @@
+#include "HPCPatternInstrASTTraversal.h"
+
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
-#include "FindHPCPatternAction.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "llvm/Support/CommandLine.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
@@ -22,10 +23,6 @@ int main (int argc, const char** argv)
 	/* Declare vector of command line arguments */
 	clang::tooling::CommandLineArguments Arguments;
 
-	/* Add Arguments for parsing of all comments */
-	Arguments.push_back("-fparse-all-comments");
-	Arguments.push_back("-fms-extensions");
-
 	/* Add Arguments to prevent inlining */
 	Arguments.push_back("-fno-inline");
 	
@@ -38,5 +35,5 @@ int main (int argc, const char** argv)
 	HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);	
 
 	/* Run the tool with options and source files provided */
-	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<FindHPCPatternAction>().get());
+	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 }
