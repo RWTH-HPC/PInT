@@ -3,14 +3,16 @@
 #include <iostream>
 
 
-std::regex ParallelPatternRegex("(Begin|End)\\s(FindingConcurrency|AlgorithmStructure|SupportingStructure|ImplementationMechanism)\\.([[:alpha:]]+)\\s([[:alnum:]]+)");
+std::regex BeginParallelPatternRegex("(FindingConcurrency|AlgorithmStructure|SupportingStructure|ImplementationMechanism)\\.([[:alpha:]]+)\\s([[:alnum:]]+)");
+std::regex EndParallelPatternRegex("([[:alnum:]]+)");
+
+std::stack<HPCParallelPattern*> Context;
 
 
-
-ParallelPattern::ParallelPattern(std::string PatternName)
+HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 {
 	std::smatch MatchRes;
-	std::regex_search(PatternName, MatchRes, ParallelPatternRegex);
+	std::regex_search(PatternName, MatchRes, BeginParallelPatternRegex);
 
 	this->DesignSp = StrToDesignSpace(MatchRes[2].str());
 	this->PatternName = MatchRes[3].str();
@@ -25,6 +27,15 @@ ParallelPattern::ParallelPattern(std::string PatternName)
 #endif
 }
 
+
+
+void HPCParallelPattern::Print() 
+{
+	std::cout << "Pattern Info:" << std::endl;
+	std::cout << "Pattern Design Space: " << this->DesignSp << std::endl;
+	std::cout << "Pattern Name: " << this->PatternName << std::endl;
+	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
+}
 
 DesignSpace StrToDesignSpace(std::string str)
 {
