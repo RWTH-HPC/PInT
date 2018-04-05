@@ -30,6 +30,8 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 	
 		std::string FnName = Callee->getNameInfo().getName().getAsString();	
 
+		// TODO distinguish Begin and End Pattern
+
 		// Is this a call to our pattern functions?
 		if (!FnName.compare(PATTERN_BEGIN_FNNAME) || !FnName.compare(PATTERN_END_FNNAME))
 		{

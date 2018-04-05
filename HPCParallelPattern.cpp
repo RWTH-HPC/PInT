@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-std::regex BeginParallelPatternRegex("(FindingConcurrency|AlgorithmStructure|SupportingStructure|ImplementationMechanism)\\.([[:alpha:]]+)\\s([[:alnum:]]+)");
+std::regex BeginParallelPatternRegex("([[:alnum:]]+)\\s([[:alnum:]]+)\\s([[:alnum:]]+)");
 std::regex EndParallelPatternRegex("([[:alnum:]]+)");
 
 std::stack<HPCParallelPattern*> Context;
@@ -12,7 +12,7 @@ std::stack<HPCParallelPattern*> Context;
 HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 {
 	std::smatch MatchRes;
-	std::regex_search(PatternName, MatchRes, BeginParallelPatternRegex);
+	std::regex_search(HPCPatternInstrString, MatchRes, BeginParallelPatternRegex);
 
 	this->DesignSp = StrToDesignSpace(MatchRes[1].str());
 	this->PatternName = MatchRes[2].str();
