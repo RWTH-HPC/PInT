@@ -62,7 +62,9 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Context(Context)
 {
-	clang::ast_matchers::StatementMatcher StringLiteralMatcher = clang::ast_matchers::hasDescendant(clang::ast_matchers::stringLiteral().bind("patternstr"));	
+	using clang::ast_matchers;	
+
+	StatementMatcher StringLiteralMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
 
 	Finder.addMatcher(StringLiteralMatcher, &Handler);
 }
