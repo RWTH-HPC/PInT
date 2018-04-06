@@ -62,7 +62,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Context(Context)
 {
-	using clang::ast_matchers;	
+	using namespace clang::ast_matchers;	
 
 	StatementMatcher StringLiteralMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
 
