@@ -60,12 +60,13 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 }
 
 
+/*
+ * Constructor
+ */
 HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Context(Context)
 {
 	using namespace clang::ast_matchers;	
-
 	StatementMatcher StringLiteralMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
-
 	Finder.addMatcher(StringLiteralMatcher, &Handler);
 }
 
@@ -88,7 +89,6 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
  */
 std::unique_ptr<clang::ASTConsumer> HPCPatternInstrAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
 {
-	DEBUG_MESSAGE("Creating consumer object!")
-	
+	DEBUG_MESSAGE("Creating consumer object!")	
 	return std::unique_ptr<clang::ASTConsumer>(new HPCPatternInstrConsumer(&Compiler.getASTContext()));	
 }

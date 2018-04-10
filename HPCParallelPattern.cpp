@@ -3,14 +3,20 @@
 #include <iostream>
 
 
+/*
+ * Regular Expressions
+ */
 std::regex BeginParallelPatternRegex("([[:alnum:]]+)\\s([[:alnum:]]+)\\s([[:alnum:]]+)");
 std::regex EndParallelPatternRegex("([[:alnum:]]+)");
 
-std::stack<HPCParallelPattern*> Context;
 
 
+/*
+ * HPC Parallel Pattern Class Functions
+ */
 HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 {
+	/* Match Regex and save info in member variables */
 	std::smatch MatchRes;
 	std::regex_search(HPCPatternInstrString, MatchRes, BeginParallelPatternRegex);
 
@@ -18,15 +24,14 @@ HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 	this->PatternName = MatchRes[2].str();
 	this->PatternID = MatchRes[3].str();
 
-#ifdef PRINT_DEBUG
-	std::cout << "Matching " << MatchRes[0].str() << std::endl;
-	std::cout << "Pattern Design Space: " << MatchRes[1].str() << std::endl;
-	std::cout << "Pattern Name: " << MatchRes[2].str() << std::endl;
-	std::cout << "Pattern Identifier: " << MatchRes[3].str() << std::endl;
-#endif
+	/* Initialise children and parent vectors */
+	if (!Context.empty())
+	{
+		ParallelPattern* Parent = GetTopPatternStack();
+		Parents.push_back(Parent);
+		Parent->addChild(this);
+	}
 }
-
-
 
 void HPCParallelPattern::Print() 
 {
@@ -36,6 +41,21 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
 }
 
+void AddChild(ParallelPattern* Child) 
+{
+	Children.push_back(Child);
+}
+
+void AddParent(ParallelPattern* Parent)
+{
+	Parents.push_back(Parent);
+}
+
+
+
+/*
+ * Design Space Helper Functions
+ */
 DesignSpace StrToDesignSpace(std::string str)
 {
 	if (str.compare("FindingConcurrency")) 
@@ -59,3 +79,41 @@ DesignSpace StrToDesignSpace(std::string str)
 		return Unknown;
 	}
 }
+
+
+
+/*
+ * Pattern Stack Management
+ */
+std::stack<HPCParallelPattern*> Context;
+
+void AddToPatternStack(ParallelPattern* Pattern)
+{
+	Context.push(Pattern);
+}
+
+HPCParallelPattern* GetTopPatternStack() 
+{
+	if (!Context.empty())
+	{
+		return Context.top();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+void RemoveFromPatternStack(std::string ID)
+{
+	if (!Context.empty)
+	{
+		ParallelPattern* Top = Context.top();	
+		
+		if (!Top.PatternID.compare(ID))
+		{
+			// TODO Thorw an Exception here
+		}
+	}
+}
+
