@@ -1,4 +1,5 @@
 #include "HPCPatternInstrASTTraversal.h"
+#include "HPCPatternTreeVisualisation.h"
 
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
@@ -35,5 +36,8 @@ int main (int argc, const char** argv)
 	HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);	
 
 	/* Run the tool with options and source files provided */
-	return HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+	HPCPatternTreeVisualisation::PrintPatternTree();
+
+	return retcode;
 }
