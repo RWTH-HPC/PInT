@@ -31,9 +31,9 @@ void HPCPatternTreeVisualisation::PrintPattern(HPCParallelPattern* Pattern, int 
 void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth)
 {
 	PrintIndent(depth);
-	std::cout << FnCall->FnName << std::endl;
+	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << std::endl;
 
-	for (HPCParallelPattern* Pattern : FnCall->Patterns)
+	for (HPCParallelPattern* Pattern : FnCall->GetPatterns())
 	{
 		PrintPattern(Pattern, depth + 1);
 	}
