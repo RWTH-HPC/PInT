@@ -3,6 +3,22 @@
 #include "clang/AST/ODRHash.h"
 
 
+
+/*
+ * Function Declaration Database Entry functions
+ */
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : Patterns(), CallerPatterns()
+{
+	this->BodyVisited = false;
+	this->FnName = Name;
+	this->Hash = Hash;
+}	
+
+
+
+/*
+ * Function Declaration Database functions
+ */
 FunctionDeclDatabase::FunctionDeclDatabase() : Entries()
 {
 }
@@ -18,7 +34,7 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 	// Search for an existing entry
 	for (FunctionDeclDatabaseEntry* e : Entries)
 	{	
-		if (e->Hash == HashVal)
+		if (e->GetHash() == HashVal)
 		{
 			return e;
 		}

@@ -15,19 +15,41 @@ class HPCParallelPattern;
 /*
  * A struct for the database entries
  */ 	
-struct FunctionDeclDatabaseEntry
+class FunctionDeclDatabaseEntry
 {
 public:
-	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : Patterns()
-	{
-		this->BodyVisited = false;
-		this->FnName = Name;
-		this->Hash = Hash;
-	}	
+	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash);	
 
+	void AddCallerPattern(HPCParallelPattern* Pattern)
+	{
+		CallerPatterns.push_back(Pattern);
+	}
+
+	void AddPattern(HPCParallelPattern* Pattern)
+	{
+		Patterns.push_back(Pattern);
+	}
+
+	unsigned GetHash() 
+	{
+		return Hash;
+	}
+
+	std::string GetFnName()
+	{
+		return FnName;
+	}
+
+	std::vector<HPCParallelPattern*> GetPatterns()
+	{
+		return Patterns;
+	}
+	
+private:
 	bool BodyVisited;	
 	std::string FnName;
 	unsigned Hash;
+	std::vector<HPCParallelPattern*> CallerPatterns;
 	std::vector<HPCParallelPattern*> Patterns;
 };
 
