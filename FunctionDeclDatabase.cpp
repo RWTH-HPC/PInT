@@ -7,7 +7,7 @@ FunctionDeclDatabase::FunctionDeclDatabase() : Entries()
 {
 }
 
-FunctionDeclDatabase::Entry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Decl)
+FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Decl)
 {
 	clang::ODRHash Hash;
 	Hash.AddDecl(Decl);
@@ -18,15 +18,15 @@ FunctionDeclDatabase::Entry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* D
 	// When the list of entries is empty, we can immediately return
 	if (Entries.empty())
 	{
-		Entry* FuncEntry;
-		FuncEntry = new Entry(FnName, HashVal);
+		FunctionDeclDatabaseEntry* FuncEntry;
+		FuncEntry = new FunctionDeclDatabaseEntry(FnName, HashVal);
 		Entries.push_back(FuncEntry);
 		return FuncEntry;
 	}
 	else
 	{
 		// Search for an existing entry
-		for (Entry* e : Entries)
+		for (FunctionDeclDatabaseEntry* e : Entries)
 		{	
 			if (e->Hash == HashVal)
 			{
@@ -35,8 +35,8 @@ FunctionDeclDatabase::Entry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* D
 		}
 
 		// We found nothing, therefore we allocate a new entry
-		Entry* FuncEntry;
-		FuncEntry = new Entry(FnName, HashVal);
+		FunctionDeclDatabaseEntry* FuncEntry;
+		FuncEntry = new FunctionDeclDatabaseEntry(FnName, HashVal);
 		Entries.push_back(FuncEntry);
 		return FuncEntry;
 	}

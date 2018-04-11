@@ -14,7 +14,7 @@ std::regex EndParallelPatternRegex("([[:alnum:]]+)");
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
+HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString) : Parents(), Children(), FnCalls()
 {
 	/* Match Regex and save info in member variables */
 	std::smatch MatchRes;
@@ -27,9 +27,9 @@ HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString)
 	/* Initialise children and parent vectors */
 	if (!Context.empty())
 	{
-		ParallelPattern* Parent = GetTopPatternStack();
+		HPCParallelPattern* Parent = GetTopPatternStack();
 		Parents.push_back(Parent);
-		Parent->addChild(this);
+		Parent->AddChild(this);
 	}
 }
 
@@ -41,14 +41,19 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
 }
 
-void AddChild(ParallelPattern* Child) 
+void HPCParallelPattern::AddChild(HPCParallelPattern* Child) 
 {
 	Children.push_back(Child);
 }
 
-void AddParent(ParallelPattern* Parent)
+void HPCParallelPattern::AddParent(HPCParallelPattern* Parent)
 {
 	Parents.push_back(Parent);
+}
+
+void HPCParallelPattern::AddFnCall(FunctionDeclDatabaseEntry* Entry)
+{
+	FnCalls.push_back(Entry);
 }
 
 
@@ -87,7 +92,7 @@ DesignSpace StrToDesignSpace(std::string str)
  */
 std::stack<HPCParallelPattern*> Context;
 
-void AddToPatternStack(ParallelPattern* Pattern)
+void AddToPatternStack(HPCParallelPattern* Pattern)
 {
 	Context.push(Pattern);
 }
@@ -106,11 +111,11 @@ HPCParallelPattern* GetTopPatternStack()
 
 void RemoveFromPatternStack(std::string ID)
 {
-	if (!Context.empty)
+	if (!Context.empty())
 	{
-		ParallelPattern* Top = Context.top();	
+		HPCParallelPattern* Top = Context.top();	
 		
-		if (!Top.PatternID.compare(ID))
+		if (!Top->GetPatternID().compare(ID))
 		{
 			// TODO Thorw an Exception here
 		}

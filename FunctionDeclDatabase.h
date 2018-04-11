@@ -7,29 +7,36 @@
 #include <string>
 
 
+/* Forward declarations */
+class HPCParallelPattern;
+
+
+
+/*
+ * A struct for the database entries
+ */ 	
+struct FunctionDeclDatabaseEntry
+{
+public:
+	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : Patterns()
+	{
+		this->BodyVisited = false;
+		this->FnName = Name;
+		this->Hash = Hash;
+	}	
+
+	bool BodyVisited;	
+	std::string FnName;
+	unsigned Hash;
+	std::vector<HPCParallelPattern*> Patterns;
+};
+
+
 
 class FunctionDeclDatabase
 {
 public:
-	/*
- 	 * A struct for the database entries
- 	 */ 	
-	struct Entry
-	{
-		Entry (std::string Name, unsigned Hash) : Patterns()
-		{
-			this->BodyVisited = false;
-			this->FnName = Name;
-			this->Hash = Hash;
-		}	
-	
-		bool BodyVisited;	
-		std::string FnName;
-		unsigned Hash;
-		std::vector<HPCParallelPattern*> Patterns;
-	};
-
-	Entry* Lookup(clang::FunctionDecl* Decl);
+	FunctionDeclDatabaseEntry* Lookup(clang::FunctionDecl* Decl);
 
 	static FunctionDeclDatabase* GetInstance() 
 	{
@@ -45,6 +52,6 @@ private:
 	FunctionDeclDatabase(const FunctionDeclDatabase&);
 	FunctionDeclDatabase& operator = (const FunctionDeclDatabase&);
 
-	std::vector<Entry*> Entries;
+	std::vector<FunctionDeclDatabaseEntry*> Entries;
 };
 

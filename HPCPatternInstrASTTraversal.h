@@ -1,6 +1,8 @@
 #pragma once
 
 #include "HPCPatternInstrHandler.h"
+#include "HPCParallelPattern.h"
+#include "FunctionDeclDatabase.h"
 
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/AST/ASTConsumer.h"
@@ -11,6 +13,7 @@
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/AST/Comment.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/Decl.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 
@@ -22,13 +25,24 @@ class HPCPatternInstrVisitor : public clang::RecursiveASTVisitor<HPCPatternInstr
 {
 public:
 	explicit HPCPatternInstrVisitor(clang::ASTContext *Context);
+	
+	bool VisitFunctionDecl(clang::FunctionDecl *Decl);
 
 	bool VisitCallExpr(clang::CallExpr *CallExpr);
 
 private:
 	clang::ASTContext *Context;
-	clang::ast_matchers::MatchFinder Finder;
-	HPCPatternInstrHandler Handler;
+	
+	clang::ast_matchers::MatchFinder PatternBeginFinder;
+	clang::ast_matchers::MatchFinder PatternEndFinder;
+	
+	HPCPatternBeginInstrHandler PatternBeginHandler;
+	HPCPatternEndInstrHandler PatternEndHandler;
+
+	FunctionDeclDatabase* FunctionDB;
+
+	clang::FunctionDecl* CurrentFn;
+	FunctionDeclDatabaseEntry* CurrentFnEntry;
 };
 
 

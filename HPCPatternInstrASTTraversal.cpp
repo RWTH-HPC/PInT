@@ -13,15 +13,20 @@
 /* 
  * Visitor function implementations
  */
+bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
+{
+	CurrentFn = Decl;
+	CurrentFnEntry = FunctionDB->Lookup(Decl);
+
+	PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
+
+	return true;
+}
+
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
 	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace()) 
-	{
-#ifdef PRINT_DEBUG
-		CallExpr->dumpPretty(*Context);
-		std::cout << std::endl;
-#endif
-		
+	{	
 		clang::FunctionDecl* Callee = CallExpr->getDirectCallee();
 
 #ifdef PRINT_DEBUG
@@ -30,44 +35,49 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 	
 		std::string FnName = Callee->getNameInfo().getName().getAsString();	
 
-		// TODO distinguish Begin and End Pattern
-
 		// Is this a call to our pattern functions?
-		if (!FnName.compare(PATTERN_BEGIN_FNNAME) || !FnName.compare(PATTERN_END_FNNAME))
+		if (!FnName.compare(PATTERN_BEGIN_FNNAME))
 		{
 			clang::Expr** Args = CallExpr->getArgs();
 #ifdef PRINT_DEBUG
 			Args[0]->dump();
 #endif
-			Finder.match(*Args[0], *Context);
+			PatternBeginFinder.match(*Args[0], *Context);
+		}
+		else if (!FnName.compare(PATTERN_END_FNNAME))
+		{
+			clang::Expr** Args = CallExpr->getArgs();
+#ifdef PRINT_DEBUG
+			Args[0]->dump();
+#endif
+			PatternEndFinder.match(*Args[0], *Context);
 		}
 		// If no: search the called function for patterns
-		else if (Callee->isDefined())
-		{
-			HPCPatternInstrVisitor RecVisitor(Context);	
-#ifdef PRINT_DEBUG
-			Callee->getBody()->dump();
-#endif
-			RecVisitor.TraverseStmt(Callee->getBody());
-		}
 		else
 		{
-			DEBUG_MESSAGE("Function is not defined!");
-		}	
+			/* Look up the database entry for this function */
+			FunctionDeclDatabaseEntry* DBEntry = FunctionDB->Lookup(Callee);
+
+			HPCParallelPattern* Top;
+			if ((Top = GetTopPatternStack()) != NULL)
+			{
+				Top->AddFnCall(DBEntry);
+			}
+		}
 	}
 
 	return true;
 }
 
-
-/*
- * Constructor
- */
 HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Context(Context)
 {
 	using namespace clang::ast_matchers;	
-	StatementMatcher StringLiteralMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
-	Finder.addMatcher(StringLiteralMatcher, &Handler);
+	StatementMatcher StringArgumentMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
+	
+	PatternBeginFinder.addMatcher(StringArgumentMatcher, &PatternBeginHandler);
+	PatternEndFinder.addMatcher(StringArgumentMatcher, &PatternEndHandler);
+	
+	FunctionDB = FunctionDeclDatabase::GetInstance();
 }
 
 
