@@ -44,6 +44,7 @@ public:
 		return &Instance;
 	}
 
+	FunctionDeclDatabaseEntry* GetMainFnEntry() { return MainFnEntry; }
 
 private:
 	FunctionDeclDatabase();
@@ -53,5 +54,7 @@ private:
 	FunctionDeclDatabase& operator = (const FunctionDeclDatabase&);
 
 	std::vector<FunctionDeclDatabaseEntry*> Entries;
+
+	FunctionDeclDatabaseEntry* MainFnEntry;
 };
 

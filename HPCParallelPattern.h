@@ -42,6 +42,10 @@ public:
 
 	std::string GetPatternID() { return this->PatternID; }
 
+	std::vector<HPCParallelPattern*> GetChildren() { return this->Children; }
+
+	std::vector<FunctionDeclDatabaseEntry*> GetFnCalls() { return this->FnCalls; }
+	
 private:	
 	DesignSpace DesignSp;
 	std::string PatternName;
