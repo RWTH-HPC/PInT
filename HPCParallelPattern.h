@@ -10,7 +10,7 @@
 
 /* Forward Declarations */
 class FunctionDeclDatabase;
-struct FunctionDeclDatabaseEntry;
+class FunctionDeclDatabaseEntry;
 
 // TODO Implement Exception for wrong pattern nesting
 

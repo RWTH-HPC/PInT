@@ -119,6 +119,8 @@ void RemoveFromPatternStack(std::string ID)
 		{
 			// TODO Thorw an Exception here
 		}
+		
+		Context.pop();
 	}
 }
 
