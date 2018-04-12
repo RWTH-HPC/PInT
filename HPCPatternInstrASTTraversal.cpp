@@ -17,8 +17,11 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 {
 	CurrentFn = Decl;
 	CurrentFnEntry = FunctionDB->Lookup(Decl);
-
+#ifdef PRINT_DEBUG
+	std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
+#endif
 	PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
+	PatternEndHandler.SetCurrentFnEntry(CurrentFnEntry);
 
 	return true;
 }
@@ -57,11 +60,14 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		{
 			/* Look up the database entry for this function */
 			FunctionDeclDatabaseEntry* DBEntry = FunctionDB->Lookup(Callee);
-
+#ifdef PRINT_DEBUG
+			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
+#endif
 			HPCParallelPattern* Top;
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
 				Top->AddFnCall(DBEntry);
+				DBEntry->AddCallerPattern(Top);
 			}
 		}
 	}
