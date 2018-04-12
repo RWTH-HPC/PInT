@@ -7,7 +7,7 @@
 /*
  * Function Declaration Database Entry functions
  */
-FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : Patterns(), CallerPatterns()
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : Patterns(), CallerPatterns(), FnCalls()
 {
 	this->BodyVisited = false;
 	this->FnName = Name;

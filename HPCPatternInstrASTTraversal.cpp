@@ -69,6 +69,10 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				Top->AddFnCall(DBEntry);
 				DBEntry->AddCallerPattern(Top);
 			}
+			else
+			{
+				CurrentFnEntry->AddFnCall(DBEntry);
+			}
 		}
 	}
 

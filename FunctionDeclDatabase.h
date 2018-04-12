@@ -30,6 +30,16 @@ public:
 		Patterns.push_back(Pattern);
 	}
 
+	void AddFnCall(FunctionDeclDatabaseEntry* FnCall)
+	{
+		FnCalls.push_back(FnCall);
+	}
+
+	std::vector<FunctionDeclDatabaseEntry*> GetFnCalls()
+	{
+		return FnCalls;
+	}	
+
 	unsigned GetHash() 
 	{
 		return Hash;
@@ -51,6 +61,7 @@ private:
 	unsigned Hash;
 	std::vector<HPCParallelPattern*> CallerPatterns;
 	std::vector<HPCParallelPattern*> Patterns;
+	std::vector<FunctionDeclDatabaseEntry*> FnCalls;
 };
 
 
