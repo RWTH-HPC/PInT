@@ -6,12 +6,12 @@
 class HPCPatternTreeVisualisation 
 {
 public:
-	static void PrintPatternTree();
+	static void PrintPatternTree(int maxdepth);
 
 private:
-	static void PrintPattern(HPCParallelPattern* Pattern, int depth);
+	static void PrintPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
 	
-	static void PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth);
+	static void PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth);
 	
 	static void PrintIndent(int depth);
 };

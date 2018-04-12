@@ -37,7 +37,7 @@ int main (int argc, const char** argv)
 
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
-	HPCPatternTreeVisualisation::PrintPatternTree();
+	HPCPatternTreeVisualisation::PrintPatternTree(10);
 
 	return retcode;
 }
