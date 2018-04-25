@@ -1,7 +1,8 @@
 #pragma once
 
 #include "HPCParallelPattern.h"
-#include "FunctionDeclDatabase.h"
+
+
 
 class HPCPatternTreeVisualisation 
 {

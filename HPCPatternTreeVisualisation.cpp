@@ -20,16 +20,19 @@ void HPCPatternTreeVisualisation::PrintPattern(HPCParallelPattern* Pattern, int 
 	}
 	
 	PrintIndent(depth);
-	std::cout << Pattern->GetPatternID() << std::endl;
+	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
+	std::cout << " (ID: " << Pattern->GetPatternID() << ")" << std::endl;
 
-	for (HPCParallelPattern* Child : Pattern->GetChildren())
+	for (PatternOccurence* Child : Pattern->GetChildren())
 	{
-		PrintPattern(Child, depth + 1, maxdepth);	
-	}
-
-	for (FunctionDeclDatabaseEntry* FnCall : Pattern->GetFnCalls())
-	{
-		PrintFunctionTree(FnCall, depth + 1, maxdepth);
+		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+		{
+			PrintFunctionTree(FnCall, depth + 1, maxdepth);
+		}
+		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
+		{
+			PrintPattern(Pattern, depth + 1, maxdepth);
+		}
 	}
 }
 	
@@ -41,16 +44,18 @@ void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* F
 	}
 
 	PrintIndent(depth);
-	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (" << FnCall->GetHash() << ")" << std::endl;
+	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
 
-	for (HPCParallelPattern* Pattern : FnCall->GetPatterns())
+	for (PatternOccurence* Child : FnCall->GetChildren())
 	{
-		PrintPattern(Pattern, depth + 1, maxdepth);
-	}
-
-	for (FunctionDeclDatabaseEntry* FnCall : FnCall->GetFnCalls())
-	{
-		PrintFunctionTree(FnCall, depth + 1, maxdepth);
+		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+		{
+			PrintFunctionTree(FnCall, depth + 1, maxdepth);
+		}
+		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
+		{
+			PrintPattern(Pattern, depth + 1, maxdepth);
+		}
 	}
 }
 	
@@ -60,7 +65,7 @@ void HPCPatternTreeVisualisation::PrintIndent(int depth)
 
 	for (; i < depth - 1; i++)
 	{
-		std::cout << "---";
+		std::cout << "    ";
 	}
 
 	for (; i < depth; i++)

@@ -1,6 +1,8 @@
 #include "HPCParallelPattern.h"
 
 #include <iostream>
+#include "clang/AST/ODRHash.h"
+
 
 
 /*
@@ -12,9 +14,60 @@ std::regex EndParallelPatternRegex("([[:alnum:]]+)");
 
 
 /*
+ * Function Declaration Database Entry functions
+ */
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternOccurence(OK_FnCall), Children()
+{
+	this->BodyVisited = false;
+	this->FnName = Name;
+	this->Hash = Hash;
+}	
+
+
+
+/*
+ * Function Declaration Database functions
+ */
+FunctionDeclDatabase::FunctionDeclDatabase() : Entries()
+{
+}
+
+FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Decl)
+{
+	clang::ODRHash Hash;
+	Hash.AddDecl(Decl);
+	unsigned HashVal = Hash.CalculateHash();		
+
+	std::string FnName = Decl->getNameInfo().getName().getAsString();	
+
+	// Search for an existing entry
+	for (FunctionDeclDatabaseEntry* e : Entries)
+	{	
+		if (e->GetHash() == HashVal)
+		{
+			return e;
+		}
+	}
+
+	// We found nothing, therefore we allocate a new entry
+	FunctionDeclDatabaseEntry* FuncEntry;
+	FuncEntry = new FunctionDeclDatabaseEntry(FnName, HashVal);
+	Entries.push_back(FuncEntry);
+
+	if (Decl->isMain())
+	{
+		MainFnEntry = FuncEntry;
+	}
+
+	return FuncEntry;
+}
+
+
+
+/*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString) : Parents(), Children(), FnCalls()
+HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString) : PatternOccurence(OK_Pattern), Parents(), Children()
 {
 	/* Match Regex and save info in member variables */
 	std::smatch MatchRes;
@@ -41,19 +94,14 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
 }
 
-void HPCParallelPattern::AddChild(HPCParallelPattern* Child) 
+void HPCParallelPattern::AddChild(PatternOccurence* Child) 
 {
 	Children.push_back(Child);
 }
 
-void HPCParallelPattern::AddParent(HPCParallelPattern* Parent)
+void HPCParallelPattern::AddParent(PatternOccurence* Parent)
 {
 	Parents.push_back(Parent);
-}
-
-void HPCParallelPattern::AddFnCall(FunctionDeclDatabaseEntry* Entry)
-{
-	FnCalls.push_back(Entry);
 }
 
 
@@ -82,6 +130,30 @@ DesignSpace StrToDesignSpace(std::string str)
 	else
 	{
 		return Unknown;
+	}
+}
+
+std::string DesignSpaceToStr(DesignSpace DesignSp)
+{
+	if (DesignSp == FindingConcurrency)
+	{
+		return "FindingConcurrency";
+	}
+	else if (DesignSp == AlgorithmStructure)
+	{
+		return "AlgorithmStructure";
+	}
+	else if (DesignSp == SupportingStructure)
+	{
+		return "SupportingStructre";
+	}
+	else if (DesignSp == ImplementationMechanism)
+	{
+		return "ImplementationMechanism";
+	}
+	else
+	{
+		return "Unknown";
 	}
 }
 

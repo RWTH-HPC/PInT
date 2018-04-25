@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FunctionDeclDatabase.h"
+#include "HPCParallelPattern.h"
 
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"

@@ -66,12 +66,11 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			HPCParallelPattern* Top;
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
-				Top->AddFnCall(DBEntry);
-				DBEntry->AddCallerPattern(Top);
+				Top->AddChild(DBEntry);
 			}
 			else
 			{
-				CurrentFnEntry->AddFnCall(DBEntry);
+				CurrentFnEntry->AddChild(DBEntry);
 			}
 		}
 	}

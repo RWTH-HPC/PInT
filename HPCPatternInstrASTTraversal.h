@@ -2,7 +2,6 @@
 
 #include "HPCPatternInstrHandler.h"
 #include "HPCParallelPattern.h"
-#include "FunctionDeclDatabase.h"
 
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/AST/ASTConsumer.h"

@@ -18,7 +18,7 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	
 	if (GetTopPatternStack() == NULL)
 	{	
-		CurrentFnEntry->AddPattern(Pattern);
+		CurrentFnEntry->AddChild(Pattern);
 	}
 
 	AddToPatternStack(Pattern);

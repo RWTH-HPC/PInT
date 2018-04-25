@@ -1,16 +1,12 @@
 #pragma once
 
-#include "FunctionDeclDatabase.h"
-
 #include <string>
 #include <regex>
 #include <vector>
 #include <stack>
+#include "clang/AST/Decl.h"
+#include "llvm/Support/Casting.h"
 
-
-/* Forward Declarations */
-class FunctionDeclDatabase;
-class FunctionDeclDatabaseEntry;
 
 // TODO Implement Exception for wrong pattern nesting
 
@@ -23,38 +19,144 @@ enum DesignSpace { Unknown, FindingConcurrency, AlgorithmStructure, SupportingSt
 
 DesignSpace StrToDesignSpace(std::string str);
 
+std::string DesignSpaceToStr(DesignSpace DesignSp);
+
+
+/*
+ * Abstract dummy class for nesting
+ */
+class PatternOccurence {
+public:
+	enum OccurenceKind 
+	{
+		OK_FnCall, 
+		OK_Pattern
+	};
+
+	OccurenceKind GetKind() const
+	{
+		return Kind;
+	}
+
+	PatternOccurence(OccurenceKind OK) : Kind(OK)
+	{
+
+	}
+
+	virtual void AddChild(PatternOccurence* Child) = 0;
+
+	virtual std::vector<PatternOccurence*> GetChildren() = 0;
+
+private:
+	const OccurenceKind Kind;
+};
+
+
+
+/*
+ * A struct for the database entries
+ */ 	
+class FunctionDeclDatabaseEntry : public PatternOccurence
+{
+public:
+	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash);
+
+	void AddChild(PatternOccurence* Child) 
+	{
+		Children.push_back(Child);
+	}
+
+	std::vector<PatternOccurence*> GetChildren()
+	{
+		return Children;
+	}	
+
+	unsigned GetHash() 
+	{
+		return Hash;
+	}
+
+	std::string GetFnName()
+	{
+		return FnName;
+	}
+
+	static bool classof(const PatternOccurence* PatternOcc)
+	{
+		return PatternOcc->GetKind() == PatternOccurence::OK_FnCall;
+	}
+	
+private:
+	bool BodyVisited;	
+	std::string FnName;
+	unsigned Hash;
+	std::vector<PatternOccurence*> Children;
+};
+
+
+
+class FunctionDeclDatabase
+{
+public:
+	FunctionDeclDatabaseEntry* Lookup(clang::FunctionDecl* Decl);
+
+	static FunctionDeclDatabase* GetInstance() 
+	{
+		static FunctionDeclDatabase Instance;
+		return &Instance;
+	}
+
+	FunctionDeclDatabaseEntry* GetMainFnEntry() { return MainFnEntry; }
+
+private:
+	FunctionDeclDatabase();
+	
+	// Prevent construction of another instance by copying
+	FunctionDeclDatabase(const FunctionDeclDatabase&);
+	FunctionDeclDatabase& operator = (const FunctionDeclDatabase&);
+
+	std::vector<FunctionDeclDatabaseEntry*> Entries;
+
+	FunctionDeclDatabaseEntry* MainFnEntry;
+};
+
 
 
 /*
  * HPC Parallel Pattern Class
  */
-class HPCParallelPattern {
+class HPCParallelPattern : public PatternOccurence {
 public:
 	HPCParallelPattern(std::string HPCPatternInstrString);
 	
 	void Print();
 
-	void AddChild(HPCParallelPattern* Child);
+	void AddChild(PatternOccurence* Child);
 
-	void AddParent(HPCParallelPattern* Pattern);
-
-	void AddFnCall(FunctionDeclDatabaseEntry* Entry);
+	void AddParent(PatternOccurence* Parent);
 
 	std::string GetPatternID() { return this->PatternID; }
 
-	std::vector<HPCParallelPattern*> GetChildren() { return this->Children; }
+	std::string GetPatternName() { return this->PatternName; }
 
-	std::vector<FunctionDeclDatabaseEntry*> GetFnCalls() { return this->FnCalls; }
+	std::string GetDesignSpaceStr() { return DesignSpaceToStr(this->DesignSp); }
+
+	DesignSpace GetDesignSpace() { return DesignSp; }
+
+	std::vector<PatternOccurence*> GetChildren() { return this->Children; }
+
+	static bool classof(const PatternOccurence* PatternOcc)
+	{
+		return PatternOcc->GetKind() == PatternOccurence::OK_Pattern;
+	}
 	
 private:	
 	DesignSpace DesignSp;
 	std::string PatternName;
 	std::string PatternID;
-
-	std::vector<HPCParallelPattern*> Parents;
-	std::vector<HPCParallelPattern*> Children;
-
-	std::vector<FunctionDeclDatabaseEntry*> FnCalls;
+	
+	std::vector<PatternOccurence*> Parents;
+	std::vector<PatternOccurence*> Children;
 };
 
 
