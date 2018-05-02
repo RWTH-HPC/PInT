@@ -14,7 +14,7 @@ void SimplePatternCountStatistic::Calculate()
 	FunctionDeclDatabase* FnDb = FunctionDeclDatabase::GetInstance();
 	FunctionDeclDatabaseEntry* MainFn = FnDb->GetMainFnEntry();
 
-	VisitFunctionCall(MainFn);
+	VisitFunctionCall(MainFn, 0, 10);
 }
 
 void SimplePatternCountStatistic::Print()
@@ -25,24 +25,29 @@ void SimplePatternCountStatistic::Print()
 	}	
 }
 
-void SimplePatternCountStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry)
+void SimplePatternCountStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth)
 {
 	/* Do nothing, but visit the children */
 	for (PatternOccurence* Child : FnEntry->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
-			VisitFunctionCall(FnCall);
+			VisitFunctionCall(FnCall, depth + 1, maxdepth);
 		}
 		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
 		{
-			VisitPattern(Pattern);
+			VisitPattern(Pattern, depth + 1, maxdepth);
 		}
 	}
 }
 
-void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern)
+void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth)
 {
+	if (depth > maxdepth)
+	{
+		return;
+	}
+
 	/* Look up this pattern. If there is no entry, create a new one */
 	SimplePatternCountStatistic::PatternOccurenceCounter* Counter = LookupPatternOcc(Pattern);
 
@@ -61,11 +66,11 @@ void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern)
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
-			VisitFunctionCall(FnCall);
+			VisitFunctionCall(FnCall, depth + 1, maxdepth);
 		}
 		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
 		{
-			VisitPattern(Pattern);
+			VisitPattern(Pattern, depth + 1, maxdepth);
 		}
 	}
 }

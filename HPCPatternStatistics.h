@@ -12,9 +12,9 @@ public:
 	virtual void Print() = 0;
 
 private:
-	virtual void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry) = 0;
+	virtual void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth) = 0;
 
-	virtual void VisitPattern(HPCParallelPattern* Pattern) = 0;
+	virtual void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth) = 0;
 };
 
 
@@ -36,9 +36,9 @@ private:
 		int Count = 0;
 	};
 
-	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry);
+	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
 
-	void VisitPattern(HPCParallelPattern* Pattern);
+	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
 
 	PatternOccurenceCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
 
