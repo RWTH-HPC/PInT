@@ -2,6 +2,8 @@
 
 #include "HPCParallelPattern.h"
 
+
+
 class HPCPatternStatistic
 {
 public:
@@ -10,39 +12,37 @@ public:
 	virtual void Print() = 0;
 
 private:
-	virtual void VisitFunction(FunctionDeclDatabaseEntry* FnEntry);
+	virtual void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry) = 0;
 
-	virtual void VisitPattern(HPCParallelPattern* Pattern);
-}
+	virtual void VisitPattern(HPCParallelPattern* Pattern) = 0;
+};
 
 
 
 class SimplePatternCountStatistic : public HPCPatternStatistic
 {
 public:
-	SimplePatternCountStatistic() : PatternOccCounter()
-	{
-	}	
+	SimplePatternCountStatistic();	
 
 	void Calculate();
 
 	void Print();
 
 private:
-	void VisitFunction(FunctionDeclDatabaseEntry* FnEntry);
-
-	void VisitPattern(HPCParallelPattern* Pattern);
-
-	PatternOccurenceCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
-
-	AddPatternOcc(HPCParallelPattern* Pattern);
-	
 	struct PatternOccurenceCounter
 	{
 		DesignSpace PatternDesignSp;
 		std::string PatternName;
 		int Count = 0;
-	}
+	};
 
+	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry);
+
+	void VisitPattern(HPCParallelPattern* Pattern);
+
+	PatternOccurenceCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
+
+	PatternOccurenceCounter* AddPatternOcc(HPCParallelPattern* Pattern);
+	
 	std::vector<PatternOccurenceCounter*> PatternOccCounter;
-}
+};

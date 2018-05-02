@@ -1,5 +1,6 @@
 #include "HPCPatternInstrASTTraversal.h"
 #include "HPCPatternTreeVisualisation.h"
+#include "HPCPatternStatistics.h"
 
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
@@ -11,6 +12,8 @@
 static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options");
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
+
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic() };
 
 /*! \brief Tool entry point.
  *
@@ -38,6 +41,12 @@ int main (int argc, const char** argv)
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	HPCPatternTreeVisualisation::PrintPatternTree(10);
+
+	for (HPCPatternStatistic* Stat : Statistics)
+	{
+		Stat->Calculate();
+		Stat->Print();
+	}
 
 	return retcode;
 }
