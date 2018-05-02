@@ -16,8 +16,11 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 
-#define PATTERN_BEGIN_FNNAME "Pattern_Begin"
-#define PATTERN_END_FNNAME "Pattern_End"
+#define PATTERN_BEGIN_C_FNNAME "PatternInstrumentation_Pattern_Begin"
+#define PATTERN_END_C_FNNAME "PatternInstrumentation_Pattern_End"
+
+#define PATTERN_BEGIN_CXX_FNNAME "Pattern_Begin"
+#define PATTERN_END_CXX_FNNAME "Pattern_End"
 
 
 class HPCPatternInstrVisitor : public clang::RecursiveASTVisitor<HPCPatternInstrVisitor> 

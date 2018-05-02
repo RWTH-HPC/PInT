@@ -39,7 +39,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		std::string FnName = Callee->getNameInfo().getName().getAsString();	
 
 		// Is this a call to our pattern functions?
-		if (!FnName.compare(PATTERN_BEGIN_FNNAME))
+		if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
 		{
 			clang::Expr** Args = CallExpr->getArgs();
 #ifdef PRINT_DEBUG
@@ -47,7 +47,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #endif
 			PatternBeginFinder.match(*Args[0], *Context);
 		}
-		else if (!FnName.compare(PATTERN_END_FNNAME))
+		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 		{
 			clang::Expr** Args = CallExpr->getArgs();
 #ifdef PRINT_DEBUG
