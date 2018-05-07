@@ -46,3 +46,34 @@ private:
 	
 	std::vector<PatternOccurenceCounter*> PatternOccCounter;
 };
+
+
+
+class FanInFanOutStatistic : public HPCPatternStatistic
+{
+public:
+	FanInFanOutStatistic();
+
+	void Calculate();
+
+	void Print();
+
+private:
+	struct FanInFanOutCounter
+	{
+		DesignSpace PatternDesignSp;
+		std::string PatternName;
+		int FanIn = 0;
+		int FanOut = 0;
+	};
+
+	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
+
+	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
+
+	FanInFanOutCounter* LookupFIFOCounter(HPCParallelPattern* Pattern);
+
+	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
+
+	std::vector<FanInFanOutCounter*> FIFOCounter;
+};
