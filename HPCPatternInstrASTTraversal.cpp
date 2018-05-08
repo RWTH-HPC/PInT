@@ -67,10 +67,12 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
 				Top->AddChild(DBEntry);
+				DBEntry->AddParent(Top);
 			}
 			else
 			{
 				CurrentFnEntry->AddChild(DBEntry);
+				DBEntry->AddParent(CurrentFnEntry);
 			}
 		}
 	}
