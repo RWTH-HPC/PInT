@@ -23,6 +23,16 @@ FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned
 	this->Hash = Hash;
 }	
 
+void FunctionDeclDatabaseEntry::AddChild(PatternOccurence* Child)
+{
+	Children.push_back(Child);
+}
+
+void FunctionDeclDatabaseEntry::AddParent(PatternOccurence* Parent)
+{
+	Parents.push_back(Parent);
+}
+
 
 
 /*
@@ -76,14 +86,6 @@ HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString) : Patt
 	this->DesignSp = StrToDesignSpace(MatchRes[1].str());
 	this->PatternName = MatchRes[2].str();
 	this->PatternID = MatchRes[3].str();
-
-	/* Initialise children and parent vectors */
-	if (!Context.empty())
-	{
-		HPCParallelPattern* Parent = GetTopPatternStack();
-		Parents.push_back(Parent);
-		Parent->AddChild(this);
-	}
 }
 
 void HPCParallelPattern::Print() 
@@ -162,18 +164,18 @@ std::string DesignSpaceToStr(DesignSpace DesignSp)
 /*
  * Pattern Stack Management
  */
-std::stack<HPCParallelPattern*> Context;
+std::stack<HPCParallelPattern*> PatternContext;
 
 void AddToPatternStack(HPCParallelPattern* Pattern)
 {
-	Context.push(Pattern);
+	PatternContext.push(Pattern);
 }
 
 HPCParallelPattern* GetTopPatternStack() 
 {
-	if (!Context.empty())
+	if (!PatternContext.empty())
 	{
-		return Context.top();
+		return PatternContext.top();
 	}
 	else
 	{
@@ -183,16 +185,16 @@ HPCParallelPattern* GetTopPatternStack()
 
 void RemoveFromPatternStack(std::string ID)
 {
-	if (!Context.empty())
+	if (!PatternContext.empty())
 	{
-		HPCParallelPattern* Top = Context.top();	
+		HPCParallelPattern* Top = PatternContext.top();	
 		
 		if (!Top->GetPatternID().compare(ID))
 		{
 			// TODO Thorw an Exception here
 		}
 		
-		Context.pop();
+		PatternContext.pop();
 	}
 }
 

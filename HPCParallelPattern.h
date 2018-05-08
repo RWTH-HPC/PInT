@@ -45,7 +45,11 @@ public:
 
 	virtual void AddChild(PatternOccurence* Child) = 0;
 
+	virtual void AddParent(PatternOccurence* Parent) = 0;
+
 	virtual std::vector<PatternOccurence*> GetChildren() = 0;
+
+	virtual std::vector<PatternOccurence*> GetParents() = 0;
 
 private:
 	const OccurenceKind Kind;
@@ -61,15 +65,19 @@ class FunctionDeclDatabaseEntry : public PatternOccurence
 public:
 	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash);
 
-	void AddChild(PatternOccurence* Child) 
-	{
-		Children.push_back(Child);
-	}
+	void AddChild(PatternOccurence* Child);
+	
+	void AddParent(PatternOccurence* Parent);
 
 	std::vector<PatternOccurence*> GetChildren()
 	{
 		return Children;
 	}	
+
+	std::vector<PatternOccurence*> GetParents()
+	{
+		return Parents;
+	}
 
 	unsigned GetHash() 
 	{
@@ -91,6 +99,7 @@ private:
 	std::string FnName;
 	unsigned Hash;
 	std::vector<PatternOccurence*> Children;
+	std::vector<PatternOccurence*> Parents;
 };
 
 
@@ -145,6 +154,8 @@ public:
 
 	std::vector<PatternOccurence*> GetChildren() { return this->Children; }
 
+	std::vector<PatternOccurence*> GetParents() { return this->Parents; }
+
 	static bool classof(const PatternOccurence* PatternOcc)
 	{
 		return PatternOcc->GetKind() == PatternOccurence::OK_Pattern;
@@ -173,7 +184,7 @@ extern std::regex EndParallelPatternRegex;
 /* 
  * Stack Management
  */
-extern std::stack<HPCParallelPattern*> Context;
+extern std::stack<HPCParallelPattern*> PatternContext;
 
 void AddToPatternStack(HPCParallelPattern* Pattern);
 
