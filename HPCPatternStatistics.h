@@ -67,6 +67,11 @@ private:
 		int FanOut = 0;
 	};
 
+	enum SearchDirection
+	{
+		DIR_Children, DIR_Parents
+	};
+
 	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
 
 	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
@@ -74,6 +79,12 @@ private:
 	FanInFanOutCounter* LookupFIFOCounter(HPCParallelPattern* Pattern);
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
+
+	void FindParentPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Parents, int maxdepth);
+	
+	void FindChildPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Children, int maxdepth);
+
+	void FindNeighbourPatternsRec(PatternOccurence* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	std::vector<FanInFanOutCounter*> FIFOCounter;
 };

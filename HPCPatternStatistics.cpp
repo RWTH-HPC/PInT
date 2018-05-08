@@ -128,7 +128,12 @@ void FanInFanOutStatistic::Calculate()
 
 void FanInFanOutStatistic::Print()
 {
-
+	for (FanInFanOutCounter* Counter : FIFOCounter)
+	{
+		std::cout << "Pattern \033[33m" << Counter->PatternName << "\033[0m has" << std::endl;
+		std::cout << "Fan-In: " << Counter->FanIn << std::endl;
+		std::cout << "Fan-Out: " << Counter->FanOut << std::endl;
+	}
 }
 
 void FanInFanOutStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth)
@@ -154,24 +159,29 @@ void FanInFanOutStatistic::VisitPattern(HPCParallelPattern* Pattern, int depth, 
 	if (Counter == NULL)
 	{
 		Counter = AddFIFOCounter(Pattern);
-	}
 
-	/* Search in child direction */
+		/* Search in Parent and Child Directions */
+		std::vector<HPCParallelPattern*> Parents;
+		FindParentPatterns(Pattern, Parents, maxdepth);
 
-	/* Search in parent direction */
+		std::vector<HPCParallelPattern*> Children;
+		FindChildPatterns(Pattern, Children, maxdepth);
 
-	// TODO Implement actual computation
+		/* Calculate the resulting fan-in and fan-out numbers */
+		Counter->FanIn = Parents.size();
+		Counter->FanOut = Children.size();
 
-	/* Continue with visiting the children */
-	for (PatternOccurence* Child : Pattern->GetChildren())
-	{
-		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+		/* Continue with visiting the children */
+		for (PatternOccurence* Child : Pattern->GetChildren())
 		{
-			VisitFunctionCall(FnCall, depth + 1, maxdepth);
-		}
-		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
-		{
-			VisitPattern(Pattern, depth + 1, maxdepth);
+			if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+			{
+				VisitFunctionCall(FnCall, depth + 1, maxdepth);
+			}
+			else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
+			{
+				VisitPattern(Pattern, depth + 1, maxdepth);
+			}
 		}
 	}
 }
@@ -198,4 +208,54 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
 	Counter->PatternName = Pattern->GetPatternName();
 	FIFOCounter.push_back(Counter);
 	return Counter;
+}
+
+void FanInFanOutStatistic::FindParentPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Parents, int maxdepth)
+{
+	FindNeighbourPatternsRec(Start, Parents, DIR_Parents, 0, maxdepth);
+}
+
+void FanInFanOutStatistic::FindChildPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Children, int maxdepth)
+{
+	FindNeighbourPatternsRec(Start, Children, DIR_Children, 0, maxdepth);
+}
+
+void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternOccurence* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth)
+{
+
+	/* If the current node is a pattern node, add the node to the result list and do not descend further */
+	if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Current))
+	{
+		Results.push_back(Pattern);
+		return;
+	}
+
+	/* Check, if we reached the maximum depth */
+	if (depth >= maxdepth)
+	{
+		return;
+	}
+
+	/* Get the neighbouring nodes depending on the defined search direction */
+	std::vector<PatternOccurence*> Neighbours;
+
+	if (dir == DIR_Parents)
+	{
+		Neighbours = Current->GetParents();
+	}
+	else if (dir == DIR_Children)
+	{
+		Neighbours = Current->GetChildren();
+	}
+	else
+	{
+		// TODO Possibly throw an error here
+		return; 
+	}
+
+	/* Visit all the neighbouring nodes according to the given direction */
+	for (PatternOccurence* Neighbour : Neighbours)
+	{
+		FindNeighbourPatternsRec(Neighbour, Results, dir, depth + 1, maxdepth);
+	}
 }
