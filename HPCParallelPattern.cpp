@@ -16,7 +16,7 @@ std::regex EndParallelPatternRegex("([[:alnum:]]+)");
 /*
  * Function Declaration Database Entry functions
  */
-FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternOccurence(OK_FnCall), Children()
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternOccurence(OK_FnCall), Children(), Parents()
 {
 	this->BodyVisited = false;
 	this->FnName = Name;
@@ -113,19 +113,19 @@ void HPCParallelPattern::AddParent(PatternOccurence* Parent)
  */
 DesignSpace StrToDesignSpace(std::string str)
 {
-	if (str.compare("FindingConcurrency")) 
+	if (!str.compare("FindingConcurrency")) 
 	{
 		return FindingConcurrency;
 	}
-	else if (str.compare("AlgorithmStructure"))
+	else if (!str.compare("AlgorithmStructure"))
 	{
 		return AlgorithmStructure;
 	}
-	else if (str.compare("SupportingStructure"))
+	else if (!str.compare("SupportingStructure"))
 	{
 		return SupportingStructure;	
 	}
-	else if (str.compare("ImplementationMechanism"))
+	else if (!str.compare("ImplementationMechanism"))
 	{
 		return ImplementationMechanism;
 	}
