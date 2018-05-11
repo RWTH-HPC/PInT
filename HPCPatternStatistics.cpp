@@ -159,6 +159,9 @@ void FanInFanOutStatistic::VisitPattern(HPCParallelPattern* Pattern, int depth, 
 		return;
 	}
 
+	// TODO check if the results are correct
+	// TODO find a way to deal with recursion
+	
 	FanInFanOutCounter* Counter = LookupFIFOCounter(Pattern);
 
 	if (Counter == NULL)
