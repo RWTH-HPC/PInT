@@ -156,6 +156,14 @@ public:
 
 	std::vector<PatternOccurence*> GetParents() { return this->Parents; }
 
+	void SetFirstLine (int FirstLine) { this->FirstLine = FirstLine; }
+
+	int GetFirstLine () { return this->FirstLine; }
+
+	void SetLastLine (int LastLine) { this->LastLine = LastLine; }
+	
+	int GetLastLine () { return this->LastLine; }
+	
 	static bool classof(const PatternOccurence* PatternOcc)
 	{
 		return PatternOcc->GetKind() == PatternOccurence::OK_Pattern;
@@ -165,6 +173,9 @@ private:
 	DesignSpace DesignSp;
 	std::string PatternName;
 	std::string PatternID;
+
+	int FirstLine;
+	int LastLine;
 	
 	std::vector<PatternOccurence*> Parents;
 	std::vector<PatternOccurence*> Children;
