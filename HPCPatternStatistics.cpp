@@ -176,6 +176,21 @@ void FanInFanOutStatistic::VisitPattern(HPCParallelPattern* Pattern, int depth, 
 	std::vector<HPCParallelPattern*> Children;
 	FindChildPatterns(Pattern, Children, maxdepth);
 
+	Pattern->Print();
+	std::cout << std::endl << "has parents" << std::endl;
+
+	for (HPCParallelPattern* Parent : Parents)
+	{
+		Parent->Print();
+	}
+
+	std::cout << std::endl << std::endl << "has children" << std::endl;
+
+	for (HPCParallelPattern* Child : Children)
+	{
+		Child->Print();
+	}
+
 	/* Calculate the resulting fan-in and fan-out numbers */
 	Counter->FanIn += Parents.size();
 	Counter->FanOut += Children.size();

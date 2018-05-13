@@ -12,10 +12,14 @@ class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::Mat
 public:
 	void SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry);
 
+	HPCParallelPattern* GetLastPattern() { return LastPattern; }
+
 	virtual void run (const clang::ast_matchers::MatchFinder::MatchResult &Result);
 
 private:
 	FunctionDeclDatabaseEntry* CurrentFnEntry;
+
+	HPCParallelPattern* LastPattern;
 };
 
 
@@ -25,8 +29,12 @@ class HPCPatternEndInstrHandler : public clang::ast_matchers::MatchFinder::Match
 public:
 	void SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry);
 
+	HPCParallelPattern* GetLastPattern() { return LastPattern; }
+
 	virtual void run (const clang::ast_matchers::MatchFinder::MatchResult &Result);
 
 private:
 	FunctionDeclDatabaseEntry* CurrentFnEntry;
+
+	HPCParallelPattern* LastPattern;
 };

@@ -46,9 +46,8 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			Args[0]->dump();
 #endif
-			PatternBeginFinder.match(*Args[0], *Context);
-		
-			HPCParallelPattern* Pattern = GetTopPatternStack();
+			PatternBeginFinder.match(*Args[0], *Context);	
+			HPCParallelPattern* Pattern = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
@@ -62,15 +61,14 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			Args[0]->dump();
 #endif
-			HPCParallelPattern* Pattern = GetTopPatternStack();
+			PatternEndFinder.match(*Args[0], *Context);
+			HPCParallelPattern* Pattern = PatternEndHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();		
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 			Pattern->SetLastLine(SourceLoc.getLineNumber() - 1);
-
-			PatternEndFinder.match(*Args[0], *Context);
 		}
 		// If no: search the called function for patterns
 		else

@@ -6,14 +6,6 @@
 
 
 /*
- * Regular Expressions
- */
-std::regex BeginParallelPatternRegex("([[:alnum:]]+)\\s([[:alnum:]]+)\\s([[:alnum:]]+)");
-std::regex EndParallelPatternRegex("([[:alnum:]]+)");
-
-
-
-/*
  * Function Declaration Database Entry functions
  */
 FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternOccurence(OK_FnCall), Children(), Parents()
@@ -77,21 +69,17 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(std::string HPCPatternInstrString) : PatternOccurence(OK_Pattern), Parents(), Children()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternOccurence(OK_Pattern), Parents(), Children()
 {
-	/* Match Regex and save info in member variables */
-	std::smatch MatchRes;
-	std::regex_search(HPCPatternInstrString, MatchRes, BeginParallelPatternRegex);
-
-	this->DesignSp = StrToDesignSpace(MatchRes[1].str());
-	this->PatternName = MatchRes[2].str();
-	this->PatternID = MatchRes[3].str();
+	this->DesignSp = DesignSp;
+	this->PatternName = PatternName;
+	this->PatternID = PatternID;
 }
 
 void HPCParallelPattern::Print() 
 {
-	std::cout << "Pattern Info:" << std::endl;
-	std::cout << "Pattern Design Space: " << this->DesignSp << std::endl;
+	std::cout << "Pattern Info" << std::endl;
+	std::cout << "Pattern Design Space: " << DesignSpaceToStr(this->DesignSp) << std::endl;
 	std::cout << "Pattern Name: " << this->PatternName << std::endl;
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
 }
@@ -104,6 +92,41 @@ void HPCParallelPattern::AddChild(PatternOccurence* Child)
 void HPCParallelPattern::AddParent(PatternOccurence* Parent)
 {
 	Parents.push_back(Parent);
+}
+
+
+
+/*
+ * HPC Pattern Database Functions
+ */
+HPCPatternDatabase::HPCPatternDatabase() : Patterns()
+{
+	
+}
+
+HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(std::string ID)
+{
+	/* Go through the list of parallel patterns to find the parallel pattern with the given identifier */
+	for (HPCParallelPattern* Pattern : Patterns)
+	{
+		if (!ID.compare(Pattern->GetPatternName()))
+		{
+			return Pattern;
+		}
+	}
+
+	return NULL;
+}
+
+void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
+{
+	if (LookupParallelPattern(Pattern->GetPatternName()) != NULL)
+	{
+		return;
+		// TODO throw exception because of duplicate pattern!
+	}
+
+	Patterns.push_back(Pattern);
 }
 
 
@@ -183,15 +206,15 @@ HPCParallelPattern* GetTopPatternStack()
 	}
 }
 
-void RemoveFromPatternStack(std::string ID)
+void RemoveFromPatternStack(HPCParallelPattern* Pattern)
 {
 	if (!PatternContext.empty())
 	{
 		HPCParallelPattern* Top = PatternContext.top();	
 		
-		if (!Top->GetPatternID().compare(ID))
+		if (Top != Pattern)
 		{
-			// TODO Thorw an Exception here
+			// TODO Throw an Exception here
 		}
 		
 		PatternContext.pop();

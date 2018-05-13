@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <regex>
 #include <vector>
 #include <stack>
 #include "clang/AST/Decl.h"
@@ -136,7 +135,7 @@ private:
  */
 class HPCParallelPattern : public PatternOccurence {
 public:
-	HPCParallelPattern(std::string HPCPatternInstrString);
+	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID);
 	
 	void Print();
 
@@ -183,12 +182,28 @@ private:
 
 
 
-/*
- * Regular Expressions
- */
-extern std::regex BeginParallelPatternRegex;
+class HPCPatternDatabase 
+{
+public:
+	HPCParallelPattern* LookupParallelPattern(std::string ID);
+	
+	void AddParallelPattern(HPCParallelPattern* Pattern);
 
-extern std::regex EndParallelPatternRegex;
+	static HPCPatternDatabase* GetInstance() 
+	{
+		static HPCPatternDatabase Instance;
+		return &Instance;
+	}
+
+private:
+	HPCPatternDatabase();
+
+	// Prevent construction of another instance by copying
+	HPCPatternDatabase(const HPCPatternDatabase&);
+	HPCPatternDatabase& operator = (const HPCPatternDatabase&);
+	
+	std::vector<HPCParallelPattern*> Patterns;
+};
 
 
 
@@ -201,4 +216,4 @@ void AddToPatternStack(HPCParallelPattern* Pattern);
 
 HPCParallelPattern* GetTopPatternStack();
 
-void RemoveFromPatternStack(std::string ID);
+void RemoveFromPatternStack(HPCParallelPattern* Pattern);
