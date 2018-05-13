@@ -109,7 +109,7 @@ HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(std::string ID)
 	/* Go through the list of parallel patterns to find the parallel pattern with the given identifier */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		if (!ID.compare(Pattern->GetPatternName()))
+		if (!ID.compare(Pattern->GetPatternID()))
 		{
 			return Pattern;
 		}
@@ -120,7 +120,7 @@ HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(std::string ID)
 
 void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 {
-	if (LookupParallelPattern(Pattern->GetPatternName()) != NULL)
+	if (LookupParallelPattern(Pattern->GetPatternID()) != NULL)
 	{
 		return;
 		// TODO throw exception because of duplicate pattern!
