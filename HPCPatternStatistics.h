@@ -10,11 +10,6 @@ public:
 	virtual void Calculate() = 0;
 
 	virtual void Print() = 0;
-
-private:
-	virtual void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth) = 0;
-
-	virtual void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth) = 0;
 };
 
 
