@@ -1,5 +1,6 @@
 #include "HPCPatternStatistics.h"
 #include <iostream>
+#include <fstream>
 
 
 
@@ -30,7 +31,17 @@ void SimplePatternCountStatistic::Print()
 
 void SimplePatternCountStatistic::CSVExport(std::string FileName)
 {
+	std::ofstream File;
+	File.open(FileName, std::ios::app);
 
+	File << "Patternname" << CSV_SEPARATOR_CHAR << "Count\n";
+
+	for (PatternOccurenceCounter* Counter : PatternOccCounter)
+	{
+		File << Counter->PatternName << CSV_SEPARATOR_CHAR << Counter->Count << "\n";
+	}	
+
+	File.close();
 }
 
 void SimplePatternCountStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth)
@@ -161,7 +172,17 @@ void FanInFanOutStatistic::Print()
 
 void FanInFanOutStatistic::CSVExport(std::string FileName)
 {
+	std::ofstream File;
+	File.open(FileName, std::ios::app);
 
+	File << "Patternname" << CSV_SEPARATOR_CHAR << "FanIn" << CSV_SEPARATOR_CHAR << "FanOut" << "\n";
+
+	for (FanInFanOutCounter* Counter : FIFOCounter)
+	{
+		File << Counter->PatternName << CSV_SEPARATOR_CHAR << Counter->FanIn << CSV_SEPARATOR_CHAR << Counter->FanOut << "\n";
+	}	
+
+	File.close();
 }
 
 FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::LookupFIFOCounter(HPCParallelPattern* Pattern)

@@ -2,6 +2,8 @@
 
 #include "HPCParallelPattern.h"
 
+#define CSV_SEPARATOR_CHAR ","
+
 
 
 class HPCPatternStatistic

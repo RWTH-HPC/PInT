@@ -48,5 +48,8 @@ int main (int argc, const char** argv)
 		Stat->Print();
 	}
 
+	Statistics[0]->CSVExport("Counts.csv");
+	Statistics[1]->CSVExport("FIFO.csv");
+
 	return retcode;
 }
