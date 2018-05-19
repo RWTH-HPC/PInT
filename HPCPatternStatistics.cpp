@@ -28,6 +28,11 @@ void SimplePatternCountStatistic::Print()
 	}	
 }
 
+void SimplePatternCountStatistic::CSVExport(std::string FileName)
+{
+
+}
+
 void SimplePatternCountStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
@@ -152,6 +157,11 @@ void FanInFanOutStatistic::Print()
 		std::cout << "Fan-In: " << Counter->FanIn << std::endl;
 		std::cout << "Fan-Out: " << Counter->FanOut << std::endl;
 	}
+}
+
+void FanInFanOutStatistic::CSVExport(std::string FileName)
+{
+
 }
 
 FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::LookupFIFOCounter(HPCParallelPattern* Pattern)

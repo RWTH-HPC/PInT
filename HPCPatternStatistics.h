@@ -10,6 +10,8 @@ public:
 	virtual void Calculate() = 0;
 
 	virtual void Print() = 0;
+
+	virtual void CSVExport(std::string FileName) = 0;
 };
 
 
@@ -22,6 +24,8 @@ public:
 	void Calculate();
 
 	void Print();
+
+	void CSVExport(std::string FileName);
 
 private:
 	struct PatternOccurenceCounter
@@ -52,6 +56,8 @@ public:
 	void Calculate();
 
 	void Print();
+
+	void CSVExport(std::string FileName);
 
 private:
 	struct FanInFanOutCounter
