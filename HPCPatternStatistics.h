@@ -47,7 +47,7 @@ private:
 class FanInFanOutStatistic : public HPCPatternStatistic
 {
 public:
-	FanInFanOutStatistic();
+	FanInFanOutStatistic(int maxdepth);
 
 	void Calculate();
 
@@ -80,6 +80,8 @@ private:
 	void FindChildPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Children, int maxdepth);
 
 	void FindNeighbourPatternsRec(PatternOccurence* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth);
+
+	int maxdepth;
 
 	std::vector<FanInFanOutCounter*> FIFOCounter;
 };

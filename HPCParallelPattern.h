@@ -189,6 +189,8 @@ public:
 	
 	void AddParallelPattern(HPCParallelPattern* Pattern);
 
+	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
+
 	static HPCPatternDatabase* GetInstance() 
 	{
 		static HPCPatternDatabase Instance;
