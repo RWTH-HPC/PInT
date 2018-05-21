@@ -123,7 +123,7 @@ void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 	if (LookupParallelPattern(Pattern->GetPatternID()) != NULL)
 	{
 		return;
-		// TODO throw exception because of duplicate pattern!
+		std::cout << "\033[31m" << "Pattern already exists in the database." << "\033[0m" << std::endl;
 	}
 
 	Patterns.push_back(Pattern);
