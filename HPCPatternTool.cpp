@@ -13,7 +13,7 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
-static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10) };
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic() };
 
 /*! \brief Tool entry point.
  *
@@ -50,6 +50,7 @@ int main (int argc, const char** argv)
 
 	Statistics[0]->CSVExport("Counts.csv");
 	Statistics[1]->CSVExport("FIFO.csv");
+	Statistics[2]->CSVExport("LOC.csv");
 
 	return retcode;
 }

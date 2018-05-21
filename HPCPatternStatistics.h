@@ -18,6 +18,18 @@ public:
 
 
 
+class LinesOfCodeStatistic : public HPCPatternStatistic
+{
+public:
+	void Calculate();
+	
+	void Print();
+
+	void CSVExport(std::string FileName);
+};
+
+
+
 class SimplePatternCountStatistic : public HPCPatternStatistic
 {
 public:

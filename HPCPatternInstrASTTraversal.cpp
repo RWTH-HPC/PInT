@@ -53,7 +53,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocStart = CallExpr->getLocStart();
 			clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
-			Pattern->SetFirstLine(SourceLoc.getLineNumber() + 1);
+			Pattern->SetFirstLine(SourceLoc.getLineNumber());
 		}
 		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 		{
@@ -68,7 +68,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();		
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-			Pattern->SetLastLine(SourceLoc.getLineNumber() - 1);
+			Pattern->SetLastLine(SourceLoc.getLineNumber());
 		}
 		// If no: search the called function for patterns
 		else

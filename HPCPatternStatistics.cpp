@@ -5,6 +5,74 @@
 
 
 /*
+ * Methods for the lines of code statistic
+ */
+void LinesOfCodeStatistic::Calculate()
+{
+
+}
+
+void LinesOfCodeStatistic::Print()
+{
+	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
+	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+
+	for (HPCParallelPattern* Pattern : Patterns)
+	{
+		std::cout << Pattern->GetPatternName() << " \033[33m" << Pattern->GetPatternID() << "\033[0m"  << " has " << Pattern->GetTotalLinesOfCode() << " line(s) of code in total:" << std::endl;
+		
+		std::vector<int> LinesOfCode = Pattern->GetLinesOfCode();
+		int numregions = LinesOfCode.size();
+
+		std::cout << numregions << " region(s) with ";
+
+		for (int i = 0; i < numregions - 1; i++)
+		{
+			std::cout << LinesOfCode.at(i) << ", ";
+		}
+
+		std::cout << LinesOfCode.at(numregions - 1) << " line(s) of code respectively." << std::endl;
+	}
+}
+
+void LinesOfCodeStatistic::CSVExport(std::string FileName)
+{
+	std::ofstream File;
+	File.open(FileName, std::ios::app);
+
+	File << "Patternname" << CSV_SEPARATOR_CHAR << "NumRegions" << CSV_SEPARATOR_CHAR << "LOCByRegions" << CSV_SEPARATOR_CHAR << "TotalLOCs\n";
+
+	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
+	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+
+	for (HPCParallelPattern* Pattern : Patterns)
+	{
+		File << Pattern->GetPatternName() << " " << Pattern->GetPatternID() << CSV_SEPARATOR_CHAR;
+		
+		std::vector<int> LinesOfCode = Pattern->GetLinesOfCode();
+		int numregions = LinesOfCode.size();
+
+		File << numregions << CSV_SEPARATOR_CHAR;
+
+		/* Print the list of LOCs per pattern region with quotes */
+		File << "\"";	
+		for (int i = 0; i < numregions - 1; i++)
+		{
+			File << LinesOfCode.at(i) << ", ";
+		}
+
+		File << LinesOfCode.at(numregions - 1);
+		File << "\"" << CSV_SEPARATOR_CHAR;
+	
+		File << Pattern->GetTotalLinesOfCode() << "\n";
+	}	
+
+	File.close();
+}
+
+
+
+/*
  * Methods for the simple pattern counter
  */
 SimplePatternCountStatistic::SimplePatternCountStatistic() : PatternOccCounter()

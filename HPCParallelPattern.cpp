@@ -69,7 +69,7 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternOccurence(OK_Pattern), Parents(), Children()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternOccurence(OK_Pattern), Parents(), Children(), LinesOfCode(), FirstLineStack()
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
@@ -82,6 +82,31 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Design Space: " << DesignSpaceToStr(this->DesignSp) << std::endl;
 	std::cout << "Pattern Name: " << this->PatternName << std::endl;
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
+}
+
+void HPCParallelPattern::SetFirstLine(int FirstLine)
+{
+	FirstLineStack.push(FirstLine);
+}
+
+void HPCParallelPattern::SetLastLine(int LastLine)
+{
+	int FirstLine = FirstLineStack.top();
+	FirstLineStack.pop();
+	int LOC = (LastLine - FirstLine) - 1;
+	LinesOfCode.push_back(LOC);
+}
+
+int HPCParallelPattern::GetTotalLinesOfCode()
+{
+	int TotalLinesOfCode = 0;
+
+	for (int LOC : LinesOfCode)
+	{
+		TotalLinesOfCode += LOC;
+	}
+
+	return TotalLinesOfCode;
 }
 
 void HPCParallelPattern::AddChild(PatternOccurence* Child) 
