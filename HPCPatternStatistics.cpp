@@ -246,11 +246,6 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternOccurence* Current, s
 		{
 			Neighbours = Current->GetChildren();
 		}
-		else
-		{
-			// TODO Possibly throw an error here
-			return; 
-		}
 
 		/* Visit all the neighbouring nodes according to the given direction */
 		for (PatternOccurence* Neighbour : Neighbours)
