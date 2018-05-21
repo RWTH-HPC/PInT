@@ -44,6 +44,7 @@ int main (int argc, const char** argv)
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{
+		std::cout << std::endl << std::endl;
 		Stat->Calculate();
 		Stat->Print();
 	}
