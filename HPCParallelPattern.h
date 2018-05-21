@@ -7,9 +7,6 @@
 #include "llvm/Support/Casting.h"
 
 
-// TODO Implement Exception for wrong pattern nesting
-
-
 
 /*
  * Design Spaces

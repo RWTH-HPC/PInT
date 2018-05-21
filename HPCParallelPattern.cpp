@@ -214,7 +214,7 @@ void RemoveFromPatternStack(HPCParallelPattern* Pattern)
 		
 		if (Top != Pattern)
 		{
-			// TODO Throw an Exception here
+			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
 		}
 		
 		PatternContext.pop();
