@@ -18,6 +18,37 @@ public:
 
 
 
+class CyclomaticComplexityStatistic : public HPCPatternStatistic
+{
+public:
+	CyclomaticComplexityStatistic();
+	
+	void Calculate();
+
+	void Print();
+
+	void CSVExport(std::string FileName);
+
+private:
+	void SetNodeVisited(PatternOccurence* Pattern);
+
+	bool IsNodeVisited(PatternOccurence* Pattern);
+
+	std::vector<PatternOccurence*> VisitedNodes;
+
+	int CountEdges();
+
+	int CountEdges(PatternOccurence* Root);
+
+	int CountNodes();
+
+	int Nodes, Edges = 0;
+
+	int CyclomaticComplexity = 0;
+};
+
+
+
 class LinesOfCodeStatistic : public HPCPatternStatistic
 {
 public:

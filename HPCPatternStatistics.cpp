@@ -5,6 +5,105 @@
 
 
 /*
+ * Methods for the Cyclomatic Complexity Statistic
+ */
+CyclomaticComplexityStatistic::CyclomaticComplexityStatistic() : VisitedNodes()
+{
+
+}
+
+void CyclomaticComplexityStatistic::Calculate()
+{	
+	Edges = CountEdges();
+	Nodes = CountNodes();
+
+	/* C = #Edges - #Nodes + 2 * #ConnectedComponents */
+	CyclomaticComplexity = (Edges - Nodes) + 2; 
+}
+
+void CyclomaticComplexityStatistic::Print()
+{
+	std::cout << "\033[33m" << "WARNING: Results from the Cyclomatic Complexity Statistic might be inconsistent!" << "\033[0m" << std::endl;
+	std::cout << "Number of Edges: " << Edges << std::endl;
+	std::cout << "Number of Nodes: " << Nodes << std::endl;
+	std::cout << "Resulting Cyclomatic Complexity: " << CyclomaticComplexity << std::endl;
+}
+
+void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
+{
+
+}
+
+void CyclomaticComplexityStatistic::SetNodeVisited(PatternOccurence* Node)
+{
+	if (!IsNodeVisited(Node))
+	{
+		VisitedNodes.push_back(Node);
+	}
+}
+
+bool CyclomaticComplexityStatistic::IsNodeVisited(PatternOccurence* Node)
+{
+	for (PatternOccurence* N : VisitedNodes)
+	{
+		if (N == Node)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int CyclomaticComplexityStatistic::CountEdges()
+{
+	/* Start the tree traversal from the Main Function */
+	FunctionDeclDatabase* FDeclDB = FunctionDeclDatabase::GetInstance();
+	FunctionDeclDatabaseEntry* MainFn = FDeclDB->GetMainFnEntry();
+
+	return CountEdges(MainFn);
+}
+
+int CyclomaticComplexityStatistic::CountEdges(PatternOccurence* Current)
+{
+	int Edges = 0;
+	
+	/* If we visit a pattern, add the incoming edge */
+	if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Current))
+	{
+		Edges = Edges + 1;		
+	}
+
+	/* If we already visited this node, then just return 1 if this is a pattern, 0 else */
+	if (IsNodeVisited(Current))
+	{
+		return Edges;
+	}
+	else
+	{
+		SetNodeVisited(Current);
+	
+		/* Count the Edges beginning from the children */
+		for (PatternOccurence* Child : Current->GetChildren())
+		{
+			Edges += CountEdges(Child);
+		}
+	}
+
+	return Edges;
+}
+
+int CyclomaticComplexityStatistic::CountNodes()
+{
+	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
+	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+
+	return Patterns.size();
+}
+
+
+
+/*
  * Methods for the lines of code statistic
  */
 void LinesOfCodeStatistic::Calculate()
