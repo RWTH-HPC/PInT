@@ -30,15 +30,15 @@ public:
 	void CSVExport(std::string FileName);
 
 private:
-	void SetNodeVisited(PatternOccurence* Pattern);
+	void SetNodeVisited(PatternTreeNode* Pattern);
 
-	bool IsNodeVisited(PatternOccurence* Pattern);
+	bool IsNodeVisited(PatternTreeNode* Pattern);
 
-	std::vector<PatternOccurence*> VisitedNodes;
+	std::vector<PatternTreeNode*> VisitedNodes;
 
 	int CountEdges();
 
-	int CountEdges(PatternOccurence* Root);
+	int CountEdges(PatternTreeNode* Root);
 
 	int CountNodes();
 
@@ -73,7 +73,7 @@ public:
 	void CSVExport(std::string FileName);
 
 private:
-	struct PatternOccurenceCounter
+	struct PatternTreeNodeCounter
 	{
 		DesignSpace PatternDesignSp;
 		std::string PatternName;
@@ -84,11 +84,11 @@ private:
 
 	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
 
-	PatternOccurenceCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
+	PatternTreeNodeCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
 
-	PatternOccurenceCounter* AddPatternOcc(HPCParallelPattern* Pattern);
+	PatternTreeNodeCounter* AddPatternOcc(HPCParallelPattern* Pattern);
 	
-	std::vector<PatternOccurenceCounter*> PatternOccCounter;
+	std::vector<PatternTreeNodeCounter*> PatternOccCounter;
 };
 
 
@@ -130,7 +130,7 @@ private:
 	
 	void FindChildPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Children, int maxdepth);
 
-	void FindNeighbourPatternsRec(PatternOccurence* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth);
+	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	int maxdepth;
 

@@ -23,7 +23,7 @@ void HPCPatternTreeVisualisation::PrintPattern(HPCParallelPattern* Pattern, int 
 	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
 	std::cout << " (ID: " << Pattern->GetPatternID() << ")" << std::endl;
 
-	for (PatternOccurence* Child : Pattern->GetChildren())
+	for (PatternTreeNode* Child : Pattern->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
@@ -46,7 +46,7 @@ void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* F
 	PrintIndent(depth);
 	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
 
-	for (PatternOccurence* Child : FnCall->GetChildren())
+	for (PatternTreeNode* Child : FnCall->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{

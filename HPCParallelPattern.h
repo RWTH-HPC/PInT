@@ -21,7 +21,7 @@ std::string DesignSpaceToStr(DesignSpace DesignSp);
 /*
  * Abstract dummy class for nesting
  */
-class PatternOccurence {
+class PatternTreeNode {
 public:
 	enum OccurenceKind 
 	{
@@ -34,18 +34,18 @@ public:
 		return Kind;
 	}
 
-	PatternOccurence(OccurenceKind OK) : Kind(OK)
+	PatternTreeNode(OccurenceKind OK) : Kind(OK)
 	{
 
 	}
 
-	virtual void AddChild(PatternOccurence* Child) = 0;
+	virtual void AddChild(PatternTreeNode* Child) = 0;
 
-	virtual void AddParent(PatternOccurence* Parent) = 0;
+	virtual void AddParent(PatternTreeNode* Parent) = 0;
 
-	virtual std::vector<PatternOccurence*> GetChildren() = 0;
+	virtual std::vector<PatternTreeNode*> GetChildren() = 0;
 
-	virtual std::vector<PatternOccurence*> GetParents() = 0;
+	virtual std::vector<PatternTreeNode*> GetParents() = 0;
 
 private:
 	const OccurenceKind Kind;
@@ -56,21 +56,21 @@ private:
 /*
  * A struct for the database entries
  */ 	
-class FunctionDeclDatabaseEntry : public PatternOccurence
+class FunctionDeclDatabaseEntry : public PatternTreeNode
 {
 public:
 	FunctionDeclDatabaseEntry (std::string Name, unsigned Hash);
 
-	void AddChild(PatternOccurence* Child);
+	void AddChild(PatternTreeNode* Child);
 	
-	void AddParent(PatternOccurence* Parent);
+	void AddParent(PatternTreeNode* Parent);
 
-	std::vector<PatternOccurence*> GetChildren()
+	std::vector<PatternTreeNode*> GetChildren()
 	{
 		return Children;
 	}	
 
-	std::vector<PatternOccurence*> GetParents()
+	std::vector<PatternTreeNode*> GetParents()
 	{
 		return Parents;
 	}
@@ -85,17 +85,17 @@ public:
 		return FnName;
 	}
 
-	static bool classof(const PatternOccurence* PatternOcc)
+	static bool classof(const PatternTreeNode* PatternOcc)
 	{
-		return PatternOcc->GetKind() == PatternOccurence::OK_FnCall;
+		return PatternOcc->GetKind() == PatternTreeNode::OK_FnCall;
 	}
 	
 private:
 	bool BodyVisited;	
 	std::string FnName;
 	unsigned Hash;
-	std::vector<PatternOccurence*> Children;
-	std::vector<PatternOccurence*> Parents;
+	std::vector<PatternTreeNode*> Children;
+	std::vector<PatternTreeNode*> Parents;
 };
 
 
@@ -130,15 +130,16 @@ private:
 /*
  * HPC Parallel Pattern Class
  */
-class HPCParallelPattern : public PatternOccurence {
+class HPCParallelPattern : public PatternTreeNode 
+{
 public:
 	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID);
 	
 	void Print();
 
-	void AddChild(PatternOccurence* Child);
+	void AddChild(PatternTreeNode* Child);
 
-	void AddParent(PatternOccurence* Parent);
+	void AddParent(PatternTreeNode* Parent);
 
 	std::string GetPatternID() { return this->PatternID; }
 
@@ -148,9 +149,9 @@ public:
 
 	DesignSpace GetDesignSpace() { return DesignSp; }
 
-	std::vector<PatternOccurence*> GetChildren() { return this->Children; }
+	std::vector<PatternTreeNode*> GetChildren() { return this->Children; }
 
-	std::vector<PatternOccurence*> GetParents() { return this->Parents; }
+	std::vector<PatternTreeNode*> GetParents() { return this->Parents; }
 
 	void SetFirstLine (int FirstLine);
 
@@ -160,9 +161,9 @@ public:
 	
 	int GetTotalLinesOfCode();
 
-	static bool classof(const PatternOccurence* PatternOcc)
+	static bool classof(const PatternTreeNode* PatternOcc)
 	{
-		return PatternOcc->GetKind() == PatternOccurence::OK_Pattern;
+		return PatternOcc->GetKind() == PatternTreeNode::OK_Pattern;
 	}
 	
 private:	
@@ -173,8 +174,8 @@ private:
 	std::stack<int> FirstLineStack;
 	std::vector<int> LinesOfCode;	
 
-	std::vector<PatternOccurence*> Parents;
-	std::vector<PatternOccurence*> Children;
+	std::vector<PatternTreeNode*> Parents;
+	std::vector<PatternTreeNode*> Children;
 };
 
 

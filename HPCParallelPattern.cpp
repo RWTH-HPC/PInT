@@ -8,19 +8,19 @@
 /*
  * Function Declaration Database Entry functions
  */
-FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternOccurence(OK_FnCall), Children(), Parents()
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternTreeNode(OK_FnCall), Children(), Parents()
 {
 	this->BodyVisited = false;
 	this->FnName = Name;
 	this->Hash = Hash;
 }	
 
-void FunctionDeclDatabaseEntry::AddChild(PatternOccurence* Child)
+void FunctionDeclDatabaseEntry::AddChild(PatternTreeNode* Child)
 {
 	Children.push_back(Child);
 }
 
-void FunctionDeclDatabaseEntry::AddParent(PatternOccurence* Parent)
+void FunctionDeclDatabaseEntry::AddParent(PatternTreeNode* Parent)
 {
 	Parents.push_back(Parent);
 }
@@ -69,7 +69,7 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternOccurence(OK_Pattern), Parents(), Children(), LinesOfCode(), FirstLineStack()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternTreeNode(OK_Pattern), Parents(), Children(), LinesOfCode(), FirstLineStack()
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
@@ -109,12 +109,12 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 	return TotalLinesOfCode;
 }
 
-void HPCParallelPattern::AddChild(PatternOccurence* Child) 
+void HPCParallelPattern::AddChild(PatternTreeNode* Child) 
 {
 	Children.push_back(Child);
 }
 
-void HPCParallelPattern::AddParent(PatternOccurence* Parent)
+void HPCParallelPattern::AddParent(PatternTreeNode* Parent)
 {
 	Parents.push_back(Parent);
 }

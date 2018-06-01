@@ -34,7 +34,7 @@ void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
 
 }
 
-void CyclomaticComplexityStatistic::SetNodeVisited(PatternOccurence* Node)
+void CyclomaticComplexityStatistic::SetNodeVisited(PatternTreeNode* Node)
 {
 	if (!IsNodeVisited(Node))
 	{
@@ -42,9 +42,9 @@ void CyclomaticComplexityStatistic::SetNodeVisited(PatternOccurence* Node)
 	}
 }
 
-bool CyclomaticComplexityStatistic::IsNodeVisited(PatternOccurence* Node)
+bool CyclomaticComplexityStatistic::IsNodeVisited(PatternTreeNode* Node)
 {
-	for (PatternOccurence* N : VisitedNodes)
+	for (PatternTreeNode* N : VisitedNodes)
 	{
 		if (N == Node)
 		{
@@ -64,7 +64,7 @@ int CyclomaticComplexityStatistic::CountEdges()
 	return CountEdges(MainFn);
 }
 
-int CyclomaticComplexityStatistic::CountEdges(PatternOccurence* Current)
+int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
 {
 	int Edges = 0;
 	
@@ -84,7 +84,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternOccurence* Current)
 		SetNodeVisited(Current);
 	
 		/* Count the Edges beginning from the children */
-		for (PatternOccurence* Child : Current->GetChildren())
+		for (PatternTreeNode* Child : Current->GetChildren())
 		{
 			Edges += CountEdges(Child);
 		}
@@ -190,7 +190,7 @@ void SimplePatternCountStatistic::Calculate()
 
 void SimplePatternCountStatistic::Print()
 {
-	for (SimplePatternCountStatistic::PatternOccurenceCounter* Counter : PatternOccCounter)
+	for (SimplePatternCountStatistic::PatternTreeNodeCounter* Counter : PatternOccCounter)
 	{
 		std::cout << "Pattern \033[33m" << Counter->PatternName << "\033[0m occurs " << Counter->Count << " times" << std::endl;
 	}	
@@ -203,7 +203,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 
 	File << "Patternname" << CSV_SEPARATOR_CHAR << "Count\n";
 
-	for (PatternOccurenceCounter* Counter : PatternOccCounter)
+	for (PatternTreeNodeCounter* Counter : PatternOccCounter)
 	{
 		File << Counter->PatternName << CSV_SEPARATOR_CHAR << Counter->Count << "\n";
 	}	
@@ -219,7 +219,7 @@ void SimplePatternCountStatistic::VisitFunctionCall(FunctionDeclDatabaseEntry* F
 	}
 
 	/* Do nothing, but visit the children */
-	for (PatternOccurence* Child : FnEntry->GetChildren())
+	for (PatternTreeNode* Child : FnEntry->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
@@ -240,7 +240,7 @@ void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern, int 
 	}
 
 	/* Look up this pattern. If there is no entry, create a new one */
-	SimplePatternCountStatistic::PatternOccurenceCounter* Counter = LookupPatternOcc(Pattern);
+	SimplePatternCountStatistic::PatternTreeNodeCounter* Counter = LookupPatternOcc(Pattern);
 
 	if (Counter != NULL)
 	{
@@ -253,7 +253,7 @@ void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern, int 
 	}
 
 	/* Visit children */
-	for (PatternOccurence* Child : Pattern->GetChildren())
+	for (PatternTreeNode* Child : Pattern->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
@@ -266,10 +266,10 @@ void SimplePatternCountStatistic::VisitPattern(HPCParallelPattern* Pattern, int 
 	}
 }
 
-SimplePatternCountStatistic::PatternOccurenceCounter* SimplePatternCountStatistic::LookupPatternOcc(HPCParallelPattern* Pattern)
+SimplePatternCountStatistic::PatternTreeNodeCounter* SimplePatternCountStatistic::LookupPatternOcc(HPCParallelPattern* Pattern)
 {
 	/* Look up the Pattern Counter for this pattern */
-	for (SimplePatternCountStatistic::PatternOccurenceCounter* Counter : PatternOccCounter)
+	for (SimplePatternCountStatistic::PatternTreeNodeCounter* Counter : PatternOccCounter)
 	{
 		if (Pattern->GetDesignSpace() == Counter->PatternDesignSp && !Pattern->GetPatternName().compare(Counter->PatternName))
 		{
@@ -280,10 +280,10 @@ SimplePatternCountStatistic::PatternOccurenceCounter* SimplePatternCountStatisti
 	return NULL;
 }
 
-SimplePatternCountStatistic::PatternOccurenceCounter* SimplePatternCountStatistic::AddPatternOcc(HPCParallelPattern* Pattern)
+SimplePatternCountStatistic::PatternTreeNodeCounter* SimplePatternCountStatistic::AddPatternOcc(HPCParallelPattern* Pattern)
 {
 	/* Create a new Pattern Counter for this Pattern */
-	PatternOccurenceCounter* Counter = new PatternOccurenceCounter;
+	PatternTreeNodeCounter* Counter = new PatternTreeNodeCounter;
 	Counter->PatternDesignSp = Pattern->GetDesignSpace();	
 	Counter->PatternName = Pattern->GetPatternName();
 	PatternOccCounter.push_back(Counter);
@@ -386,7 +386,7 @@ void FanInFanOutStatistic::FindChildPatterns(HPCParallelPattern* Start, std::vec
 	FindNeighbourPatternsRec(Start, Children, DIR_Children, 0, maxdepth);
 }
 
-void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternOccurence* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth)
+void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check, if we reached the maximum depth */
 	if (depth >= maxdepth)
@@ -403,7 +403,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternOccurence* Current, s
 	else
 	{
 		/* Get the neighbouring nodes depending on the defined search direction */
-		std::vector<PatternOccurence*> Neighbours;
+		std::vector<PatternTreeNode*> Neighbours;
 
 		if (dir == DIR_Parents)
 		{
@@ -415,7 +415,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternOccurence* Current, s
 		}
 
 		/* Visit all the neighbouring nodes according to the given direction */
-		for (PatternOccurence* Neighbour : Neighbours)
+		for (PatternTreeNode* Neighbour : Neighbours)
 		{
 			FindNeighbourPatternsRec(Neighbour, Results, dir, depth + 1, maxdepth);
 		}
