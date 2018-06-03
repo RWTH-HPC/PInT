@@ -69,7 +69,7 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID) : PatternTreeNode(OK_Pattern), Parents(), Children(), LinesOfCode(), FirstLineStack()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID)
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
@@ -84,39 +84,60 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
 }
 
-void HPCParallelPattern::SetFirstLine(int FirstLine)
+void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
 {
-	FirstLineStack.push(FirstLine);
+	this->Occurences.push_back(Occurence);
 }
 
-void HPCParallelPattern::SetLastLine(int LastLine)
+std::vector<PatternOccurences*> GetAllOccurences()
 {
-	int FirstLine = FirstLineStack.top();
-	FirstLineStack.pop();
-	int LOC = (LastLine - FirstLine) - 1;
-	LinesOfCode.push_back(LOC);
+	return this->Occurences;
 }
 
-int HPCParallelPattern::GetTotalLinesOfCode()
+std::vector<PatternOccurences*> GetOccurencesWithID(std::string ID)
 {
-	int TotalLinesOfCode = 0;
+	std_vector<PatternOccurence*> res;
 
-	for (int LOC : LinesOfCode)
+	for (PatternOccurence* Occ : Occurences)
 	{
-		TotalLinesOfCode += LOC;
+		if (!ID.compare(Occ->GetID()))
+		{
+			res.push_back(Occ);
+		}
 	}
 
-	return TotalLinesOfCode;
+	return res;
 }
 
-void HPCParallelPattern::AddChild(PatternTreeNode* Child) 
+
+
+/*
+ * Pattern Occurence Class Functions
+ */
+PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID) : PatternIreeNode(OK_Pattern), Parents(), Children()
+{
+	this->Pattern = Pattern;
+	this->ID = ID;
+}
+
+void PatternOccurence::AddChild(PatternTreeNode* Child) 
 {
 	Children.push_back(Child);
 }
 
-void HPCParallelPattern::AddParent(PatternTreeNode* Parent)
+void PatternOccurence::AddParent(PatternTreeNode* Parent)
 {
 	Parents.push_back(Parent);
+}
+
+void PatternOccurence::SetFirstLine(int FirstLine)
+{
+	this->LinesOfCode = FirstLine;
+}
+
+void PatternOccurence::SetLastLine(int LastLine)
+{
+	this->LinesOfCode = (this->LinesOfCode - LastLine);
 }
 
 
@@ -129,12 +150,12 @@ HPCPatternDatabase::HPCPatternDatabase() : Patterns()
 	
 }
 
-HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(std::string ID)
+HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(DesignSpace DesignSp, std::string PatternName)
 {
 	/* Go through the list of parallel patterns to find the parallel pattern with the given identifier */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		if (!ID.compare(Pattern->GetPatternID()))
+		if (DesignSp == Pattern->GetDesignSpace() && !PatternName.compare(Pattern->GetPatternName()))
 		{
 			return Pattern;
 		}
@@ -145,7 +166,7 @@ HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(std::string ID)
 
 void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 {
-	if (LookupParallelPattern(Pattern->GetPatternID()) != NULL)
+	if (LookupParallelPattern(Pattern->GetDesignSpace(), Pattern->GetPatternName()) != NULL)
 	{
 		return;
 		std::cout << "\033[31m" << "Pattern already exists in the database." << "\033[0m" << std::endl;
@@ -212,14 +233,14 @@ std::string DesignSpaceToStr(DesignSpace DesignSp)
 /*
  * Pattern Stack Management
  */
-std::stack<HPCParallelPattern*> PatternContext;
+std::stack<PatternOccurence*> PatternContext;
 
-void AddToPatternStack(HPCParallelPattern* Pattern)
+void AddToPatternStack(PatternOccurence* PatternOcc)
 {
-	PatternContext.push(Pattern);
+	PatternContext.push(PatternOcc);
 }
 
-HPCParallelPattern* GetTopPatternStack() 
+PatternOccurence* GetTopPatternStack() 
 {
 	if (!PatternContext.empty())
 	{
@@ -231,13 +252,13 @@ HPCParallelPattern* GetTopPatternStack()
 	}
 }
 
-void RemoveFromPatternStack(HPCParallelPattern* Pattern)
+void RemoveFromPatternStack(PatternOcc* PatternOcc)
 {
 	if (!PatternContext.empty())
 	{
-		HPCParallelPattern* Top = PatternContext.top();	
+		PatternOccurence* Top = PatternContext.top();	
 		
-		if (Top != Pattern)
+		if (Top != PatternOcc)
 		{
 			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
 		}
@@ -245,4 +266,3 @@ void RemoveFromPatternStack(HPCParallelPattern* Pattern)
 		PatternContext.pop();
 	}
 }
-

@@ -34,34 +34,39 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	std::string PatternName = MatchRes[2].str();
 	std::string PatternID = MatchRes[3].str();
 	
-	/* Look if a pattern with this ID already exists */
-	HPCParallelPattern* Pattern = HPCPatternDatabase::GetInstance()->LookupParallelPattern(PatternID);
+	/* Look if a pattern with this Design Space and Name already exists */
+	HPCParallelPattern* Pattern = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSp, PatternName);
 
 	if (Pattern == NULL)
 	{
-		Pattern = new HPCParallelPattern(DesignSp, PatternName, PatternID);
+		Pattern = new HPCParallelPattern(DesignSp, PatternName);
 		HPCPatternDatabase::GetInstance()->AddParallelPattern(Pattern);
 	}
 
-	HPCParallelPattern* Top = GetTopPatternStack();
+
+	/* Create a new object for pattern occurence */
+	PatternOccurence* PatternOcc = new PatternOccurence(Pattern, PatternID);
+
+
+	PatternOccurence* Top = GetTopPatternStack();
 	
 	/* Connect the child and parent links between the objects */
 	if (Top != NULL)
 	{
-		Top->AddChild(Pattern);
-		Pattern->AddParent(Top);
+		Top->AddChild(PatternOcc);
+		PatternOcc->AddParent(Top);
 	}
 	else
 	{	
-		CurrentFnEntry->AddChild(Pattern);
-		Pattern->AddParent(CurrentFnEntry);
+		CurrentFnEntry->AddChild(PatternOcc);
+		PatternOcc->AddParent(CurrentFnEntry);
 	}
 
-	AddToPatternStack(Pattern);
-	LastPattern = Pattern;
+	AddToPatternStack(PatternOcc);
+	LastPattern = PatternOcc;
 
 #if PRINT_DEBUG
-	Pattern->Print();	
+	Pattern->Print();
 #endif
 }
 
@@ -74,10 +79,10 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");	
 	
-	HPCParallelPattern* Pattern = HPCPatternDatabase::GetInstance()->LookupParallelPattern(patternstr->getString().str());
+	std::string PatternOccID = patternstr->getString().str();
 	
-	RemoveFromPatternStack(Pattern);
-	LastPattern = Pattern;
+	RemoveFromPatternStack(PatternOccID);
+	LastPattern = PatternOccID;
 }
 
 void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry) 

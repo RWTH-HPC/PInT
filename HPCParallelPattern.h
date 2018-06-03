@@ -127,13 +127,16 @@ private:
 
 
 
+/* Forward declaration for Pattern Occurences */
+class PatternOccurence;
+
 /*
  * HPC Parallel Pattern Class
  */
-class HPCParallelPattern : public PatternTreeNode 
+class HPCParallelPattern
 {
 public:
-	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID);
+	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName);
 	
 	void Print();
 
@@ -141,13 +144,47 @@ public:
 
 	void AddParent(PatternTreeNode* Parent);
 
-	std::string GetPatternID() { return this->PatternID; }
+	void AddOccurence(PatternOccurence* Occurence);
 
+	std::vector<PatternOccurence*> GetAllOccurences() { return this->Occurences; }
+
+	std::vector<PatternOccurence*> GetOccurencesWithID(std::string ID);
+	
 	std::string GetPatternName() { return this->PatternName; }
 
 	std::string GetDesignSpaceStr() { return DesignSpaceToStr(this->DesignSp); }
 
 	DesignSpace GetDesignSpace() { return DesignSp; }
+	
+	int GetTotalLinesOfCode();
+
+private:	
+	DesignSpace DesignSp;
+	std::string PatternName;
+
+	std::vector<PatternOccurence*> Occurences;
+};
+
+
+
+/* 
+ * Pattern Occurence Class
+ */
+class PatternOccurence : public PatternTreeNode
+{
+public:
+	PatternOccurence(HPCParallelPattern* Pattern, std::string ID);
+
+	HPCParallelPattern* GetPattern() { return this->Pattern; }
+
+	static bool classof(const PatternTreeNode* Node)
+	{
+		return Node->GetKind() == PatternTreeNode::OK_Pattern;
+	}
+
+	void AddChild(PatternTreeNode* Child);
+
+	void AddParent(PatternTreeNode* Parent);
 
 	std::vector<PatternTreeNode*> GetChildren() { return this->Children; }
 
@@ -156,30 +193,22 @@ public:
 	void SetFirstLine (int FirstLine);
 
 	void SetLastLine (int LastLine);
-	
-	std::vector<int> GetLinesOfCode () { return this->LinesOfCode; }
-	
-	int GetTotalLinesOfCode();
 
-	static bool classof(const PatternTreeNode* PatternOcc)
-	{
-		return PatternOcc->GetKind() == PatternTreeNode::OK_Pattern;
-	}
-	
-private:	
-	DesignSpace DesignSp;
-	std::string PatternName;
-	std::string PatternID;
+	std::string GetPatternID() { return this->PatternID; }
 
-	std::stack<int> FirstLineStack;
-	std::vector<int> LinesOfCode;	
+private:
+	HPCParallelPattern* Pattern;	
 
 	std::vector<PatternTreeNode*> Parents;
 	std::vector<PatternTreeNode*> Children;
-};
+
+	int LinesOfCode;
+}
 
 
-
+/*
+ * HPC Pattern Database Class
+ */
 class HPCPatternDatabase 
 {
 public:
@@ -210,10 +239,10 @@ private:
 /* 
  * Stack Management
  */
-extern std::stack<HPCParallelPattern*> PatternContext;
+extern std::stack<PatternOccurence*> PatternContext;
 
-void AddToPatternStack(HPCParallelPattern* Pattern);
+void AddToPatternStack(PatternOccurence* PatternOcc);
 
-HPCParallelPattern* GetTopPatternStack();
+PatternOccurence* GetTopPatternStack();
 
-void RemoveFromPatternStack(HPCParallelPattern* Pattern);
+void RemoveFromPatternStack(PatternOccurence* PatternOcc);

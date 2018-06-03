@@ -47,13 +47,13 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			Args[0]->dump();
 #endif
 			PatternBeginFinder.match(*Args[0], *Context);	
-			HPCParallelPattern* Pattern = PatternBeginHandler.GetLastPattern();
+			PatternOccurence* PatternOcc = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocStart = CallExpr->getLocStart();
 			clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
-			Pattern->SetFirstLine(SourceLoc.getLineNumber());
+			PatternOcc->SetFirstLine(SourceLoc.getLineNumber());
 		}
 		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 		{
@@ -62,13 +62,13 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			Args[0]->dump();
 #endif
 			PatternEndFinder.match(*Args[0], *Context);
-			HPCParallelPattern* Pattern = PatternEndHandler.GetLastPattern();
+			PatternOccurence* PatternOcc = PatternEndHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();		
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-			Pattern->SetLastLine(SourceLoc.getLineNumber());
+			PatternOcc->SetLastLine(SourceLoc.getLineNumber());
 		}
 		// If no: search the called function for patterns
 		else
@@ -78,7 +78,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
 #endif
-			HPCParallelPattern* Top;
+			PatternOccurence* Top;
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
 				Top->AddChild(DBEntry);
