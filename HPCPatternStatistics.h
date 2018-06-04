@@ -71,24 +71,6 @@ public:
 	void Print();
 
 	void CSVExport(std::string FileName);
-
-private:
-	struct PatternTreeNodeCounter
-	{
-		DesignSpace PatternDesignSp;
-		std::string PatternName;
-		int Count = 0;
-	};
-
-	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
-
-	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
-
-	PatternTreeNodeCounter* LookupPatternOcc(HPCParallelPattern* Pattern);
-
-	PatternTreeNodeCounter* AddPatternOcc(HPCParallelPattern* Pattern);
-	
-	std::vector<PatternTreeNodeCounter*> PatternOccCounter;
 };
 
 
@@ -107,8 +89,7 @@ public:
 private:
 	struct FanInFanOutCounter
 	{
-		DesignSpace PatternDesignSp;
-		std::string PatternName;
+		HPCParallelPattern* Pattern;
 		int FanIn = 0;
 		int FanOut = 0;
 	};
@@ -120,17 +101,17 @@ private:
 
 	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
 
-	void VisitPattern(HPCParallelPattern* Pattern, int depth, int maxdepth);
+	void VisitPattern(PatternOccurence* PatternOcc, int depth, int maxdepth);
 
 	FanInFanOutCounter* LookupFIFOCounter(HPCParallelPattern* Pattern);
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
-	void FindParentPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Parents, int maxdepth);
+	void FindParentPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Parents, int maxdepth);
 	
-	void FindChildPatterns(HPCParallelPattern* Start, std::vector<HPCParallelPattern*>& Children, int maxdepth);
+	void FindChildPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Children, int maxdepth);
 
-	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<HPCParallelPattern*>& Results, SearchDirection dir, int depth, int maxdepth);
+	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	int maxdepth;
 

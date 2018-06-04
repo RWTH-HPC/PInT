@@ -194,16 +194,21 @@ public:
 
 	void SetLastLine (int LastLine);
 
-	std::string GetPatternID() { return this->PatternID; }
+	int GetLinesOfCode() { return this->LinesOfCode; }
+
+	std::string GetID() { return this->ID; }
 
 private:
 	HPCParallelPattern* Pattern;	
 
+	std::string ID;
+
 	std::vector<PatternTreeNode*> Parents;
 	std::vector<PatternTreeNode*> Children;
 
-	int LinesOfCode;
-}
+	int LinesOfCode = 0;
+};
+
 
 
 /*
@@ -212,7 +217,7 @@ private:
 class HPCPatternDatabase 
 {
 public:
-	HPCParallelPattern* LookupParallelPattern(std::string ID);
+	HPCParallelPattern* LookupParallelPattern(DesignSpace DesignSp, std::string PatternName);
 	
 	void AddParallelPattern(HPCParallelPattern* Pattern);
 
@@ -245,4 +250,4 @@ void AddToPatternStack(PatternOccurence* PatternOcc);
 
 PatternOccurence* GetTopPatternStack();
 
-void RemoveFromPatternStack(PatternOccurence* PatternOcc);
+void RemoveFromPatternStack(std::string ID);

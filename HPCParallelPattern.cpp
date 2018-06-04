@@ -69,11 +69,10 @@ FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Dec
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName, std::string PatternID)
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName) : Occurences()
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
-	this->PatternID = PatternID;
 }
 
 void HPCParallelPattern::Print() 
@@ -81,7 +80,7 @@ void HPCParallelPattern::Print()
 	std::cout << "Pattern Info" << std::endl;
 	std::cout << "Pattern Design Space: " << DesignSpaceToStr(this->DesignSp) << std::endl;
 	std::cout << "Pattern Name: " << this->PatternName << std::endl;
-	std::cout << "Pattern Identifier: " << this->PatternID << std::endl;
+	std::cout << this->Occurences.size() << " Occurences." << std::endl;
 }
 
 void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
@@ -89,14 +88,9 @@ void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
 	this->Occurences.push_back(Occurence);
 }
 
-std::vector<PatternOccurences*> GetAllOccurences()
+std::vector<PatternOccurence*> HPCParallelPattern::GetOccurencesWithID(std::string ID)
 {
-	return this->Occurences;
-}
-
-std::vector<PatternOccurences*> GetOccurencesWithID(std::string ID)
-{
-	std_vector<PatternOccurence*> res;
+	std::vector<PatternOccurence*> res;
 
 	for (PatternOccurence* Occ : Occurences)
 	{
@@ -114,7 +108,7 @@ std::vector<PatternOccurences*> GetOccurencesWithID(std::string ID)
 /*
  * Pattern Occurence Class Functions
  */
-PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID) : PatternIreeNode(OK_Pattern), Parents(), Children()
+PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID) : PatternTreeNode(OK_Pattern), Parents(), Children()
 {
 	this->Pattern = Pattern;
 	this->ID = ID;
@@ -252,13 +246,13 @@ PatternOccurence* GetTopPatternStack()
 	}
 }
 
-void RemoveFromPatternStack(PatternOcc* PatternOcc)
+void RemoveFromPatternStack(std::string ID)
 {
 	if (!PatternContext.empty())
 	{
 		PatternOccurence* Top = PatternContext.top();	
 		
-		if (Top != PatternOcc)
+		if (ID.compare(Top->GetID()))
 		{
 			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
 		}

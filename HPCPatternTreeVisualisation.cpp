@@ -12,7 +12,7 @@ void HPCPatternTreeVisualisation::PrintPatternTree(int maxdepth)
 	PrintFunctionTree(MainFnEntry, 0, maxdepth);
 }
 
-void HPCPatternTreeVisualisation::PrintPattern(HPCParallelPattern* Pattern, int depth, int maxdepth)
+void HPCPatternTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -20,18 +20,21 @@ void HPCPatternTreeVisualisation::PrintPattern(HPCParallelPattern* Pattern, int 
 	}
 	
 	PrintIndent(depth);
-	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
-	std::cout << " (ID: " << Pattern->GetPatternID() << ")" << std::endl;
 
-	for (PatternTreeNode* Child : Pattern->GetChildren())
+	HPCParallelPattern* Pattern = PatternOcc->GetPattern();
+	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
+
+	std::cout << "(" << PatternOcc->GetID() << ")" << std::endl;
+
+	for (PatternTreeNode* Child : PatternOcc->GetChildren())
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
 			PrintFunctionTree(FnCall, depth + 1, maxdepth);
 		}
-		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
+		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
 		{
-			PrintPattern(Pattern, depth + 1, maxdepth);
+			PrintPattern(PatternOcc, depth + 1, maxdepth);
 		}
 	}
 }
@@ -52,9 +55,9 @@ void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* F
 		{
 			PrintFunctionTree(FnCall, depth + 1, maxdepth);
 		}
-		else if (HPCParallelPattern* Pattern = clang::dyn_cast<HPCParallelPattern>(Child))
+		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
 		{
-			PrintPattern(Pattern, depth + 1, maxdepth);
+			PrintPattern(PatternOcc, depth + 1, maxdepth);
 		}
 	}
 }

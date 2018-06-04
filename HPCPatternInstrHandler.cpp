@@ -80,9 +80,9 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");	
 	
 	std::string PatternOccID = patternstr->getString().str();
-	
+
+	LastPattern = GetTopPatternStack();	
 	RemoveFromPatternStack(PatternOccID);
-	LastPattern = PatternOccID;
 }
 
 void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry) 
