@@ -75,6 +75,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		{
 			/* Look up the database entry for this function */
 			FunctionDeclDatabaseEntry* DBEntry = FunctionDB->Lookup(Callee);
+			DBEntry->SetReachable();
 #ifdef PRINT_DEBUG
 			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
 #endif

@@ -58,10 +58,16 @@ bool CyclomaticComplexityStatistic::IsNodeVisited(PatternTreeNode* Node)
 int CyclomaticComplexityStatistic::CountEdges()
 {
 	/* Start the tree traversal from the Main Function */
-	FunctionDeclDatabase* FDeclDB = FunctionDeclDatabase::GetInstance();
-	FunctionDeclDatabaseEntry* MainFn = FDeclDB->GetMainFnEntry();
+	std::vector<FunctionDeclDatabaseEntry*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
 
-	return CountEdges(MainFn);
+	int edges = 0;
+
+	for (FunctionDeclDatabaseEntry* Fn : Functions)
+	{
+		edges += CountEdges(Fn);
+	}
+
+	return edges;
 }
 
 int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
@@ -137,7 +143,7 @@ void LinesOfCodeStatistic::Print()
 			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetLinesOfCode() << std::endl;
 		}
 
-		std::cout << "Line(s) of code respectively." << std::endl;
+		std::cout << "Line(s) of code respectively." << std::endl << std::endl;
 	}
 }
 

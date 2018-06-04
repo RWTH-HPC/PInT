@@ -46,7 +46,7 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 
 	/* Create a new object for pattern occurence */
 	PatternOccurence* PatternOcc = new PatternOccurence(Pattern, PatternID);
-
+	Pattern->AddOccurence(PatternOcc);
 
 	PatternOccurence* Top = GetTopPatternStack();
 	

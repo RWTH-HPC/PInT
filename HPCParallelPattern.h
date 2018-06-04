@@ -65,6 +65,10 @@ public:
 	
 	void AddParent(PatternTreeNode* Parent);
 
+	void SetReachable() { this->Reachable = true; }
+
+	bool IsReachable() { return this->Reachable; }
+
 	std::vector<PatternTreeNode*> GetChildren()
 	{
 		return Children;
@@ -91,9 +95,11 @@ public:
 	}
 	
 private:
-	bool BodyVisited;	
+	bool Reachable;
+
 	std::string FnName;
 	unsigned Hash;
+
 	std::vector<PatternTreeNode*> Children;
 	std::vector<PatternTreeNode*> Parents;
 };
@@ -110,6 +116,8 @@ public:
 		static FunctionDeclDatabase Instance;
 		return &Instance;
 	}
+
+	std::vector<FunctionDeclDatabaseEntry*> GetAllFunctionEntries() { return Entries; }
 
 	FunctionDeclDatabaseEntry* GetMainFnEntry() { return MainFnEntry; }
 

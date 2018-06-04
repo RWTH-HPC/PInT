@@ -10,7 +10,7 @@
  */
 FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternTreeNode(OK_FnCall), Children(), Parents()
 {
-	this->BodyVisited = false;
+	this->Reachable = false;
 	this->FnName = Name;
 	this->Hash = Hash;
 }	
@@ -103,6 +103,18 @@ std::vector<PatternOccurence*> HPCParallelPattern::GetOccurencesWithID(std::stri
 	return res;
 }
 
+int HPCParallelPattern::GetTotalLinesOfCode()
+{
+	int LOC = 0;
+
+	for (PatternOccurence* PatternOcc : this->Occurences)
+	{
+		LOC += PatternOcc->GetLinesOfCode();
+	}
+
+	return LOC;
+}
+
 
 
 /*
@@ -131,7 +143,7 @@ void PatternOccurence::SetFirstLine(int FirstLine)
 
 void PatternOccurence::SetLastLine(int LastLine)
 {
-	this->LinesOfCode = (this->LinesOfCode - LastLine);
+	this->LinesOfCode = (LastLine - this->LinesOfCode) - 1;
 }
 
 
