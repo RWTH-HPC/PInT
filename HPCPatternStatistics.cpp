@@ -16,9 +16,10 @@ void CyclomaticComplexityStatistic::Calculate()
 {	
 	Edges = CountEdges();
 	Nodes = CountNodes();
-
+	ConnectedComponents = CountConnectedComponents();
+	
 	/* C = #Edges - #Nodes + 2 * #ConnectedComponents */
-	CyclomaticComplexity = (Edges - Nodes) + 2; 
+	CyclomaticComplexity = (Edges - Nodes) + 2 * ConnectedComponents; 
 }
 
 void CyclomaticComplexityStatistic::Print()
@@ -26,6 +27,7 @@ void CyclomaticComplexityStatistic::Print()
 	std::cout << "\033[33m" << "WARNING: Results from the Cyclomatic Complexity Statistic might be inconsistent!" << "\033[0m" << std::endl;
 	std::cout << "Number of Edges: " << Edges << std::endl;
 	std::cout << "Number of Nodes: " << Nodes << std::endl;
+	std::cout << "Number of Connected Components: " << ConnectedComponents << std::endl;
 	std::cout << "Resulting Cyclomatic Complexity: " << CyclomaticComplexity << std::endl;
 }
 
@@ -114,6 +116,42 @@ int CyclomaticComplexityStatistic::CountNodes()
 	}
 
 	return nodes;
+}
+
+int CyclomaticComplexityStatistic::CountConnectedComponents()
+{
+	std::vector<PatternOccurence*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternOccurences();
+
+	int ConnectedComponents = 0;
+
+	for (PatternOccurence* PatternOcc : PatternOccs)
+	{
+		if (PatternOcc->GetConnectedComponent() == -1)
+		{
+			MarkConnectedComponent(PatternOcc, ConnectedComponents);
+			ConnectedComponents++;
+		}
+	}
+
+	return ConnectedComponents;
+}
+
+void CyclomaticComplexityStatistic::MarkConnectedComponent(PatternTreeNode* Node, int ComponentID)
+{
+	if (Node->GetConnectedComponent() == -1)
+	{
+		Node->SetConnectedComponent(ComponentID);
+		
+		for (PatternTreeNode* Child : Node->GetChildren())
+		{
+			MarkConnectedComponent(Child, ComponentID);
+		}
+
+		for (PatternTreeNode* Parent : Node->GetParents())
+		{
+			MarkConnectedComponent(Parent, ComponentID);
+		}
+	}
 }
 
 

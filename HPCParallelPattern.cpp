@@ -180,6 +180,22 @@ void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 	Patterns.push_back(Pattern);
 }
 
+std::vector<PatternOccurence*> HPCPatternDatabase::GetAllPatternOccurences()
+{
+	std::vector<PatternOccurence*> Occs;
+
+	for (HPCParallelPattern* Pattern : Patterns)
+	{
+		for (PatternOccurence* PatternOcc : Pattern->GetAllOccurences())
+		{
+			Occs.push_back(PatternOcc);
+		}
+	}
+
+	return Occs;
+}
+
+
 
 
 /*

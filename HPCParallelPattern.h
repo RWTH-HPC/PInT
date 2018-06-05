@@ -231,6 +231,8 @@ public:
 
 	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
 
+	std::vector<PatternOccurence*> GetAllPatternOccurences();
+
 	static HPCPatternDatabase* GetInstance() 
 	{
 		static HPCPatternDatabase Instance;

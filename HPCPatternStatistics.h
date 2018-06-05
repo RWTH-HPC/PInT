@@ -30,9 +30,9 @@ public:
 	void CSVExport(std::string FileName);
 
 private:
-	void SetNodeVisited(PatternTreeNode* Pattern);
+	void SetNodeVisited(PatternTreeNode* Node);
 
-	bool IsNodeVisited(PatternTreeNode* Pattern);
+	bool IsNodeVisited(PatternTreeNode* Node);
 
 	std::vector<PatternTreeNode*> VisitedNodes;
 
@@ -42,7 +42,11 @@ private:
 
 	int CountNodes();
 
-	int Nodes, Edges = 0;
+	int CountConnectedComponents();
+
+	void MarkConnectedComponent(PatternTreeNode * Node, int ComponentID);
+
+	int Nodes, Edges, ConnectedComponents = 0;
 
 	int CyclomaticComplexity = 0;
 };
