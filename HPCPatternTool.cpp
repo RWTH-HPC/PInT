@@ -1,5 +1,5 @@
 #include "HPCPatternInstrASTTraversal.h"
-#include "HPCPatternTreeVisualisation.h"
+#include "TreeVisualisation.h"
 #include "HPCPatternStatistics.h"
 
 #include <iostream>
@@ -40,7 +40,7 @@ int main (int argc, const char** argv)
 
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
-	HPCPatternTreeVisualisation::PrintPatternTree(10);
+	CallTreeVisualisation::PrintPatternTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{

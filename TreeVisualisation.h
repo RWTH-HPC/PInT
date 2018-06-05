@@ -4,7 +4,7 @@
 
 
 
-class HPCPatternTreeVisualisation 
+class CallTreeVisualisation 
 {
 public:
 	static void PrintPatternTree(int maxdepth);

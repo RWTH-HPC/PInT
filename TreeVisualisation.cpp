@@ -1,10 +1,10 @@
-#include "HPCPatternTreeVisualisation.h"
+#include "TreeVisualisation.h"
 
 #include <iostream>
 
 
 
-void HPCPatternTreeVisualisation::PrintPatternTree(int maxdepth)
+void CallTreeVisualisation::PrintPatternTree(int maxdepth)
 {
 	FunctionDeclDatabase* FuncDB = FunctionDeclDatabase::GetInstance();
 	
@@ -12,7 +12,7 @@ void HPCPatternTreeVisualisation::PrintPatternTree(int maxdepth)
 	PrintFunctionTree(MainFnEntry, 0, maxdepth);
 }
 
-void HPCPatternTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth, int maxdepth)
+void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -39,7 +39,7 @@ void HPCPatternTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int
 	}
 }
 	
-void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth)
+void CallTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -62,7 +62,7 @@ void HPCPatternTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* F
 	}
 }
 	
-void HPCPatternTreeVisualisation::PrintIndent(int depth)
+void CallTreeVisualisation::PrintIndent(int depth)
 {
 	int i = 0;
 
