@@ -1,6 +1,7 @@
 #include "HPCPatternStatistics.h"
 #include <iostream>
 #include <fstream>
+#include "TreeAlgorithms.h"
 
 
 
@@ -126,38 +127,21 @@ int CyclomaticComplexityStatistic::CountNodes()
 
 int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
+	TreeAlgorithms::MarkConnectedComponents();
+
 	std::vector<PatternOccurence*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternOccurences();
 
 	int ConnectedComponents = 0;
 
 	for (PatternOccurence* PatternOcc : PatternOccs)
 	{
-		if (PatternOcc->GetConnectedComponent() == -1)
+		if (PatternOcc->GetConnectedComponent() > ConnectedComponents)
 		{
-			MarkConnectedComponent(PatternOcc, ConnectedComponents);
-			ConnectedComponents++;
+			ConnectedComponents = PatternOcc->GetConnectedComponent();
 		}
 	}
 
-	return ConnectedComponents;
-}
-
-void CyclomaticComplexityStatistic::MarkConnectedComponent(PatternTreeNode* Node, int ComponentID)
-{
-	if (Node->GetConnectedComponent() == -1)
-	{
-		Node->SetConnectedComponent(ComponentID);
-		
-		for (PatternTreeNode* Child : Node->GetChildren())
-		{
-			MarkConnectedComponent(Child, ComponentID);
-		}
-
-		for (PatternTreeNode* Parent : Node->GetParents())
-		{
-			MarkConnectedComponent(Parent, ComponentID);
-		}
-	}
+	return ConnectedComponents + 1;
 }
 
 
