@@ -28,12 +28,18 @@ void CyclomaticComplexityStatistic::Print()
 	std::cout << "Number of Edges: " << Edges << std::endl;
 	std::cout << "Number of Nodes: " << Nodes << std::endl;
 	std::cout << "Number of Connected Components: " << ConnectedComponents << std::endl;
-	std::cout << "Resulting Cyclomatic Complexity: " << CyclomaticComplexity << std::endl;
+	std::cout << "Resulting \033[33mCyclomatic Complexity\033[0m: " << CyclomaticComplexity << std::endl;
 }
 
 void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
 {
+	std::ofstream File;
+	File.open(FileName, std::ios::app);
 
+	File << "CyclComplexity" << CSV_SEPARATOR_CHAR << "NumEdges" << CSV_SEPARATOR_CHAR << "NumNodes" << CSV_SEPARATOR_CHAR << "NumConnectedComps\n";
+	File << CyclomaticComplexity << CSV_SEPARATOR_CHAR << Edges << CSV_SEPARATOR_CHAR << Nodes << CSV_SEPARATOR_CHAR << ConnectedComponents;
+	
+	File.close();
 }
 
 void CyclomaticComplexityStatistic::SetNodeVisited(PatternTreeNode* Node)
