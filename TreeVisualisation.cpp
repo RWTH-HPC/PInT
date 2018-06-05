@@ -4,12 +4,12 @@
 
 
 
-void CallTreeVisualisation::PrintPatternTree(int maxdepth)
+void CallTreeVisualisation::PrintCallTree(int maxdepth)
 {
 	FunctionDeclDatabase* FuncDB = FunctionDeclDatabase::GetInstance();
 	
 	FunctionDeclDatabaseEntry* MainFnEntry = FuncDB->GetMainFnEntry();
-	PrintFunctionTree(MainFnEntry, 0, maxdepth);
+	PrintFunction(MainFnEntry, 0, maxdepth);
 }
 
 void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth, int maxdepth)
@@ -30,7 +30,7 @@ void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
-			PrintFunctionTree(FnCall, depth + 1, maxdepth);
+			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
 		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
 		{
@@ -39,7 +39,7 @@ void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth
 	}
 }
 	
-void CallTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth)
+void CallTreeVisualisation::PrintFunction(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -53,7 +53,7 @@ void CallTreeVisualisation::PrintFunctionTree(FunctionDeclDatabaseEntry* FnCall,
 	{
 		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
 		{
-			PrintFunctionTree(FnCall, depth + 1, maxdepth);
+			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
 		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
 		{
