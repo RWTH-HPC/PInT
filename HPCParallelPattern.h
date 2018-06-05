@@ -36,7 +36,7 @@ public:
 
 	PatternTreeNode(OccurenceKind OK) : Kind(OK)
 	{
-
+		this->ComponentID = -1;
 	}
 
 	virtual void AddChild(PatternTreeNode* Child) = 0;
@@ -47,7 +47,13 @@ public:
 
 	virtual std::vector<PatternTreeNode*> GetParents() = 0;
 
+	void SetConnectedComponent(int CID) { this->ComponentID = CID; }
+
+	int GetConnectedComponent() { return this->ComponentID; }
+
 private:
+	int ComponentID;
+
 	const OccurenceKind Kind;
 };
 
@@ -64,10 +70,6 @@ public:
 	void AddChild(PatternTreeNode* Child);
 	
 	void AddParent(PatternTreeNode* Parent);
-
-	void SetReachable() { this->Reachable = true; }
-
-	bool IsReachable() { return this->Reachable; }
 
 	std::vector<PatternTreeNode*> GetChildren()
 	{
@@ -95,8 +97,6 @@ public:
 	}
 	
 private:
-	bool Reachable;
-
 	std::string FnName;
 	unsigned Hash;
 

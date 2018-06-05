@@ -10,7 +10,6 @@
  */
 FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternTreeNode(OK_FnCall), Children(), Parents()
 {
-	this->Reachable = false;
 	this->FnName = Name;
 	this->Hash = Hash;
 }	
