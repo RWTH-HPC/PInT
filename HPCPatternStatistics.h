@@ -111,6 +111,8 @@ private:
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
+	std::vector<PatternOccurence*> GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs);
+
 	void FindParentPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Parents, int maxdepth);
 	
 	void FindChildPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Children, int maxdepth);

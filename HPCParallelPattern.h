@@ -190,6 +190,8 @@ public:
 		return Node->GetKind() == PatternTreeNode::OK_Pattern;
 	}
 
+	void Print();
+
 	void AddChild(PatternTreeNode* Child);
 
 	void AddParent(PatternTreeNode* Parent);
@@ -197,6 +199,8 @@ public:
 	std::vector<PatternTreeNode*> GetChildren() { return this->Children; }
 
 	std::vector<PatternTreeNode*> GetParents() { return this->Parents; }
+
+	bool Equals(PatternOccurence* PatternOcc);
 
 	void SetFirstLine (int FirstLine);
 

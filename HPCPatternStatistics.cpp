@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "TreeAlgorithms.h"
+#include "Debug.h"
 
 
 
@@ -277,18 +278,69 @@ void FanInFanOutStatistic::Calculate()
 		
 		for (PatternOccurence* PatternOcc : Pattern->GetAllOccurences())
 		{
+#ifdef PRINT_DEBUG
+			PatternOcc->Print();
+			std::cout << std::endl;
+#endif
 			/* Search in Parent and Child Directions */
 			std::vector<PatternOccurence*> Parents;
 			FindParentPatterns(PatternOcc, Parents, maxdepth);
+			Parents = GetUniquePatternOccList(Parents);
+#ifdef PRINT_DEBUG
+			std::cout << "List of parents: " << std::endl;			
 
+			for (PatternOccurence* Parent : Parents)
+			{
+				Parent->Print();
+				std::cout << std::endl;
+			}
+#endif
 			std::vector<PatternOccurence*> Children;
 			FindChildPatterns(PatternOcc, Children, maxdepth);
+			Children = GetUniquePatternOccList(Children);
+#ifdef PRINT_DEBUG
+			std::cout << "List of children: " << std::endl;
 
+			for (PatternOccurence* Child : Children)
+			{
+				Child->Print();
+				std::cout << std::endl;
+			}
+
+			std::cout << std::endl;
+#endif
 			/* Calculate the resulting fan-in and fan-out numbers */
 			Counter->FanIn += Parents.size();
 			Counter->FanOut += Children.size();
 		}
 	}
+}
+
+std::vector<PatternOccurence*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs)
+{
+	std::vector<PatternOccurence*> Res;
+
+	for (PatternOccurence* PatternOcc : PatternOccs)
+	{
+		/* Search the pattern list, whether this is a duplicate */
+		bool duplicate = false;
+
+		for (PatternOccurence* ResOcc : Res)
+		{
+			if (PatternOcc == ResOcc || PatternOcc->Equals(ResOcc))
+			{
+				duplicate = true;
+				break;
+			} 
+		}
+
+		if (!duplicate)
+		{
+			Res.push_back(PatternOcc);
+		}
+	}
+
+	return Res;
 }
 
 void FanInFanOutStatistic::Print()

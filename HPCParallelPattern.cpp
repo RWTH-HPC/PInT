@@ -145,6 +145,22 @@ void PatternOccurence::SetLastLine(int LastLine)
 	this->LinesOfCode = (LastLine - this->LinesOfCode) - 1;
 }
 
+bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
+{
+	if (!this->ID.compare(PatternOcc->ID) && this->Pattern == PatternOcc->Pattern)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+void PatternOccurence::Print()
+{
+	std::cout << "Pattern Identifier: " << this->ID << std::endl;
+	this->Pattern->Print();
+}
+
 
 
 /*
