@@ -276,6 +276,10 @@ void FanInFanOutStatistic::Calculate()
 			Counter = AddFIFOCounter(Pattern);
 		}
 		
+		/* Gather all parents and children */
+		std::vector<PatternOccurence*> Parents;
+		std::vector<PatternOccurence*> Children;
+
 		for (PatternOccurence* PatternOcc : Pattern->GetAllOccurences())
 		{
 #ifdef PRINT_DEBUG
@@ -283,9 +287,7 @@ void FanInFanOutStatistic::Calculate()
 			std::cout << std::endl;
 #endif
 			/* Search in Parent and Child Directions */
-			std::vector<PatternOccurence*> Parents;
 			FindParentPatterns(PatternOcc, Parents, maxdepth);
-			Parents = GetUniquePatternOccList(Parents);
 #ifdef PRINT_DEBUG
 			std::cout << "List of parents: " << std::endl;			
 
@@ -295,9 +297,7 @@ void FanInFanOutStatistic::Calculate()
 				std::cout << std::endl;
 			}
 #endif
-			std::vector<PatternOccurence*> Children;
 			FindChildPatterns(PatternOcc, Children, maxdepth);
-			Children = GetUniquePatternOccList(Children);
 #ifdef PRINT_DEBUG
 			std::cout << "List of children: " << std::endl;
 
@@ -309,10 +309,15 @@ void FanInFanOutStatistic::Calculate()
 
 			std::cout << std::endl;
 #endif
-			/* Calculate the resulting fan-in and fan-out numbers */
-			Counter->FanIn += Parents.size();
-			Counter->FanOut += Children.size();
 		}
+
+		/* Filter out the duplicates */
+		Parents = GetUniquePatternOccList(Parents);
+		Children = GetUniquePatternOccList(Children);
+
+		/* Calculate the resulting fan-in and fan-out numbers */
+		Counter->FanIn += Parents.size();
+		Counter->FanOut += Children.size();
 	}
 }
 

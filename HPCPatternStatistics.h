@@ -18,6 +18,53 @@ public:
 
 
 
+class JaccardSimilarityStatistic : public HPCPatternStatistic
+{
+public:
+	JaccardSimilarityStatistic(int length);
+
+	void Calculate();
+
+	void Print();
+
+	void CSVExport();
+
+private:
+	/* Datastructure to save a sequence of PatternOccurences and link them with similarities */
+	struct SimilarityPair;
+
+	struct PatternOccurenceSequence
+	{
+		std::vector<PatternOccurence*> Patterns;
+		std::vector<SimilarityPair*> Similarities;
+	};
+
+	std::vector<PatternOccurenceSequence*> PatternOccSequences;
+
+
+	/* Datastructure to save the similarity between two sequences */
+	struct SimilarityPair
+	{
+		PatternOccurenceSequence* Seq1;
+		PatternOccurenceSequence* Seq2;
+		float Similarity;
+	};
+
+	std::vector<SimilarityPair*> Similarities;
+
+	/* Functions to calculate the Jaccard Similarity */
+	float Similarity(PatternOccurenceSequence* Seq1, PatternOccurenceSequence* Seq2);
+
+	std::vector<PatternOccurence*> IntersectByDesignSp(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+
+	std::vector<PatternOccurence*> IntersectByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+
+	std::vector<PatternOccurence*> UnionByDesignSp(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+
+	std::vector<PatternOccurence*> UnionByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2); 
+};
+
+
 class CyclomaticComplexityStatistic : public HPCPatternStatistic
 {
 public:
@@ -79,6 +126,11 @@ public:
 
 
 
+/*
+ * This statistic calculates the fan-in and fan-out numbers for every pattern which occurs in the code.
+ * The fan-in number is calculated as the number of patterns which are a direct parent to the pattern in question.
+ * The fan-out number is the number of patterns which are direct children to this pattern.
+ */
 class FanInFanOutStatistic : public HPCPatternStatistic
 {
 public:
