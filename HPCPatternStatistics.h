@@ -18,18 +18,9 @@ public:
 
 
 
-class JaccardSimilarityStatistic : public HPCPatternStatistic
+class SimilarityMeasure
 {
-public:
-	JaccardSimilarityStatistic(int length);
-
-	void Calculate();
-
-	void Print();
-
-	void CSVExport();
-
-private:
+protected:
 	/* Datastructure to save a sequence of PatternOccurences and link them with similarities */
 	struct SimilarityPair;
 
@@ -52,6 +43,22 @@ private:
 
 	std::vector<SimilarityPair*> Similarities;
 
+};
+
+
+
+class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
+{
+public:
+	JaccardSimilarityStatistic(int length);
+
+	void Calculate();
+
+	void Print();
+
+	void CSVExport();
+
+private:
 	/* Functions to calculate the Jaccard Similarity */
 	float Similarity(PatternOccurenceSequence* Seq1, PatternOccurenceSequence* Seq2);
 
