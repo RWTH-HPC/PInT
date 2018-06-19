@@ -1,8 +1,109 @@
 #include "HPCPatternStatistics.h"
 #include <iostream>
 #include <fstream>
-#include "TreeAlgorithms.h"
 #include "Debug.h"
+
+
+
+/* 
+ * Methods for the Similarity Metric Interface
+ */
+SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir)
+{
+	this->RootPattern = RootPattern;
+	this->maxlength = maxlength;
+	this->dir = dir;
+}
+
+std::vector<SimilarityMeasure::PatternOccurenceSequence*> SimilarityMeasure::FindPatternOccSeqs(PatternOccurence* PatternOccNode, SearchDirection dir, int maxdepth)
+{
+	std::vector<PatternOccurenceSequence*> Seqs;
+
+	PatternOccurenceSequence* CurSeq;
+	CurSeq = new PatternOccurenceSequence;
+	CurSeq->PatternOccs.push_back(PatternOccNode);
+
+	std::vector<PatternTreeNode*> Neighbours;
+
+	/* determine the direction in which to build the sequences */
+	if (dir ==  DIR_Children)
+	{
+		Neighbours = PatternOccNode->GetChildren();
+	}
+	else
+	{
+		Neighbours = PatternOccNode->GetParents();
+	}
+
+	/* Start with visiting the neighbours */
+	for (PatternTreeNode* Neighbour : Neighbours)
+	{
+		VisitPatternTreeNode(Neighbour, CurSeq, &Seqs, dir, 1, maxdepth);
+	}
+
+	return Seqs;
+}
+
+void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternOccurenceSequence* CurrentSequence, std::vector<PatternOccurenceSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
+{
+	/* Check if the current node is a pattern occurence node */
+	if (PatternOccurence* CurrentOcc = clang::dyn_cast<PatternOccurence>(CurrentNode))
+	{
+		/* Branch a new sequence from the previous */
+		PatternOccurenceSequence* NewSequence = CurrentSequence->Fork();
+		NewSequence->PatternOccs.push_back(CurrentOcc);
+		Sequences->push_back(NewSequence);
+
+		CurrentSequence = NewSequence;
+	}
+
+	/* If we can still add new occurences, then continue */	
+	if (CurrentSequence->PatternOccs.size() < this->maxlength && depth < maxdepth)
+	{
+		/* Get neighbours */
+		std::vector<PatternTreeNode*> Neighbours;
+
+		if (dir == DIR_Children)
+		{
+			Neighbours = CurrentNode->GetChildren();
+		}
+		else
+		{
+			Neighbours = CurrentNode->GetParents();
+		}
+		
+		/* Visit Neighbours */
+		for (PatternTreeNode* Neighbour : Neighbours)
+		{	
+			VisitPatternTreeNode(Neighbour, CurrentSequence, Sequences, dir, 1, maxdepth);
+		}
+	}
+}
+
+
+
+/*
+ * Methods for the Jaccard Similarity Statistic
+ */
+JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir) : SimilarityMeasure(RootPattern, length, dir)
+{
+
+}
+
+void JaccardSimilarityStatistic::Calculate()
+{
+
+}
+
+void JaccardSimilarityStatistic::Print()
+{
+
+}
+
+void JaccardSimilarityStatistic::CSVExport()
+{
+
+}
 
 
 

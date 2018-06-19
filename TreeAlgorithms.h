@@ -3,6 +3,12 @@
 #include "HPCParallelPattern.h"
 
 
+
+enum SearchDirection
+{
+	DIR_Children, DIR_Parents
+};
+
 class TreeAlgorithms
 {
 public:

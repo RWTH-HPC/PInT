@@ -1,6 +1,8 @@
 #pragma once
 
 #include "HPCParallelPattern.h"
+#include <string>
+#include "TreeAlgorithms.h"
 
 #define CSV_SEPARATOR_CHAR ","
 
@@ -20,18 +22,25 @@ public:
 
 class SimilarityMeasure
 {
-protected:
+public:
 	/* Datastructure to save a sequence of PatternOccurences and link them with similarities */
 	struct SimilarityPair;
 
 	struct PatternOccurenceSequence
 	{
-		std::vector<PatternOccurence*> Patterns;
+		std::vector<PatternOccurence*> PatternOccs;
 		std::vector<SimilarityPair*> Similarities;
+	
+		/* A little fork operator, so that we can branch one sequence from another */
+		PatternOccurenceSequence* Fork()
+		{
+			PatternOccurenceSequence* POS;
+			POS = new PatternOccurenceSequence;
+		
+			POS->PatternOccs = this->PatternOccs;
+			return POS;
+		}
 	};
-
-	std::vector<PatternOccurenceSequence*> PatternOccSequences;
-
 
 	/* Datastructure to save the similarity between two sequences */
 	struct SimilarityPair
@@ -41,8 +50,29 @@ protected:
 		float Similarity;
 	};
 
+
+protected:
+	SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir);
+
+
+	std::vector<SimilarityPair*> SortBySimilarity(std::vector<SimilarityPair*> Sims);
+
+
+	std::vector<PatternOccurenceSequence*> PatternOccSequences;
+
 	std::vector<SimilarityPair*> Similarities;
 
+	/* Functions to build the sequences of pattern occurences */
+	std::vector<PatternOccurenceSequence*> FindPatternOccSeqs(PatternOccurence* PatternOccNode, SearchDirection dir, int maxdepth);
+
+	void VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternOccurenceSequence* CurrentSequence, std::vector<PatternOccurenceSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
+
+
+	HPCParallelPattern* RootPattern;
+
+	int maxlength;
+	
+	SearchDirection dir;
 };
 
 
@@ -50,7 +80,7 @@ protected:
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:
-	JaccardSimilarityStatistic(int length);
+	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir);
 
 	void Calculate();
 
@@ -68,8 +98,9 @@ private:
 
 	std::vector<PatternOccurence*> UnionByDesignSp(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
 
-	std::vector<PatternOccurence*> UnionByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2); 
+	std::vector<PatternOccurence*> UnionByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2); 	
 };
+
 
 
 class CyclomaticComplexityStatistic : public HPCPatternStatistic
@@ -155,11 +186,6 @@ private:
 		HPCParallelPattern* Pattern;
 		int FanIn = 0;
 		int FanOut = 0;
-	};
-
-	enum SearchDirection
-	{
-		DIR_Children, DIR_Parents
 	};
 
 	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
