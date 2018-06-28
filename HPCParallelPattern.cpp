@@ -8,7 +8,7 @@
 /*
  * Function Declaration Database Entry functions
  */
-FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternTreeNode(OK_FnCall), Children(), Parents()
+FunctionDeclDatabaseEntry::FunctionDeclDatabaseEntry (std::string Name, unsigned Hash) : PatternTreeNode(TNK_FnCall), Children(), Parents()
 {
 	this->FnName = Name;
 	this->Hash = Hash;
@@ -87,28 +87,16 @@ void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
 	this->Occurences.push_back(Occurence);
 }
 
-std::vector<PatternOccurence*> HPCParallelPattern::GetOccurencesWithID(std::string ID)
-{
-	std::vector<PatternOccurence*> res;
-
-	for (PatternOccurence* Occ : Occurences)
-	{
-		if (!ID.compare(Occ->GetID()))
-		{
-			res.push_back(Occ);
-		}
-	}
-
-	return res;
-}
-
 int HPCParallelPattern::GetTotalLinesOfCode()
 {
 	int LOC = 0;
 
 	for (PatternOccurence* PatternOcc : this->Occurences)
 	{
-		LOC += PatternOcc->GetLinesOfCode();
+		for (PatternCodeRegion* CodeRegion : PatternOcc->GetCodeRegions())
+		{
+			LOC += CodeRegion->GetLinesOfCode();
+		}
 	}
 
 	return LOC;
@@ -119,46 +107,36 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 /*
  * Pattern Occurence Class Functions
  */
-PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID) : PatternTreeNode(OK_Pattern), Parents(), Children()
+PatternCodeRegion::PatternCodeRegion(PatternOccurence* PatternOcc) : PatternTreeNode(TNK_Pattern), Parents(), Children()
 {
-	this->Pattern = Pattern;
-	this->ID = ID;
+	this->PatternOcc = PatternOcc;
 }
 
-void PatternOccurence::AddChild(PatternTreeNode* Child) 
+void PatternCodeRegion::AddChild(PatternTreeNode* Child) 
 {
 	Children.push_back(Child);
 }
 
-void PatternOccurence::AddParent(PatternTreeNode* Parent)
+void PatternCodeRegion::AddParent(PatternTreeNode* Parent)
 {
 	Parents.push_back(Parent);
 }
 
-void PatternOccurence::SetFirstLine(int FirstLine)
+void PatternCodeRegion::SetFirstLine(int FirstLine)
 {
 	this->LinesOfCode = FirstLine;
 }
 
-void PatternOccurence::SetLastLine(int LastLine)
+void PatternCodeRegion::SetLastLine(int LastLine)
 {
 	this->LinesOfCode = (LastLine - this->LinesOfCode) - 1;
 }
 
-bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
+void PatternCodeRegion::Print()
 {
-	if (!this->ID.compare(PatternOcc->ID) && this->Pattern == PatternOcc->Pattern)
-	{
-		return true;
-	}
-	
-	return false;
-}
-
-void PatternOccurence::Print()
-{
-	std::cout << "Pattern Identifier: " << this->ID << std::endl;
-	this->Pattern->Print();
+	this->PatternOcc->GetPattern()->Print();
+	this->PatternOcc->Print();
+	std::cout << this->GetLinesOfCode() << " lines of code." << std::endl;
 }
 
 
@@ -196,21 +174,45 @@ void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 	Patterns.push_back(Pattern);
 }
 
-std::vector<PatternOccurence*> HPCPatternDatabase::GetAllPatternOccurences()
+/* Search and add pattern occurences */
+PatternOccurence* HPCPatternDatabase::LookupPatternOccurence(std::string ID)
 {
-	std::vector<PatternOccurence*> Occs;
-
-	for (HPCParallelPattern* Pattern : Patterns)
+	for (PatternOccurence* PatternOcc : PatternOccurences)
 	{
-		for (PatternOccurence* PatternOcc : Pattern->GetAllOccurences())
+		if (!ID.compare(PatternOcc->GetID()))
 		{
-			Occs.push_back(PatternOcc);
+			return PatternOcc;
 		}
 	}
 
-	return Occs;
+	return NULL;
 }
 
+void HPCPatternDatabase::AddPatternOccurence(PatternOccurence* PatternOcc)
+{
+	if (LookupPatternOccurence(PatternOcc->GetID()) != NULL)
+	{
+		return;
+		std::cout << "\033[31m" << "PatternOccurence already exists in the database." << "\033[0m" << std::endl;
+	}
+	
+	PatternOccurences.push_back(PatternOcc);
+}
+
+std::vector<PatternCodeRegion*> HPCPatternDatabase::GetAllPatternCodeRegions()
+{
+	std::vector<PatternCodeRegion*> CodeRegions;
+
+	for (PatternOccurence* PatternOcc : PatternOccurences)
+	{
+		for (PatternCodeRegion* CodeRegion : PatternOcc->GetCodeRegions())
+		{
+			CodeRegions.push_back(CodeRegion);
+		}
+	}
+
+	return CodeRegions;
+}
 
 
 
@@ -270,14 +272,14 @@ std::string DesignSpaceToStr(DesignSpace DesignSp)
 /*
  * Pattern Stack Management
  */
-std::stack<PatternOccurence*> PatternContext;
+std::stack<PatternCodeRegion*> PatternContext;
 
-void AddToPatternStack(PatternOccurence* PatternOcc)
+void AddToPatternStack(PatternCodeRegion* PatternOcc)
 {
 	PatternContext.push(PatternOcc);
 }
 
-PatternOccurence* GetTopPatternStack() 
+PatternCodeRegion* GetTopPatternStack() 
 {
 	if (!PatternContext.empty())
 	{
@@ -293,7 +295,7 @@ void RemoveFromPatternStack(std::string ID)
 {
 	if (!PatternContext.empty())
 	{
-		PatternOccurence* Top = PatternContext.top();	
+		PatternCodeRegion* Top = PatternContext.top();	
 		
 		if (ID.compare(Top->GetID()))
 		{

@@ -12,7 +12,7 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth)
 	PrintFunction(MainFnEntry, 0, maxdepth);
 }
 
-void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth, int maxdepth)
+void CallTreeVisualisation::PrintPattern(PatternCodeRegion* PatternOcc, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -32,7 +32,7 @@ void CallTreeVisualisation::PrintPattern(PatternOccurence* PatternOcc, int depth
 		{
 			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
-		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
+		else if (PatternCodeRegion* PatternOcc = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
 			PrintPattern(PatternOcc, depth + 1, maxdepth);
 		}
@@ -55,7 +55,7 @@ void CallTreeVisualisation::PrintFunction(FunctionDeclDatabaseEntry* FnCall, int
 		{
 			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
-		else if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Child))
+		else if (PatternCodeRegion* PatternOcc = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
 			PrintPattern(PatternOcc, depth + 1, maxdepth);
 		}

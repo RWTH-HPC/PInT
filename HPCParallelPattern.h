@@ -19,22 +19,26 @@ std::string DesignSpaceToStr(DesignSpace DesignSp);
 
 
 /*
- * Abstract dummy class for nesting
+ * Pattern Tree Node
+ *
+ * This abstract class is a prototype for all pattern tree node classes following.
+ * Descendants have to implement functionality to manage parents and children in the pattern tree.
+ * Also, some variables about the connected components is saved in this class.
  */
 class PatternTreeNode {
 public:
-	enum OccurenceKind 
+	enum TreeNodeKind 
 	{
-		OK_FnCall, 
-		OK_Pattern
+		TNK_FnCall, 
+		TNK_Pattern
 	};
 
-	OccurenceKind GetKind() const
+	TreeNodeKind GetKind() const
 	{
 		return Kind;
 	}
 
-	PatternTreeNode(OccurenceKind OK) : Kind(OK)
+	PatternTreeNode(TreeNodeKind OK) : Kind(OK)
 	{
 		this->ComponentID = -1;
 	}
@@ -54,13 +58,16 @@ public:
 private:
 	int ComponentID;
 
-	const OccurenceKind Kind;
+	const TreeNodeKind Kind;
 };
 
 
 
 /*
- * A struct for the database entries
+ * Function Declaration Database Entry
+ *
+ * A function declaration database is a node in the pattern tree, and has children and parents.
+ * It contains a hash value to uniquely identify a function declaration across compilation-units.
  */ 	
 class FunctionDeclDatabaseEntry : public PatternTreeNode
 {
@@ -93,7 +100,7 @@ public:
 
 	static bool classof(const PatternTreeNode* PatternOcc)
 	{
-		return PatternOcc->GetKind() == PatternTreeNode::OK_FnCall;
+		return PatternOcc->GetKind() == PatternTreeNode::TNK_FnCall;
 	}
 	
 private:
@@ -105,7 +112,13 @@ private:
 };
 
 
-
+/*
+ * Function Declaration Database
+ *
+ * This singleton class implements a database for function entries.
+ * It is needed to allow for cross-compilation-unit processing of the AST.
+ * The class provides methods for lookup and addition of function declarations encountered in the code.
+ */
 class FunctionDeclDatabase
 {
 public:
@@ -135,11 +148,16 @@ private:
 
 
 
-/* Forward declaration for Pattern Occurences */
+/* Forward declarations */
 class PatternOccurence;
+class PatternCodeRegion;
 
 /*
  * HPC Parallel Pattern Class
+ *
+ * The pattern class describes the parallel pattern identified by the design space and the pattern name.
+ * The pattern name is not the same as the pattern identifier.
+ * This class contains references to all occurences of a pattern, hence indirectly to all code regions.
  */
 class HPCParallelPattern
 {
@@ -148,15 +166,11 @@ public:
 	
 	void Print();
 
-	void AddChild(PatternTreeNode* Child);
-
-	void AddParent(PatternTreeNode* Parent);
-
 	void AddOccurence(PatternOccurence* Occurence);
 
 	std::vector<PatternOccurence*> GetAllOccurences() { return this->Occurences; }
 
-	std::vector<PatternOccurence*> GetOccurencesWithID(std::string ID);
+	std::vector<PatternCodeRegion*> GetAllCodeRegions();
 	
 	std::string GetPatternName() { return this->PatternName; }
 
@@ -177,17 +191,53 @@ private:
 
 /* 
  * Pattern Occurence Class
+ *
+ * The pattern occurence is a hypothetical construct that represents a collection for all code regions
+ * with the same identifier.
+ * It is linked to a unique pattern, which all the code regions implement.
  */
-class PatternOccurence : public PatternTreeNode
+class PatternOccurence
 {
 public:
 	PatternOccurence(HPCParallelPattern* Pattern, std::string ID);
 
 	HPCParallelPattern* GetPattern() { return this->Pattern; }
 
+	void Print();
+
+	std::string GetID() { return this->ID; }
+
+	void AddCodeRegion(PatternCodeRegion* CodeRegion) { this->CodeRegions.push_back(CodeRegion); }
+
+	std::vector<PatternCodeRegion*> GetCodeRegions() { return this->CodeRegions; }
+
+private:
+	HPCParallelPattern* Pattern;
+
+	std::vector<PatternCodeRegion*> CodeRegions;
+	
+	std::string ID;
+};
+
+
+
+/*
+ * Pattern Code Region Class
+ *
+ * This class represents the block of code that is enclosed with the instrumentation calls.
+ * It is a node in the pattern tree, hence has children and parents in the tree.
+ * Every region belongs to a pattern occurence.
+ */
+class PatternCodeRegion : public PatternTreeNode
+{
+public:
+	PatternCodeRegion(PatternOccurence* PatternOcc);
+
+	PatternOccurence* GetPatternOccurence() { return this->PatternOcc; }
+
 	static bool classof(const PatternTreeNode* Node)
 	{
-		return Node->GetKind() == PatternTreeNode::OK_Pattern;
+		return Node->GetKind() == PatternTreeNode::TNK_Pattern;
 	}
 
 	void Print();
@@ -200,20 +250,16 @@ public:
 
 	std::vector<PatternTreeNode*> GetParents() { return this->Parents; }
 
-	bool Equals(PatternOccurence* PatternOcc);
-
 	void SetFirstLine (int FirstLine);
 
 	void SetLastLine (int LastLine);
 
 	int GetLinesOfCode() { return this->LinesOfCode; }
 
-	std::string GetID() { return this->ID; }
+	std::string GetID() { return this->PatternOcc->GetID(); }
 
 private:
-	HPCParallelPattern* Pattern;	
-
-	std::string ID;
+	PatternOccurence* PatternOcc;	
 
 	std::vector<PatternTreeNode*> Parents;
 	std::vector<PatternTreeNode*> Children;
@@ -225,17 +271,30 @@ private:
 
 /*
  * HPC Pattern Database Class
+ *
+ * This class contains references to all patterns and pattern occurences currently known.
+ * It allows for comfortable and reliable lookup of patterns and occurences by name, resp. ID.
  */
 class HPCPatternDatabase 
 {
 public:
+	/* Search and add patterns */
 	HPCParallelPattern* LookupParallelPattern(DesignSpace DesignSp, std::string PatternName);
 	
 	void AddParallelPattern(HPCParallelPattern* Pattern);
 
 	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
 
-	std::vector<PatternOccurence*> GetAllPatternOccurences();
+
+	/* Search and add pattern occurences */
+	PatternOccurence* LookupPatternOccurence(std::string ID);
+
+	void AddPatternOccurence(PatternOccurence* PatternOcc);
+
+	std::vector<PatternOccurence*> GetAllPatternOccurences() { return PatternOccurences; }
+
+	std::vector<PatternCodeRegion*> GetAllPatternCodeRegions();
+
 
 	static HPCPatternDatabase* GetInstance() 
 	{
@@ -251,17 +310,21 @@ private:
 	HPCPatternDatabase& operator = (const HPCPatternDatabase&);
 	
 	std::vector<HPCParallelPattern*> Patterns;
+
+	std::vector<PatternOccurence*> PatternOccurences;
 };
 
 
 
 /* 
  * Stack Management
+ *
+ * The pattern stack is used to keep track of the nesting of patterns.
  */
-extern std::stack<PatternOccurence*> PatternContext;
+extern std::stack<PatternCodeRegion*> PatternContext;
 
-void AddToPatternStack(PatternOccurence* PatternOcc);
+void AddToPatternStack(PatternCodeRegion* PatternOcc);
 
-PatternOccurence* GetTopPatternStack();
+PatternCodeRegion* GetTopPatternStack();
 
 void RemoveFromPatternStack(std::string ID);

@@ -33,6 +33,7 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	DesignSpace DesignSp = StrToDesignSpace(MatchRes[1].str());
 	std::string PatternName = MatchRes[2].str();
 	std::string PatternID = MatchRes[3].str();
+
 	
 	/* Look if a pattern with this Design Space and Name already exists */
 	HPCParallelPattern* Pattern = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSp, PatternName);
@@ -44,29 +45,43 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	}
 
 
-	/* Create a new object for pattern occurence */
-	PatternOccurence* PatternOcc = new PatternOccurence(Pattern, PatternID);
-	Pattern->AddOccurence(PatternOcc);
+	/* Check if this code regions is part of an existing pattern occurence */
+	PatternOccurence* PatternOcc = HPCPatternDatabase::GetInstance()->LookupPatternOccurence(PatternID);
 
-	PatternOccurence* Top = GetTopPatternStack();
-	
+	if (PatternOcc == NULL)
+	{
+		PatternOcc = new PatternOccurence(Pattern, PatternID);
+		HPCPatternDatabase::GetInstance()->AddPatternOccurence(PatternOcc);
+		Pattern->AddOccurence(PatternOcc);
+	}
+
+
+	/* Create a new object for pattern occurence */
+	PatternCodeRegion* CodeRegion = new PatternCodeRegion(PatternOcc);
+	PatternOcc->AddCodeRegion(CodeRegion);
+
+
 	/* Connect the child and parent links between the objects */
+	PatternCodeRegion* Top = GetTopPatternStack();
+	
 	if (Top != NULL)
 	{
-		Top->AddChild(PatternOcc);
-		PatternOcc->AddParent(Top);
+		Top->AddChild(CodeRegion);
+		CodeRegion->AddParent(Top);
 	}
 	else
 	{	
-		CurrentFnEntry->AddChild(PatternOcc);
-		PatternOcc->AddParent(CurrentFnEntry);
+		CurrentFnEntry->AddChild(CodeRegion);
+		CodeRegion->AddParent(CurrentFnEntry);
 	}
 
-	AddToPatternStack(PatternOcc);
-	LastPattern = PatternOcc;
+	AddToPatternStack(CodeRegion);
+	LastPattern = CodeRegion;
 
 #if PRINT_DEBUG
 	Pattern->Print();
+	PatternOcc->Print();
+	CodeRegion->Print();
 #endif
 }
 
@@ -79,10 +94,10 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");	
 	
-	std::string PatternOccID = patternstr->getString().str();
+	std::string PatternID = patternstr->getString().str();
 
 	LastPattern = GetTopPatternStack();	
-	RemoveFromPatternStack(PatternOccID);
+	RemoveFromPatternStack(PatternID);
 }
 
 void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry) 

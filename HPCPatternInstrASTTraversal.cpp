@@ -47,7 +47,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			Args[0]->dump();
 #endif
 			PatternBeginFinder.match(*Args[0], *Context);	
-			PatternOccurence* PatternOcc = PatternBeginHandler.GetLastPattern();
+			PatternCodeRegion* PatternOcc = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
@@ -62,7 +62,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			Args[0]->dump();
 #endif
 			PatternEndFinder.match(*Args[0], *Context);
-			PatternOccurence* PatternOcc = PatternEndHandler.GetLastPattern();
+			PatternCodeRegion* PatternOcc = PatternEndHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
@@ -78,7 +78,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
 #endif
-			PatternOccurence* Top;
+			PatternCodeRegion* Top;
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
 				Top->AddChild(DBEntry);

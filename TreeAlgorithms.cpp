@@ -5,11 +5,11 @@
 
 void TreeAlgorithms::MarkConnectedComponents()
 {
-	std::vector<PatternOccurence*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternOccurences();
+	std::vector<PatternCodeRegion*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
 
 	int ConnectedComponents = 0;
 
-	for (PatternOccurence* PatternOcc : PatternOccs)
+	for (PatternCodeRegion* PatternOcc : PatternOccs)
 	{
 		if (PatternOcc->GetConnectedComponent() == -1)
 		{

@@ -23,19 +23,19 @@ public:
 class SimilarityMeasure
 {
 public:
-	/* Datastructure to save a sequence of PatternOccurences and link them with similarities */
+	/* Datastructure to save a sequence of PatternCodeRegions and link them with similarities */
 	struct SimilarityPair;
 
-	struct PatternOccurenceSequence
+	struct PatternCodeRegionSequence
 	{
-		std::vector<PatternOccurence*> PatternOccs;
+		std::vector<PatternCodeRegion*> PatternOccs;
 		std::vector<SimilarityPair*> Similarities;
 	
 		/* A little fork operator, so that we can branch one sequence from another */
-		PatternOccurenceSequence* Fork()
+		PatternCodeRegionSequence* Fork()
 		{
-			PatternOccurenceSequence* POS;
-			POS = new PatternOccurenceSequence;
+			PatternCodeRegionSequence* POS;
+			POS = new PatternCodeRegionSequence;
 		
 			POS->PatternOccs = this->PatternOccs;
 			return POS;
@@ -45,8 +45,8 @@ public:
 	/* Datastructure to save the similarity between two sequences */
 	struct SimilarityPair
 	{
-		PatternOccurenceSequence* Seq1;
-		PatternOccurenceSequence* Seq2;
+		PatternCodeRegionSequence* Seq1;
+		PatternCodeRegionSequence* Seq2;
 		float Similarity;
 	};
 
@@ -58,14 +58,14 @@ protected:
 	std::vector<SimilarityPair*> SortBySimilarity(std::vector<SimilarityPair*> Sims);
 
 
-	std::vector<PatternOccurenceSequence*> PatternOccSequences;
+	std::vector<PatternCodeRegionSequence*> PatternOccSequences;
 
 	std::vector<SimilarityPair*> Similarities;
 
 	/* Functions to build the sequences of pattern occurences */
-	std::vector<PatternOccurenceSequence*> FindPatternOccSeqs(PatternOccurence* PatternOccNode, SearchDirection dir, int maxdepth);
+	std::vector<PatternCodeRegionSequence*> FindPatternOccSeqs(PatternCodeRegion* PatternOccNode, SearchDirection dir, int maxdepth);
 
-	void VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternOccurenceSequence* CurrentSequence, std::vector<PatternOccurenceSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
+	void VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternCodeRegionSequence* CurrentSequence, std::vector<PatternCodeRegionSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
 
 
 	HPCParallelPattern* RootPattern;
@@ -90,15 +90,15 @@ public:
 
 private:
 	/* Functions to calculate the Jaccard Similarity */
-	float Similarity(PatternOccurenceSequence* Seq1, PatternOccurenceSequence* Seq2);
+	float Similarity(PatternCodeRegionSequence* Seq1, PatternCodeRegionSequence* Seq2);
 
-	std::vector<PatternOccurence*> IntersectByDesignSp(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+	std::vector<PatternCodeRegion*> IntersectByDesignSp(std::vector<PatternCodeRegion*> Seq1, std::vector<PatternCodeRegion*> Seq2);
 
-	std::vector<PatternOccurence*> IntersectByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+	std::vector<PatternCodeRegion*> IntersectByPatternName(std::vector<PatternCodeRegion*> Seq1, std::vector<PatternCodeRegion*> Seq2);
 
-	std::vector<PatternOccurence*> UnionByDesignSp(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2);
+	std::vector<PatternCodeRegion*> UnionByDesignSp(std::vector<PatternCodeRegion*> Seq1, std::vector<PatternCodeRegion*> Seq2);
 
-	std::vector<PatternOccurence*> UnionByPatternName(std::vector<PatternOccurence*> Seq1, std::vector<PatternOccurence*> Seq2); 	
+	std::vector<PatternCodeRegion*> UnionByPatternName(std::vector<PatternCodeRegion*> Seq1, std::vector<PatternCodeRegion*> Seq2); 	
 };
 
 
@@ -190,19 +190,19 @@ private:
 
 	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
 
-	void VisitPattern(PatternOccurence* PatternOcc, int depth, int maxdepth);
+	void VisitPattern(PatternCodeRegion* PatternOcc, int depth, int maxdepth);
 
 	FanInFanOutCounter* LookupFIFOCounter(HPCParallelPattern* Pattern);
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
-	std::vector<PatternOccurence*> GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs);
+	std::vector<PatternCodeRegion*> GetUniquePatternOccList(std::vector<PatternCodeRegion*> PatternOccs);
 
-	void FindParentPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Parents, int maxdepth);
+	void FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Parents, int maxdepth);
 	
-	void FindChildPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Children, int maxdepth);
+	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth);
 
-	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth);
+	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternCodeRegion*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	int maxdepth;
 

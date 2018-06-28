@@ -15,12 +15,12 @@ SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlen
 	this->dir = dir;
 }
 
-std::vector<SimilarityMeasure::PatternOccurenceSequence*> SimilarityMeasure::FindPatternOccSeqs(PatternOccurence* PatternOccNode, SearchDirection dir, int maxdepth)
+std::vector<SimilarityMeasure::PatternCodeRegionSequence*> SimilarityMeasure::FindPatternOccSeqs(PatternCodeRegion* PatternOccNode, SearchDirection dir, int maxdepth)
 {
-	std::vector<PatternOccurenceSequence*> Seqs;
+	std::vector<PatternCodeRegionSequence*> Seqs;
 
-	PatternOccurenceSequence* CurSeq;
-	CurSeq = new PatternOccurenceSequence;
+	PatternCodeRegionSequence* CurSeq;
+	CurSeq = new PatternCodeRegionSequence;
 	CurSeq->PatternOccs.push_back(PatternOccNode);
 
 	std::vector<PatternTreeNode*> Neighbours;
@@ -44,13 +44,13 @@ std::vector<SimilarityMeasure::PatternOccurenceSequence*> SimilarityMeasure::Fin
 	return Seqs;
 }
 
-void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternOccurenceSequence* CurrentSequence, std::vector<PatternOccurenceSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
+void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternCodeRegionSequence* CurrentSequence, std::vector<PatternCodeRegionSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check if the current node is a pattern occurence node */
-	if (PatternOccurence* CurrentOcc = clang::dyn_cast<PatternOccurence>(CurrentNode))
+	if (PatternCodeRegion* CurrentOcc = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
 	{
 		/* Branch a new sequence from the previous */
-		PatternOccurenceSequence* NewSequence = CurrentSequence->Fork();
+		PatternCodeRegionSequence* NewSequence = CurrentSequence->Fork();
 		NewSequence->PatternOccs.push_back(CurrentOcc);
 		Sequences->push_back(NewSequence);
 
@@ -186,7 +186,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
 	int Edges = 0;
 	
 	/* If we visit a pattern, add the incoming edge */
-	if (PatternOccurence* PatternOcc = clang::dyn_cast<PatternOccurence>(Current))
+	if (PatternCodeRegion* PatternOcc = clang::dyn_cast<PatternCodeRegion>(Current))
 	{
 		Edges = Edges + 1;
 	}
@@ -220,7 +220,7 @@ int CyclomaticComplexityStatistic::CountNodes()
 	/* Count all occurences for all patterns */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		std::vector<PatternOccurence*> Occurences = Pattern->GetAllOccurences();
+		std::vector<PatternCodeRegion*> Occurences = Pattern->GetAllOccurences();
 		nodes += Occurences.size();
 	}
 
@@ -231,11 +231,11 @@ int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
 	TreeAlgorithms::MarkConnectedComponents();
 
-	std::vector<PatternOccurence*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternOccurences();
+	std::vector<PatternCodeRegion*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
 
 	int ConnectedComponents = 0;
 
-	for (PatternOccurence* PatternOcc : PatternOccs)
+	for (PatternCodeRegion* PatternOcc : PatternOccs)
 	{
 		if (PatternOcc->GetConnectedComponent() > ConnectedComponents)
 		{
@@ -265,10 +265,10 @@ void LinesOfCodeStatistic::Print()
 	{
 		std::cout << "\033[33m" << Pattern->GetPatternName() << "\033[0m" << " has " << Pattern->GetTotalLinesOfCode() << " line(s) of code in total." << std::endl;
 
-		std::vector<PatternOccurence*> Occurences = Pattern->GetAllOccurences();
-		std::cout << Occurences.size() << " Occurences in code." << std::endl;
+		std::vector<PatternCodeRegion*> Occurences = Pattern->GetAllOccurences();
+		std::cout << Occurences.size() << " regions in code." << std::endl;
 
-		for (PatternOccurence* PatternOcc : Occurences)
+		for (PatternCodeRegion* PatternOcc : Occurences)
 		{
 			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetLinesOfCode() << std::endl;
 		}
@@ -291,18 +291,18 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 	{
 		File << Pattern->GetPatternName()  << CSV_SEPARATOR_CHAR;
 		
-		std::vector<PatternOccurence*> PatternOccurences = Pattern->GetAllOccurences();
-		File << PatternOccurences.size() << CSV_SEPARATOR_CHAR;	
+		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetAllOccurences();
+		File << PatternCodeRegions.size() << CSV_SEPARATOR_CHAR;	
 
 		/* Print the list of lines of code for this pattern */
 		File << "\"";	
 	
-		for (int i = 0; i < PatternOccurences.size() - 1; i++)
+		for (int i = 0; i < PatternCodeRegions.size() - 1; i++)
 		{
-			File << PatternOccurences.at(i)->GetLinesOfCode() << ", ";
+			File << PatternCodeRegions.at(i)->GetLinesOfCode() << ", ";
 		}
 
-		File << PatternOccurences.at(PatternOccurences.size() - 1)->GetLinesOfCode();
+		File << PatternCodeRegions.at(PatternCodeRegions.size() - 1)->GetLinesOfCode();
 		File << "\"" << CSV_SEPARATOR_CHAR;
 	
 		File << Pattern->GetTotalLinesOfCode() << "\n";
@@ -378,10 +378,10 @@ void FanInFanOutStatistic::Calculate()
 		}
 		
 		/* Gather all parents and children */
-		std::vector<PatternOccurence*> Parents;
-		std::vector<PatternOccurence*> Children;
+		std::vector<PatternCodeRegion*> Parents;
+		std::vector<PatternCodeRegion*> Children;
 
-		for (PatternOccurence* PatternOcc : Pattern->GetAllOccurences())
+		for (PatternCodeRegion* PatternOcc : Pattern->GetAllOccurences())
 		{
 #ifdef PRINT_DEBUG
 			PatternOcc->Print();
@@ -392,7 +392,7 @@ void FanInFanOutStatistic::Calculate()
 #ifdef PRINT_DEBUG
 			std::cout << "List of parents: " << std::endl;			
 
-			for (PatternOccurence* Parent : Parents)
+			for (PatternCodeRegion* Parent : Parents)
 			{
 				Parent->Print();
 				std::cout << std::endl;
@@ -402,7 +402,7 @@ void FanInFanOutStatistic::Calculate()
 #ifdef PRINT_DEBUG
 			std::cout << "List of children: " << std::endl;
 
-			for (PatternOccurence* Child : Children)
+			for (PatternCodeRegion* Child : Children)
 			{
 				Child->Print();
 				std::cout << std::endl;
@@ -422,16 +422,16 @@ void FanInFanOutStatistic::Calculate()
 	}
 }
 
-std::vector<PatternOccurence*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs)
+std::vector<PatternCodeRegion*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternCodeRegion*> PatternOccs)
 {
-	std::vector<PatternOccurence*> Res;
+	std::vector<PatternCodeRegion*> Res;
 
-	for (PatternOccurence* PatternOcc : PatternOccs)
+	for (PatternCodeRegion* PatternOcc : PatternOccs)
 	{
 		/* Search the pattern list, whether this is a duplicate */
 		bool duplicate = false;
 
-		for (PatternOccurence* ResOcc : Res)
+		for (PatternCodeRegion* ResOcc : Res)
 		{
 			if (PatternOcc == ResOcc || PatternOcc->Equals(ResOcc))
 			{
@@ -497,17 +497,17 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
 	return Counter;
 }
 
-void FanInFanOutStatistic::FindParentPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Parents, int maxdepth)
+void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Parents, int maxdepth)
 {
 	FindNeighbourPatternsRec(Start, Parents, DIR_Parents, 0, maxdepth);
 }
 
-void FanInFanOutStatistic::FindChildPatterns(PatternOccurence* Start, std::vector<PatternOccurence*>& Children, int maxdepth)
+void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth)
 {
 	FindNeighbourPatternsRec(Start, Children, DIR_Children, 0, maxdepth);
 }
 
-void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth)
+void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternCodeRegion*>& Results, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check, if we reached the maximum depth */
 	if (depth >= maxdepth)
@@ -515,7 +515,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, st
 		return;
 	}
 
-	PatternOccurence* Pattern = clang::dyn_cast<PatternOccurence>(Current);
+	PatternCodeRegion* Pattern = clang::dyn_cast<PatternCodeRegion>(Current);
 
 	if (depth > 0 && Pattern != NULL)
 	{
