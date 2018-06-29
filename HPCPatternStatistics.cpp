@@ -15,24 +15,24 @@ SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlen
 	this->dir = dir;
 }
 
-std::vector<SimilarityMeasure::PatternCodeRegionSequence*> SimilarityMeasure::FindPatternOccSeqs(PatternCodeRegion* PatternOccNode, SearchDirection dir, int maxdepth)
+std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth)
 {
-	std::vector<PatternCodeRegionSequence*> Seqs;
+	std::vector<PatternSequence*> Seqs;
 
-	PatternCodeRegionSequence* CurSeq;
-	CurSeq = new PatternCodeRegionSequence;
-	CurSeq->PatternOccs.push_back(PatternOccNode);
+	PatternSequence* CurSeq;
+	CurSeq = new PatternSequence;
+	CurSeq->Patterns.push_back(PatternNode->GetPatternOccurence()->GetPattern());
 
 	std::vector<PatternTreeNode*> Neighbours;
 
 	/* determine the direction in which to build the sequences */
 	if (dir ==  DIR_Children)
 	{
-		Neighbours = PatternOccNode->GetChildren();
+		Neighbours = PatternNode->GetChildren();
 	}
 	else
 	{
-		Neighbours = PatternOccNode->GetParents();
+		Neighbours = PatternNode->GetParents();
 	}
 
 	/* Start with visiting the neighbours */
@@ -44,21 +44,21 @@ std::vector<SimilarityMeasure::PatternCodeRegionSequence*> SimilarityMeasure::Fi
 	return Seqs;
 }
 
-void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternCodeRegionSequence* CurrentSequence, std::vector<PatternCodeRegionSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
+void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check if the current node is a pattern occurence node */
-	if (PatternCodeRegion* CurrentOcc = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
+	if (PatternCodeRegion* CurrentCodeReg = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
 	{
 		/* Branch a new sequence from the previous */
-		PatternCodeRegionSequence* NewSequence = CurrentSequence->Fork();
-		NewSequence->PatternOccs.push_back(CurrentOcc);
+		PatternSequence* NewSequence = CurrentSequence->Fork();
+		NewSequence->Patterns.push_back(CurrentCodeReg->GetPatternOccurence()->GetPattern());
 		Sequences->push_back(NewSequence);
 
 		CurrentSequence = NewSequence;
 	}
 
 	/* If we can still add new occurences, then continue */	
-	if (CurrentSequence->PatternOccs.size() < this->maxlength && depth < maxdepth)
+	if (CurrentSequence->Patterns.size() < this->maxlength && depth < maxdepth)
 	{
 		/* Get neighbours */
 		std::vector<PatternTreeNode*> Neighbours;
