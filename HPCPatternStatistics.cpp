@@ -389,32 +389,32 @@ void FanInFanOutStatistic::Calculate()
 			Counter = AddFIFOCounter(Pattern);
 		}
 		
-		/* Gather all parents and children */
-		std::vector<PatternCodeRegion*> Parents;
-		std::vector<PatternCodeRegion*> Children;
+		/* We want to count the number of pattern occurences */
+		std::vector<PatternOccurence*> Parents;
+		std::vector<PatternOccurence*> Children;
 
-		for (PatternCodeRegion* PatternOcc : Pattern->GetAllOccurences())
+		for (PatternCodeRegion* CodeReg : Pattern->GetAllCodeRegions())
 		{
 #ifdef PRINT_DEBUG
-			PatternOcc->Print();
+			CodeReg->Print();
 			std::cout << std::endl;
 #endif
 			/* Search in Parent and Child Directions */
-			FindParentPatterns(PatternOcc, Parents, maxdepth);
+			FindParentPatterns(CodeReg, Parents, maxdepth);
 #ifdef PRINT_DEBUG
 			std::cout << "List of parents: " << std::endl;			
 
-			for (PatternCodeRegion* Parent : Parents)
+			for (PatternOccurence* Parent : Parents)
 			{
 				Parent->Print();
 				std::cout << std::endl;
 			}
 #endif
-			FindChildPatterns(PatternOcc, Children, maxdepth);
+			FindChildPatterns(CodeReg, Children, maxdepth);
 #ifdef PRINT_DEBUG
 			std::cout << "List of children: " << std::endl;
 
-			for (PatternCodeRegion* Child : Children)
+			for (PatternOccurence* Child : Children)
 			{
 				Child->Print();
 				std::cout << std::endl;
@@ -434,16 +434,16 @@ void FanInFanOutStatistic::Calculate()
 	}
 }
 
-std::vector<PatternCodeRegion*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternCodeRegion*> PatternOccs)
+std::vector<PatternOccurence*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs)
 {
-	std::vector<PatternCodeRegion*> Res;
+	std::vector<PatternOccurence*> Res;
 
-	for (PatternCodeRegion* PatternOcc : PatternOccs)
+	for (PatternOccurence* PatternOcc : PatternOccs)
 	{
 		/* Search the pattern list, whether this is a duplicate */
 		bool duplicate = false;
 
-		for (PatternCodeRegion* ResOcc : Res)
+		for (PatternOccurence* ResOcc : Res)
 		{
 			if (PatternOcc == ResOcc || PatternOcc->Equals(ResOcc))
 			{
@@ -509,17 +509,17 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
 	return Counter;
 }
 
-void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Parents, int maxdepth)
+void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Parents, int maxdepth)
 {
 	FindNeighbourPatternsRec(Start, Parents, DIR_Parents, 0, maxdepth);
 }
 
-void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth)
+void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth)
 {
 	FindNeighbourPatternsRec(Start, Children, DIR_Children, 0, maxdepth);
 }
 
-void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternCodeRegion*>& Results, SearchDirection dir, int depth, int maxdepth)
+void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check, if we reached the maximum depth */
 	if (depth >= maxdepth)
@@ -531,7 +531,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, st
 
 	if (depth > 0 && Pattern != NULL)
 	{
-		Results.push_back(Pattern);
+		Results.push_back(Pattern->GetPatternOccurence());
 	}
 	else
 	{

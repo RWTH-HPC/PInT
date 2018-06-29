@@ -93,13 +93,20 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 
 	for (PatternOccurence* PatternOcc : this->Occurences)
 	{
-		for (PatternCodeRegion* CodeRegion : PatternOcc->GetCodeRegions())
-		{
-			LOC += CodeRegion->GetLinesOfCode();
-		}
+		LOC += PatternOcc->GetTotalLinesOfCode();
 	}
 
 	return LOC;
+}
+
+bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
+{
+	if (this->DesignSp == Pattern->GetDesignSpace() && !this->PatternName.compare(Pattern->GetPatternName()))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 
@@ -117,6 +124,16 @@ int PatternOccurence::GetTotalLinesOfCode()
 	}
 
 	return LOC;
+}
+
+bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
+{
+	if (!this->ID.compare(PatternOcc->GetID()) && this->Pattern->Equals(PatternOcc->GetPattern()))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 

@@ -180,6 +180,8 @@ public:
 	
 	int GetTotalLinesOfCode();
 
+	bool Equals(HPCParallelPattern* Pattern);
+
 private:	
 	DesignSpace DesignSp;
 	std::string PatternName;
@@ -215,6 +217,8 @@ public:
 
 	int GetNumberOfCodeRegions() { return this->CodeRegions.size(); }
 
+	bool Equals(PatternOccurence* PatternOcc);
+	
 private:
 	HPCParallelPattern* Pattern;
 
