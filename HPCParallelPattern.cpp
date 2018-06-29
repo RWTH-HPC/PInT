@@ -107,6 +107,23 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 /*
  * Pattern Occurence Class Functions
  */
+int PatternOccurence::GetTotalLinesOfCode() 
+{
+	int LOC = 0;	
+
+	for (PatternCodeRegion* CodeReg : this->CodeRegions)
+	{
+		LOC += CodeReg->GetLinesOfCode();
+	}
+
+	return LOC;
+}
+
+
+
+/*
+ * Pattern Code Region Class Functions
+ */
 PatternCodeRegion::PatternCodeRegion(PatternOccurence* PatternOcc) : PatternTreeNode(TNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;

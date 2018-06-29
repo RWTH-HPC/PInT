@@ -211,6 +211,10 @@ public:
 
 	std::vector<PatternCodeRegion*> GetCodeRegions() { return this->CodeRegions; }
 
+	int GetTotalLinesOfCode();
+
+	int GetNumberOfCodeRegions() { return this->CodeRegions.size(); }
+
 private:
 	HPCParallelPattern* Pattern;
 
