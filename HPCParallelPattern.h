@@ -168,9 +168,9 @@ public:
 
 	void AddOccurence(PatternOccurence* Occurence);
 
-	std::vector<PatternOccurence*> GetAllOccurences() { return this->Occurences; }
+	std::vector<PatternOccurence*> GetOccurences() { return this->Occurences; }
 
-	std::vector<PatternCodeRegion*> GetAllCodeRegions();
+	std::vector<PatternCodeRegion*> GetCodeRegions();
 	
 	std::string GetPatternName() { return this->PatternName; }
 

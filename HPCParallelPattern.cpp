@@ -109,11 +109,32 @@ bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
 	return false;
 }
 
+std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
+{
+	std::vector<PatternCodeRegion*> CodeRegions;
+
+	for (PatternOccurence* PatternOcc : this->GetOccurences())
+	{
+		for (PatternCodeRegion* CodeReg : PatternOcc->GetCodeRegions())
+		{
+			CodeRegions.push_back(CodeReg);
+		}
+	}
+	
+	return CodeRegions;
+}
+
 
 
 /*
  * Pattern Occurence Class Functions
  */
+PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID)
+{
+	this->Pattern = Pattern;
+	this->ID = ID;
+} 
+
 int PatternOccurence::GetTotalLinesOfCode() 
 {
 	int LOC = 0;	
@@ -134,6 +155,12 @@ bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
 	}
 	
 	return false;
+}
+
+void PatternOccurence::Print()
+{
+	this->Pattern->Print();
+	std::cout << this->GetID() << std::endl;
 }
 
 
@@ -168,7 +195,6 @@ void PatternCodeRegion::SetLastLine(int LastLine)
 
 void PatternCodeRegion::Print()
 {
-	this->PatternOcc->GetPattern()->Print();
 	this->PatternOcc->Print();
 	std::cout << this->GetLinesOfCode() << " lines of code." << std::endl;
 }

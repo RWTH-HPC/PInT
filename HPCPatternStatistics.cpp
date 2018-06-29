@@ -220,7 +220,7 @@ int CyclomaticComplexityStatistic::CountNodes()
 	/* Count all occurences for all patterns */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		std::vector<PatternCodeRegion*> CodeRegs = Pattern->GetAllCodeRegions();
+		std::vector<PatternCodeRegion*> CodeRegs = Pattern->GetCodeRegions();
 		nodes += CodeRegs.size();
 	}
 
@@ -277,7 +277,7 @@ void LinesOfCodeStatistic::Print()
 	{
 		std::cout << "\033[33m" << Pattern->GetPatternName() << "\033[0m" << " has " << Pattern->GetTotalLinesOfCode() << " line(s) of code in total." << std::endl;
 
-		std::vector<PatternOccurence*> Occurences = Pattern->GetAllOccurences();
+		std::vector<PatternOccurence*> Occurences = Pattern->GetOccurences();
 		std::cout << Occurences.size() << " occurences in code." << std::endl;
 
 		for (PatternOccurence* PatternOcc : Occurences)
@@ -303,7 +303,7 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 	{
 		File << Pattern->GetPatternName()  << CSV_SEPARATOR_CHAR;
 		
-		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetAllCodeRegions();
+		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetCodeRegions();
 		File << PatternCodeRegions.size() << CSV_SEPARATOR_CHAR;	
 
 		/* Print the list of lines of code for this pattern */
@@ -344,7 +344,7 @@ void SimplePatternCountStatistic::Print()
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		std::cout << "Pattern \033[33m" << Pattern->GetPatternName() << "\033[0m occurs " << Pattern->GetAllOccurences().size() << " times." << std::endl;
+		std::cout << "Pattern \033[33m" << Pattern->GetPatternName() << "\033[0m occurs " << Pattern->GetOccurences().size() << " times." << std::endl;
 	}
 }
 
@@ -359,7 +359,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		File << Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Pattern->GetAllOccurences().size() << "\n";
+		File << Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Pattern->GetOccurences().size() << "\n";
 	}	
 
 	File.close();
@@ -393,7 +393,7 @@ void FanInFanOutStatistic::Calculate()
 		std::vector<PatternOccurence*> Parents;
 		std::vector<PatternOccurence*> Children;
 
-		for (PatternCodeRegion* CodeReg : Pattern->GetAllCodeRegions())
+		for (PatternCodeRegion* CodeReg : Pattern->GetCodeRegions())
 		{
 #ifdef PRINT_DEBUG
 			CodeReg->Print();
