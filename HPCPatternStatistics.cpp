@@ -168,7 +168,7 @@ bool CyclomaticComplexityStatistic::IsNodeVisited(PatternTreeNode* Node)
 
 int CyclomaticComplexityStatistic::CountEdges()
 {
-	/* Start the tree traversal from the Main Function */
+	/* Start the tree traversal from all functions */
 	std::vector<FunctionDeclDatabaseEntry*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
 
 	int edges = 0;
@@ -186,7 +186,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
 	int Edges = 0;
 	
 	/* If we visit a pattern, add the incoming edge */
-	if (PatternCodeRegion* PatternOcc = clang::dyn_cast<PatternCodeRegion>(Current))
+	if (PatternCodeRegion* Pattern = clang::dyn_cast<PatternCodeRegion>(Current))
 	{
 		Edges = Edges + 1;
 	}
@@ -220,8 +220,8 @@ int CyclomaticComplexityStatistic::CountNodes()
 	/* Count all occurences for all patterns */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		std::vector<PatternCodeRegion*> Occurences = Pattern->GetAllOccurences();
-		nodes += Occurences.size();
+		std::vector<PatternCodeRegion*> CodeRegs = Pattern->GetAllCodeRegions();
+		nodes += CodeRegs.size();
 	}
 
 	return nodes;
@@ -231,18 +231,30 @@ int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
 	TreeAlgorithms::MarkConnectedComponents();
 
-	std::vector<PatternCodeRegion*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
+	std::vector<PatternCodeRegion*> CodeRegs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
+	std::vector<FunctionDeclDatabaseEntry*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
 
 	int ConnectedComponents = 0;
 
-	for (PatternCodeRegion* PatternOcc : PatternOccs)
+	/* Get CCs from the code regions */
+	for (PatternCodeRegion* Reg : CodeRegs)
 	{
-		if (PatternOcc->GetConnectedComponent() > ConnectedComponents)
+		if (Reg->GetConnectedComponent() > ConnectedComponents)
 		{
-			ConnectedComponents = PatternOcc->GetConnectedComponent();
+			ConnectedComponents = Reg->GetConnectedComponent();
 		}
 	}
 
+	/* Also check the function calls */
+	for (FunctionDeclDatabaseEntry* Fn : Functions)
+	{
+		if (Fn->GetConnectedComponent() > ConnectedComponents)
+		{
+			ConnectedComponents = Fn->GetConnectedComponent();
+		}
+	}
+
+	/* Return highest index + 1 (null based index) */
 	return ConnectedComponents + 1;
 }
 
@@ -265,12 +277,12 @@ void LinesOfCodeStatistic::Print()
 	{
 		std::cout << "\033[33m" << Pattern->GetPatternName() << "\033[0m" << " has " << Pattern->GetTotalLinesOfCode() << " line(s) of code in total." << std::endl;
 
-		std::vector<PatternCodeRegion*> Occurences = Pattern->GetAllOccurences();
-		std::cout << Occurences.size() << " regions in code." << std::endl;
+		std::vector<PatternOccurence*> Occurences = Pattern->GetAllOccurences();
+		std::cout << Occurences.size() << " occurences in code." << std::endl;
 
-		for (PatternCodeRegion* PatternOcc : Occurences)
+		for (PatternOccurence* PatternOcc : Occurences)
 		{
-			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetLinesOfCode() << std::endl;
+			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
 		}
 
 		std::cout << "Line(s) of code respectively." << std::endl << std::endl;
@@ -291,7 +303,7 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 	{
 		File << Pattern->GetPatternName()  << CSV_SEPARATOR_CHAR;
 		
-		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetAllOccurences();
+		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetAllCodeRegions();
 		File << PatternCodeRegions.size() << CSV_SEPARATOR_CHAR;	
 
 		/* Print the list of lines of code for this pattern */
