@@ -6,6 +6,12 @@
 
 
 
+enum SimilarityCriterion
+{
+	DesignSpace, Pattern
+};
+
+
 class SimilarityMeasure
 {
 public:
@@ -66,7 +72,7 @@ protected:
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:
-	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir);
+	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir, SimilarityCriterion Crit);
 
 	void Calculate();
 
@@ -84,6 +90,10 @@ private:
 
 	std::vector<HPCParallelPattern*> UnionByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 
-	std::vector<HPCParallelPattern*> UnionByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2); 	
+	std::vector<HPCParallelPattern*> UnionByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);	
+
+	std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet);
+
+	SimilarityCriterion Crit;
 };
 
