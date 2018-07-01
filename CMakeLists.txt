@@ -34,6 +34,6 @@ include_directories(${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
 llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp TreeAlgorithms.cpp) 
+add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp TreeAlgorithms.cpp SimilarityMetrics.cpp) 
 target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic libclang clangTooling clangFrontendTool)
 
