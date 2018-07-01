@@ -160,7 +160,7 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionByPatternName(
 	return Seq1;
 }
 
-std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet)
+std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::RemoveDuplicates(std::vector<HPCParallelPattern*> InSet)
 {
 	std::vector<HPCParallelPattern*> OutSet;
 
