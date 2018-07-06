@@ -4,6 +4,7 @@
 #include "HPCParallelPattern.h"
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 
 
@@ -42,13 +43,32 @@ public:
 				Pattern->PrintShort();
 				std::cout << std::endl;
 			}
-		
-			for (SimilarityPair* Similarity : Similarities)
-			{
-				Similarity->Print();
-			}
-
+	
 			std::cout << std::endl;
+		}
+	
+		bool Equals (PatternSequence* Seq)
+		{
+			/* Check for equality by iterating over the list of patterns until a difference is found */
+			if (this->Patterns.size() == Seq->Patterns.size())
+			{
+				for (int i = 0; i < this->Patterns.size(); i++)
+				{
+					if (!this->Patterns.at(i)->Equals(Seq->Patterns.at(i)))
+					{
+						return false;
+					}
+				}
+
+				return true;	
+			}
+			
+			return false;
+		}
+
+		int Size()
+		{
+			return this->Patterns.size();
 		}
 	};
 
@@ -59,9 +79,36 @@ public:
 		PatternSequence* Seq2;
 		float Similarity;
 
+		SimilarityPair(PatternSequence* Seq1, PatternSequence* Seq2, float Similarity)
+		{
+			this->Seq1 = Seq1;
+			this->Seq2 = Seq2;
+			this->Similarity = Similarity;
+		}	
+
 		void Print()
 		{
-			// TODO implement a printing function for the similarities
+			int maxlength = std::max(this->Seq1->Size(), this->Seq2->Size());
+
+			/* Print both sequences next to each other */
+			for (int i = 0; i < maxlength; i++)
+			{
+				if (i < this->Seq1->Size())
+				{
+					this->Seq1->Patterns.at(i)->PrintShort();
+				}
+		
+				std::cout << "\033[31m  - \033[0m";
+				
+				if (i < this->Seq2->Size())
+				{
+					this->Seq2->Patterns.at(i)->PrintShort();
+				}
+				
+				std::cout << std::endl;
+			}
+
+			std::cout << "Resulting similarity: " << this->Similarity << std::endl << std::endl;
 		}
 	};
 
@@ -92,7 +139,7 @@ protected:
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:
-	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir, SimilarityCriterion Crit);
+	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit);
 
 	void Calculate();
 
@@ -111,6 +158,8 @@ private:
 	std::vector<HPCParallelPattern*> UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 	
 	std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet);
+
+	int minlength;
 
 	SimilarityCriterion Crit;
 };

@@ -104,8 +104,9 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequen
 /*
  * Methods for the Jaccard Similarity Statistic
  */
-JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int length, SearchDirection dir, SimilarityCriterion Crit) : SimilarityMeasure(RootPattern, length, dir)
+JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit) : SimilarityMeasure(RootPattern, maxlength, dir)
 {
+	this->minlength = minlength;
 	this->Crit = Crit;
 }
 
@@ -122,7 +123,22 @@ void JaccardSimilarityStatistic::Calculate()
 		}
 	}
 
-	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, 3, 3);	
+	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, this->minlength, this->maxlength);	
+
+	/* Calculate the similarities for all pairs of pattern sequences */
+	for (PatternSequence* Seq1 : this->PatternSequences)
+	{	
+		for (PatternSequence* Seq2 : this->PatternSequences)
+		{
+			if (Seq1 != Seq2 && !Seq1->Equals(Seq2))
+			{
+				float sim = Similarity(Seq1, Seq2);
+
+				SimilarityPair* SimPair = new SimilarityPair(Seq1, Seq2, sim);
+				this->Similarities.push_back(SimPair);
+			}
+		}
+	}
 }
 
 void JaccardSimilarityStatistic::Print()
@@ -130,6 +146,11 @@ void JaccardSimilarityStatistic::Print()
 	for (PatternSequence* Seq : this->PatternSequences)
 	{
 		Seq->Print();
+	}
+
+	for (SimilarityPair* Pair : this->Similarities)
+	{
+		Pair->Print();
 	}
 }
 
