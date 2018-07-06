@@ -1,6 +1,9 @@
 #include "HPCPatternInstrASTTraversal.h"
 #include "TreeVisualisation.h"
 #include "HPCPatternStatistics.h"
+#include "HPCParallelPattern.h"
+#include "TreeAlgorithms.h"
+#include "SimilarityMetrics.h"
 
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
@@ -52,6 +55,14 @@ int main (int argc, const char** argv)
 	Statistics[0]->CSVExport("Counts.csv");
 	Statistics[1]->CSVExport("FIFO.csv");
 	Statistics[2]->CSVExport("LOC.csv");
+
+	/* Similarity Measures */
+	HPCParallelPattern* IMVI = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
+	JaccardSimilarityStatistic Jaccard(IMVI, 5, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern);
+
+	Jaccard.Calculate();
+	Jaccard.Print();
+
 
 	return retcode;
 }

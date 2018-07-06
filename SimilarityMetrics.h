@@ -3,6 +3,7 @@
 #include "HPCPatternStatistics.h"
 #include "HPCParallelPattern.h"
 #include <vector>
+#include <iostream>
 
 
 
@@ -32,6 +33,23 @@ public:
 			PS->Patterns = this->Patterns;
 			return PS;
 		}
+	
+		/* Prints all the information for this pattern sequence */
+		void Print()
+		{
+			for (HPCParallelPattern* Pattern : Patterns)
+			{
+				Pattern->PrintShort();
+				std::cout << std::endl;
+			}
+		
+			for (SimilarityPair* Similarity : Similarities)
+			{
+				Similarity->Print();
+			}
+
+			std::cout << std::endl;
+		}
 	};
 
 	/* Datastructure to save the similarity between two sequences */
@@ -40,6 +58,11 @@ public:
 		PatternSequence* Seq1;
 		PatternSequence* Seq2;
 		float Similarity;
+
+		void Print()
+		{
+			// TODO implement a printing function for the similarities
+		}
 	};
 
 
@@ -78,7 +101,7 @@ public:
 
 	void Print();
 
-	void CSVExport();
+	void CSVExport(std::string FileName);
 
 private:
 	/* Functions to calculate the Jaccard Similarity */
@@ -86,12 +109,10 @@ private:
 
 	std::vector<HPCParallelPattern*> IntersectByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 
-	std::vector<HPCParallelPattern*> IntersectByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
+	std::vector<HPCParallelPattern*> IntersectByPattern(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 
-	std::vector<HPCParallelPattern*> UnionByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
-
-	std::vector<HPCParallelPattern*> UnionByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);	
-
+	std::vector<HPCParallelPattern*> UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
+	
 	std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet);
 
 	SimilarityCriterion Crit;

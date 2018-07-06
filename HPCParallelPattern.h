@@ -166,6 +166,8 @@ public:
 	
 	void Print();
 
+	void PrintShort();
+
 	void AddOccurence(PatternOccurence* Occurence);
 
 	std::vector<PatternOccurence*> GetOccurences() { return this->Occurences; }

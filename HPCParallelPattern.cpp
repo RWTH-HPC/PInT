@@ -82,6 +82,11 @@ void HPCParallelPattern::Print()
 	std::cout << this->Occurences.size() << " Occurences." << std::endl;
 }
 
+void HPCParallelPattern::PrintShort()
+{
+	std::cout << "\033[33m" << DesignSpaceToStr(this->DesignSp) << "\033[0m" << this->PatternName;
+}
+
 void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
 {
 	this->Occurences.push_back(Occurence);

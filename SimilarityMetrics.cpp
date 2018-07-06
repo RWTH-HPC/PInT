@@ -79,7 +79,7 @@ void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, Patte
 		/* Visit Neighbours */
 		for (PatternTreeNode* Neighbour : Neighbours)
 		{	
-			VisitPatternTreeNode(Neighbour, CurrentSequence, Sequences, dir, 1, maxdepth);
+			VisitPatternTreeNode(Neighbour, CurrentSequence, Sequences, dir, depth + 1, maxdepth);
 		}
 	}
 }
@@ -96,15 +96,27 @@ JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootP
 
 void JaccardSimilarityStatistic::Calculate()
 {
-	
+	/* Iterate over all occurences and all code regions of the root pattern to find all sequences starting from this pattern */
+	for (PatternCodeRegion* CodeRegion : RootPattern->GetCodeRegions())
+	{
+		std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, this->maxlength);
+
+		for (PatternSequence* Seq : Seqs)
+		{
+			this->PatternSequences.push_back(Seq);
+		}
+	}	
 }
 
 void JaccardSimilarityStatistic::Print()
 {
-
+	for (PatternSequence* Seq : PatternSequences)
+	{
+		Seq->Print();
+	}
 }
 
-void JaccardSimilarityStatistic::CSVExport()
+void JaccardSimilarityStatistic::CSVExport(std::string FileName)
 {
 
 }
@@ -114,27 +126,24 @@ float JaccardSimilarityStatistic::Similarity(PatternSequence* Seq1, PatternSeque
 {
 	int num, denom;
 	std::vector<HPCParallelPattern*> numset, denomset;
+	
+	denomset = UnionSet(Seq1->Patterns, Seq2->Patterns);
 
 	switch (Crit)
 	{
 		/* Calculate the metric by using the Design Space as criterion */
 		case DesignSpace:
 			numset = IntersectByDesignSp(Seq1->Patterns, Seq2->Patterns);
-			denomset = UnionByDesignSp(Seq1->Patterns, Seq2->Patterns);
 			break;
 
 		/* Use the pattern as intersection and union criterion */
 		case Pattern:
-			numset = IntersectByPatternName(Seq1->Patterns, Seq2->Patterns);
-			denomset = UnionByPatternName(Seq1->Patterns, Seq2->Patterns);		
+			numset = IntersectByPattern(Seq1->Patterns, Seq2->Patterns);
 			break;
 	}
 
 	/* Remove duplicates and calculate the numerator and denominator */
-	numset = RemoveDuplicates(numset);
 	num = numset.size();
-
-	denomset = RemoveDuplicates(denomset);
 	denom = denomset.size();
 
 	return (float)(num) / (float)(denom);
@@ -142,22 +151,59 @@ float JaccardSimilarityStatistic::Similarity(PatternSequence* Seq1, PatternSeque
 
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
-	return Seq1;
+	std::vector<HPCParallelPattern*> Intersection;
+
+	/* Iterate over all patterns and add all combinations of patterns where the design spaces match */
+	for (HPCParallelPattern* Pattern1 : Seq1)
+	{
+		for (HPCParallelPattern* Pattern2 : Seq2)
+		{
+			if (Pattern1->GetDesignSpace() == Pattern2->GetDesignSpace())
+			{
+				Intersection.push_back(Pattern1);
+				Intersection.push_back(Pattern2);
+			}
+		}
+	}
+
+	return RemoveDuplicates(Intersection);
 }
 
-std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
+std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPattern(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
-	return Seq1;
+	std::vector<HPCParallelPattern*> Intersection;
+	
+	/* Add all patterns which are equal to one another */
+	for (HPCParallelPattern* Pattern1 : Seq1)
+	{
+		for (HPCParallelPattern* Pattern2 : Seq2)
+		{
+			if (Pattern1->Equals(Pattern2))
+			{
+				Intersection.push_back(Pattern1);
+			}
+		}
+	}
+
+	return RemoveDuplicates(Intersection);
 }
 
-std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
+std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
-	return Seq1;
-}
+	std::vector<HPCParallelPattern*> Union;
 
-std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionByPatternName(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
-{
-	return Seq1;
+	/* Unite both sets by adding all patterns */	
+	for (HPCParallelPattern* Pattern : Seq1)
+	{
+		Union.push_back(Pattern);
+	}
+
+	for (HPCParallelPattern* Pattern : Seq2)
+	{
+		Union.push_back(Pattern);
+	}
+
+	return RemoveDuplicates(Union);
 }
 
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::RemoveDuplicates(std::vector<HPCParallelPattern*> InSet)
