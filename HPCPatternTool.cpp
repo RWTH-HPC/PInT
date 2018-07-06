@@ -57,6 +57,9 @@ int main (int argc, const char** argv)
 	Statistics[2]->CSVExport("LOC.csv");
 
 	/* Similarity Measures */
+	std::cout << std::endl;
+	std::cout << "Pattern sequences:" << std::endl;	
+
 	HPCParallelPattern* IMVI = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
 	JaccardSimilarityStatistic Jaccard(IMVI, 5, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern);
 

@@ -84,6 +84,21 @@ void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, Patte
 	}
 }
 
+std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequencesByLength(std::vector<PatternSequence*> PatternSequences, int minlength, int maxlength)
+{
+	std::vector<PatternSequence*> FilteredSequences;	
+
+	/* Iterate over all sequences and check the length of the pattern list */
+	for (PatternSequence* Seq : PatternSequences)
+	{
+		if (Seq->Patterns.size() >= minlength && Seq->Patterns.size() <= maxlength)
+		{
+			FilteredSequences.push_back(Seq);
+		}
+	}
+
+	return FilteredSequences;
+}
 
 
 /*
@@ -99,18 +114,20 @@ void JaccardSimilarityStatistic::Calculate()
 	/* Iterate over all occurences and all code regions of the root pattern to find all sequences starting from this pattern */
 	for (PatternCodeRegion* CodeRegion : RootPattern->GetCodeRegions())
 	{
-		std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, this->maxlength);
+		std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, 10);
 
 		for (PatternSequence* Seq : Seqs)
 		{
 			this->PatternSequences.push_back(Seq);
 		}
-	}	
+	}
+
+	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, 3, 3);	
 }
 
 void JaccardSimilarityStatistic::Print()
 {
-	for (PatternSequence* Seq : PatternSequences)
+	for (PatternSequence* Seq : this->PatternSequences)
 	{
 		Seq->Print();
 	}

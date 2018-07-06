@@ -65,23 +65,20 @@ public:
 		}
 	};
 
-
-protected:
 	SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir);
-
 
 	std::vector<SimilarityPair*> SortBySimilarity(std::vector<SimilarityPair*> Sims);
 
+	std::vector<PatternSequence*> FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth);
 
+	std::vector<PatternSequence*> FilterSequencesByLength(std::vector<PatternSequence*> Sequences, int minlength, int maxlength);
+
+protected:
 	std::vector<PatternSequence*> PatternSequences;
 
 	std::vector<SimilarityPair*> Similarities;
 
-	/* Functions to build the sequences of pattern occurences */
-	std::vector<PatternSequence*> FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth);
-
 	void VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
-
 
 	HPCParallelPattern* RootPattern;
 
