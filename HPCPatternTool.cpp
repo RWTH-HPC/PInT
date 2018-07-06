@@ -61,7 +61,7 @@ int main (int argc, const char** argv)
 	std::cout << "Pattern sequences:" << std::endl;	
 
 	HPCParallelPattern* IMVI = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
-	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern);
+	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
 
 	Jaccard.Calculate();
 	Jaccard.Print();

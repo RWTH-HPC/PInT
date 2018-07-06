@@ -16,6 +16,8 @@ std::vector<SimilarityMeasure::SimilarityPair*> SimilarityMeasure::SortBySimilar
 {
 	// TODO Implement sorting function
 	std::vector<SimilarityPair*> res;
+	
+
 	return res;
 }
 
@@ -104,10 +106,11 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequen
 /*
  * Methods for the Jaccard Similarity Statistic
  */
-JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit) : SimilarityMeasure(RootPattern, maxlength, dir)
+JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
 {
 	this->minlength = minlength;
 	this->Crit = Crit;
+	this->outputlen = outputlen;
 }
 
 void JaccardSimilarityStatistic::Calculate()
@@ -143,15 +146,17 @@ void JaccardSimilarityStatistic::Calculate()
 
 void JaccardSimilarityStatistic::Print()
 {
+#if PRINT_DEBUG
 	for (PatternSequence* Seq : this->PatternSequences)
 	{
 		Seq->Print();
 	}
+#endif
 
-	for (SimilarityPair* Pair : this->Similarities)
+	for (int i = 0; i < std::min((ulong)outputlen, this->Similarities.size()); i++)
 	{
-		Pair->Print();
-	}
+		this->Similarities.at(i)->Print();
+	}	
 }
 
 void JaccardSimilarityStatistic::CSVExport(std::string FileName)

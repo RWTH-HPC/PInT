@@ -139,7 +139,7 @@ protected:
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:
-	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit);
+	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit, int outputlen);
 
 	void Calculate();
 
@@ -158,6 +158,8 @@ private:
 	std::vector<HPCParallelPattern*> UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 	
 	std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet);
+
+	int outputlen;
 
 	int minlength;
 
