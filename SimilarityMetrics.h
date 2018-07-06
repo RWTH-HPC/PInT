@@ -112,9 +112,11 @@ public:
 		}
 	};
 
+	static bool CompareBySimilarity(const SimilarityPair* SimPair1, const SimilarityPair* SimPair2);
+
 	SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir);
 
-	std::vector<SimilarityPair*> SortBySimilarity(std::vector<SimilarityPair*> Sims);
+	static void SortBySimilarity(std::vector<SimilarityPair*>& Sims);
 
 	std::vector<PatternSequence*> FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth);
 

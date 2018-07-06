@@ -12,13 +12,14 @@ SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlen
 	this->dir = dir;
 }
 
-std::vector<SimilarityMeasure::SimilarityPair*> SimilarityMeasure::SortBySimilarity(std::vector<SimilarityPair*> Sims)
+void SimilarityMeasure::SortBySimilarity(std::vector<SimilarityPair*>& Sims)
 {
-	// TODO Implement sorting function
-	std::vector<SimilarityPair*> res;
-	
+	std::sort(Sims.begin(), Sims.end(), SimilarityMeasure::CompareBySimilarity);	
+}
 
-	return res;
+bool SimilarityMeasure::CompareBySimilarity(const SimilarityPair* SimPair1, const SimilarityPair* SimPair2)
+{
+	return (SimPair1->Similarity > SimPair2->Similarity);
 }
 
 std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth)
@@ -126,7 +127,8 @@ void JaccardSimilarityStatistic::Calculate()
 		}
 	}
 
-	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, this->minlength, this->maxlength);	
+	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, this->minlength, this->maxlength);		
+
 
 	/* Calculate the similarities for all pairs of pattern sequences */
 	for (PatternSequence* Seq1 : this->PatternSequences)
@@ -142,6 +144,8 @@ void JaccardSimilarityStatistic::Calculate()
 			}
 		}
 	}
+		
+	SortBySimilarity(this->Similarities);
 }
 
 void JaccardSimilarityStatistic::Print()
