@@ -54,7 +54,13 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 		HPCPatternDatabase::GetInstance()->AddPatternOccurence(PatternOcc);
 		Pattern->AddOccurence(PatternOcc);
 	}
-
+	else
+	{
+		if (!PatternOcc->GetPattern()->Equals(Pattern))
+		{
+			std::cout << "\033[31m" << "Pattern Occurences with same identifier have different underlying pattern:\033[0m" << PatternID << std::endl;
+		}
+	}
 
 	/* Create a new object for pattern occurence */
 	PatternCodeRegion* CodeRegion = new PatternCodeRegion(PatternOcc);

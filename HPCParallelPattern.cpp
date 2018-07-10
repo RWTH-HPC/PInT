@@ -320,7 +320,7 @@ std::string DesignSpaceToStr(DesignSpace DesignSp)
 	}
 	else if (DesignSp == SupportingStructure)
 	{
-		return "SupportingStructre";
+		return "SupportingStructure";
 	}
 	else if (DesignSp == ImplementationMechanism)
 	{
