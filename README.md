@@ -1,7 +1,7 @@
 <h1>How to install and use the tool</h1>
 <h2>1. Prerequisites</h2>
 1) Install clang 5 with libTooling support<br>
-2) Install cmake (3.4.1)<br>
+2) Install cmake (preferably 3.4.1, not tested with older versions)<br>
 3) Clone the git repository to your machine
 
 <h2>2. Installing the tool</h2>
