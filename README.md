@@ -43,7 +43,9 @@ Please note that patterns that due to implementation, pattern regions have to be
 3) Create/update your build system ('mkdir build && cd build && ccmake ..')<br>
 4) Copy compile_commands.json to the directory with the sources<br>
 <b>OR</b><br>
-Write your compile_commands.json manually. But I would advise against doing that.
+Write your compile_commands.json manually. But I would advise against doing that.<br>
+
+If you have trouble with this explanation, consider: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> or <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
 
 <h3>3.3 Running the tool</h3>
 1) If you created no compilation database: think of the parameters you would want to pass to the clang compiler<br>
