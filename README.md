@@ -16,6 +16,27 @@
 1) Include pattern instrumentation headers (Mind the C and CPP versions) in your source file<br>
 2) Add instrumenation commands at the beginning and end of code regions that belong to a pattern
 
+<figure>
+  <figcaption>Example for code instrumentation</figcaption>
+  <pre>
+    <code>
+    PatternInstrumentation::PatternBegin("SupportingStructure LoopParallelism MainParLoop");
+    #pragma omp for
+    for (int i = 0; i < MAX_ITERATIONS; i++)
+        someCode();
+    PatternInstrumentation::PatternEnd("MainParLoop");
+    </code>
+  </pre>
+</figure>
+
+The formal Syntax of the PatternBegin expression is as follows:<br>
+<b>'DesignSpace PatternName Identifier'</b><br>
+where DesignSpace is either FindingConcurrency, AlgorithmStructure, SupportingStructure or ImplementationMechanism,<br>
+PatternName is the name of the pattern employed in this code region,<br>
+and the Identifier is a name for this exact occurence of the pattern.<br>
+Identifiers can be re-used to indicate to the tool, that two (or more) code regions belong together.<br><br>
+Please note that patterns that due to implementation, pattern regions have to be closed in the opposite order in which they are opened (First Opened - Last Closed).
+
 <h3>3.2 <b>Optional:</b> Create compile_commands.json</h3>
 1) Create a cmake project for your source files, or use an existing project<br>
 2) Set the variable "EXPORT_COMPILE_COMMANDS" to true<br>
