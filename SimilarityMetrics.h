@@ -7,25 +7,49 @@
 #include <algorithm>
 
 
-
+/**
+ * Similarity Criterion for intersection of pattern sets.
+ * Intersection by design space means that both patterns have the same design space.
+ * By Pattern means pattern identity.
+ */
 enum SimilarityCriterion
 {
 	DesignSpace, Pattern
 };
 
-
+/**
+ * An abstract class for similarity measures which provides mutual methods and standard implementations.
+ * All similarity measures should inherit from this class.
+ * Most importantly, extraction of pattern sequences from the pattern tree for later similarity investigations is implemented.
+ * Furthermore, miscellaneous implementations are provided here.
+ * E.g. sorting by similarity etc.
+ */
 class SimilarityMeasure
 {
 public:
 	/* Datastructure to save a sequence of PatternCodeRegions and link them with similarities */
 	struct SimilarityPair;
 
+	/**
+ 	 * Class that contains a sequence of patterns and similarities to other PatternSequence objects.
+ 	 */
 	struct PatternSequence
 	{
+		/**
+ 		 * The patterns contained in this pattern sequence
+ 		 */ 
 		std::vector<HPCParallelPattern*> Patterns;
+		/**
+ 		 * Similarities to other Pattern Sequences
+ 		 */ 
 		std::vector<SimilarityPair*> Similarities;
 	
-		/* A little fork operator, so that we can branch one sequence from another */
+		/**
+ 		 * A convenient fork operator which copies the patterns to the new objects. 
+ 		 * Similarities are not copied. 
+ 		 * 
+ 		 * @returns A new PatternSequence object with same patterns.
+		 */
 		PatternSequence* Fork()
 		{
 			PatternSequence* PS;
@@ -35,7 +59,10 @@ public:
 			return PS;
 		}
 	
-		/* Prints all the information for this pattern sequence */
+		/**
+ 		 * Prints all the information for this pattern sequence.
+ 		 * Calls HPCParallelPattern::PrintShort()
+ 		 */
 		void Print()
 		{
 			for (HPCParallelPattern* Pattern : Patterns)
@@ -46,7 +73,13 @@ public:
 	
 			std::cout << std::endl;
 		}
-	
+		
+		/**
+ 		 * Function for comparison of PatternSequence objects.
+ 		 * @param Seq Sequence to compare against.
+ 		 *
+ 		 * @returns True if equal, false else.
+ 		 */
 		bool Equals (PatternSequence* Seq)
 		{
 			/* Check for equality by iterating over the list of patterns until a difference is found */
@@ -72,13 +105,22 @@ public:
 		}
 	};
 
-	/* Datastructure to save the similarity between two sequences */
+	/** 
+ 	 * Datastructure to save the similarity between two sequences 
+ 	 */
 	struct SimilarityPair
 	{
 		PatternSequence* Seq1;
 		PatternSequence* Seq2;
 		float Similarity;
 
+		/**
+ 		 * Constructor for similarity pairs.
+ 		 *
+ 		 * @param Seq1 First sequence.
+ 		 * @param Seq2 Second sequence.
+ 		 * @param Similaity Calculated similarity.
+ 		 */
 		SimilarityPair(PatternSequence* Seq1, PatternSequence* Seq2, float Similarity)
 		{
 			this->Seq1 = Seq1;
@@ -86,6 +128,9 @@ public:
 			this->Similarity = Similarity;
 		}	
 
+		/**
+ 		 * Prints the information contained in this object.
+ 		 */
 		void Print()
 		{
 			int maxlength = std::max(this->Seq1->Size(), this->Seq2->Size());
@@ -138,6 +183,15 @@ protected:
 
 
 
+/**
+ * This class implements the Jaccard similarity statistic.
+ * Jaccard coefficient is a metric that can be used to quantify similarity between two sets.
+ * We adapted this metric for parallel patterns.
+ * It is calculated as the size of the intersection divided by size of the union.
+ * J = size(intersection(A, B)) / size(union(A, B)).
+ * The intersection criterion can be chosen upon statistic object creation.
+ * The order of patterns in the pattern sequences is irrelevant for this set-based similarity measure.
+ */
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:

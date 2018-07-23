@@ -11,9 +11,14 @@
 
 
 
-/* 
- * Visitor function implementations
- */
+/**
+ * @brief If a function declaration is encountered, look up the corresponding database entry. 
+ * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionDeclDatabaseEntry for correct parent-child-relations. 
+ *
+ * @param Decl The clang object encountered by the visitor.
+ *
+ * @return Always true to signal that the tree traversal should be continued.
+ **/
 bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 {
 	CurrentFn = Decl;
@@ -27,6 +32,18 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 	return true;
 }
 
+
+/**
+ * @brief When we encounter a call expression, we look up the declaration of the function called.
+ * If it is one of our instrumentation functions, we extract the information from the string argument with ASTMatchers.
+ * A PatternCodeRegion object is created if this is the start of a region or the current region is closed.
+ * For a non-instrumentation function, the function is added to top-most pattern as a child.
+ * If the pattern stack is empty, the function is a direct child of the calling function.
+ *
+ * @param CallExpr The clang object containing information about the call expression.
+ *
+ * @return True to signal continuing the traversal.
+ **/
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
 	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace()) 
@@ -109,7 +126,7 @@ HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Co
 
 
 /* 
- * Consumer function implementations+
+ * Consumer function implementations
  */
 void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context) 
 {

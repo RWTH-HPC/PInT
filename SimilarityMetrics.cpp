@@ -2,9 +2,13 @@
 
 
 
-/* 
- * Methods for the Similarity Metric Interface
- */
+/**
+ * @brief Constructor for the abstract similarity measure class.
+ *
+ * @param RootPattern The pattern from which the pattern sequences are constructed.
+ * @param maxlength The maximum sequence length.
+ * @param dir The direction (children/parents) in which the sequences are extracted.
+ **/
 SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir)
 {
 	this->RootPattern = RootPattern;
@@ -12,16 +16,39 @@ SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlen
 	this->dir = dir;
 }
 
+/**
+ * @brief Sorts the sequence pairs in place.
+ *
+ * @param Sims The similarity pairs that are meant to be sorted.
+ **/
 void SimilarityMeasure::SortBySimilarity(std::vector<SimilarityPair*>& Sims)
 {
 	std::sort(Sims.begin(), Sims.end(), SimilarityMeasure::CompareBySimilarity);	
 }
 
+/**
+ * @brief Compares two similarity pairs (Needed for SimilarityMeasure::SortBySimilarity)
+ *
+ * @param SimPair1 First pair.
+ * @param SimPair2 Second pair.
+ *
+ * @return True if similarity of first pair is greater than of second. False, else.
+ **/
 bool SimilarityMeasure::CompareBySimilarity(const SimilarityPair* SimPair1, const SimilarityPair* SimPair2)
 {
 	return (SimPair1->Similarity > SimPair2->Similarity);
 }
 
+/**
+ * @brief Extracts the pattern sequences starting with the root pattern and saves them in SimilarityMeasure::PatternSequence objects.
+ * Calls SimilarityMeasure::VisitPatternTreeNode().
+ *
+ * @param PatternNode The starting code region.
+ * @param dir Direction (children/parent) of descent.
+ * @param maxdepth The maximum depth of the recursion.
+ *
+ * @return A list of pattern sequences.
+ **/
 std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth)
 {
 	std::vector<PatternSequence*> Seqs;
@@ -51,6 +78,16 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
 	return Seqs;
 }
 
+/**
+ * @brief Recursive function for extraction of the pattern sequences.
+ *
+ * @param CurrentNode The current pattern tree node.
+ * @param CurrentSequence The current pattern sequence to which we add further patterns.
+ * @param Sequences A pointer to a vector of sequences to which new sequences are added.
+ * @param dir Direction of recursive descent.
+ * @param depth The current recursion depth.
+ * @param maxdepth The maximum recursion depth.
+ **/
 void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check if the current node is a pattern occurence node */
@@ -87,6 +124,15 @@ void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, Patte
 	}
 }
 
+/**
+ * @brief Filters a list of sequences so that only PatternSequence objects with a specific length are retained.
+ *
+ * @param PatternSequences Input list of PatternSequence objects.
+ * @param minlength The minimum length.
+ * @param maxlength The maximum length. 
+ *
+ * @return Input list clear of sequences that are longer than maxlength and shorter than minlength.
+ **/
 std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequencesByLength(std::vector<PatternSequence*> PatternSequences, int minlength, int maxlength)
 {
 	std::vector<PatternSequence*> FilteredSequences;	
@@ -104,9 +150,17 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequen
 }
 
 
-/*
- * Methods for the Jaccard Similarity Statistic
- */
+
+/**
+ * @brief Constructor for the Jaccard similarity statistic.
+ *
+ * @param RootPattern The root pattern for all pattern sequences.
+ * @param minlength The minimum length for a sequence to be considered.
+ * @param maxlength The max length of a sequence.
+ * @param dir Direction of recursive descent.
+ * @param Crit The similarity criterion used.
+ * @param outputlen Length of the textual output: how many entries are displayed.
+ **/
 JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
 {
 	this->minlength = minlength;
@@ -114,6 +168,11 @@ JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootP
 	this->outputlen = outputlen;
 }
 
+/**
+ * @brief Calculates the Jaccard similarity statistic for all sequences extracted.
+ * First, the sequences are filtered by length.
+ * Then, a similarity is calculated for all pairs of sequences.
+ */
 void JaccardSimilarityStatistic::Calculate()
 {
 	/* Iterate over all occurences and all code regions of the root pattern to find all sequences starting from this pattern */
@@ -148,6 +207,9 @@ void JaccardSimilarityStatistic::Calculate()
 	SortBySimilarity(this->Similarities);
 }
 
+/**
+ * @brief Prints similarities for all pairs of pattern sequences.
+ */
 void JaccardSimilarityStatistic::Print()
 {
 #if PRINT_DEBUG
@@ -163,12 +225,26 @@ void JaccardSimilarityStatistic::Print()
 	}	
 }
 
+/**
+ * @brief Dummy function
+ *
+ * @param FileName File name of the output file.
+ **/
 void JaccardSimilarityStatistic::CSVExport(std::string FileName)
 {
 
 }
 
-/* Functions to calculate the Jaccard Similarity */
+/**
+ * @brief Calculates the Jaccard similarity for two given pattern sequences.
+ * Calls JaccardSimilarityStatistic::UnionSet(), JaccardSimilarityStatistic::IntersectByDesignSp() and JaccardSimilarityStatistic::IntersectByPattern() to build a union set and an intersection of both sets constructed from the sequences.
+ * Set sizes are then used to calculate the metric.
+ *
+ * @param Seq1 First sequence.
+ * @param Seq2 Second sequence.
+ *
+ * @return The similarity of the sequences.
+ **/
 float JaccardSimilarityStatistic::Similarity(PatternSequence* Seq1, PatternSequence* Seq2)
 {
 	int num, denom;
@@ -196,6 +272,16 @@ float JaccardSimilarityStatistic::Similarity(PatternSequence* Seq1, PatternSeque
 	return (float)(num) / (float)(denom);
 }
 
+/**
+ * @brief Builds an intersection of the input sets.
+ * The critetion for intersection is that both patterns have the same design space.
+ * They are added to an intermediate set, which is then cleansed from duplicates.
+ *
+ * @param Seq1 First Set.
+ * @param Seq2 Second Set.
+ *
+ * @return The intersection of both sets.
+ **/
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByDesignSp(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
 	std::vector<HPCParallelPattern*> Intersection;
@@ -216,6 +302,15 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByDesignSp
 	return RemoveDuplicates(Intersection);
 }
 
+/**
+ * @brief See JaccardSimilarityStatistic::IntersectByDesignSp().
+ * Intersection criterion is the pattern name, hence pattern equality.
+ *
+ * @param Seq1 First Set.
+ * @param Seq2 Second Set.
+ *
+ * @return The intersection of both sets.
+ **/
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPattern(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
 	std::vector<HPCParallelPattern*> Intersection;
@@ -235,6 +330,15 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPattern(
 	return RemoveDuplicates(Intersection);
 }
 
+/**
+ * @brief Computes the union of both sets.
+ * All patterns are saved in an intermediate set and duplicates are removed.
+ *
+ * @param Seq1 First set.
+ * @param Seq2 Second set.
+ *
+ * @return The union of both sets.
+ **/
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
 	std::vector<HPCParallelPattern*> Union;
@@ -253,6 +357,13 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vecto
 	return RemoveDuplicates(Union);
 }
 
+/**
+ * @brief Removes duplicates from the input set.
+ *
+ * @param InSet Input set.
+ *
+ * @return Set free of duplicates.
+ **/
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::RemoveDuplicates(std::vector<HPCParallelPattern*> InSet)
 {
 	std::vector<HPCParallelPattern*> OutSet;

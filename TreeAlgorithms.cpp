@@ -3,6 +3,10 @@
 
 
 
+/**
+ * @brief A tree operation that marks every tree node with the label corresponding to its connected component.
+ * Calls TreeAlgorithms::MarkConnectedComponents(PatternTreeNode*, int).
+ */
 void TreeAlgorithms::MarkConnectedComponents()
 {
 	std::vector<PatternCodeRegion*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
@@ -19,6 +23,12 @@ void TreeAlgorithms::MarkConnectedComponents()
 	}
 }
 
+/**
+ * @brief Marks every tree node with label corresponding to connected component
+ *
+ * @param Node The current node.
+ * @param ComponentID ID of the connected component.
+ **/
 void TreeAlgorithms::MarkConnectedComponents(PatternTreeNode* Node, int ComponentID)
 {
 	if (Node->GetConnectedComponent() == -1)

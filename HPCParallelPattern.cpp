@@ -33,6 +33,19 @@ FunctionDeclDatabase::FunctionDeclDatabase() : Entries()
 {
 }
 
+
+
+/**
+ * @brief Lookup function for the database entry that corresponds to the given function declaration.
+ *
+ * This function takes a clang function declaration object as input and calculates an ODR hash value from the object.
+ * This value is then used for lookup of the corresponding entry in our function declaration database to enable linking of function calls and bodies with their declarations between translation units.
+ * If no entry is found, a new entry is created and the object corresponding to this new entry is returned.
+ *
+ * @param Decl The clang object that belongs to a function declaration in the source code.
+ *
+ * @return The (new) function declaration database entry corresponding to the function declaration.
+ **/
 FunctionDeclDatabaseEntry* FunctionDeclDatabase::Lookup(clang::FunctionDecl* Decl)
 {
 	clang::ODRHash Hash;
@@ -74,6 +87,9 @@ HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string Pattern
 	this->PatternName = PatternName;
 }
 
+/**
+ * @brief Prints design space, pattern name and number of occurences.
+ **/
 void HPCParallelPattern::Print() 
 {
 	std::cout << "Pattern Info" << std::endl;
@@ -82,6 +98,9 @@ void HPCParallelPattern::Print()
 	std::cout << this->Occurences.size() << " Occurences." << std::endl;
 }
 
+/**
+ * @brief Like Print() but output is only a single line. 
+ **/
 void HPCParallelPattern::PrintShort()
 {
 	std::cout << "\033[33m" << DesignSpaceToStr(this->DesignSp) << "\033[0m" << this->PatternName;
@@ -92,6 +111,11 @@ void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
 	this->Occurences.push_back(Occurence);
 }
 
+/**
+ * @brief Returns the sum of lines of code from all pattern occurences.
+ *
+ * @return Sum of lines of code.
+ **/
 int HPCParallelPattern::GetTotalLinesOfCode()
 {
 	int LOC = 0;
@@ -104,6 +128,11 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 	return LOC;
 }
 
+/**
+ * @brief Compares two patterns for design space and pattern name.
+ *
+ * @return True if equal, else false.
+ **/
 bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
 {
 	if (this->DesignSp == Pattern->GetDesignSpace() && !this->PatternName.compare(Pattern->GetPatternName()))
@@ -114,6 +143,11 @@ bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
 	return false;
 }
 
+/**
+ * @brief Get all code regions from all pattern occurences.
+ *
+ * @return Return pointers to all PatternCodeRegion objects from all PatternOccurence objects.
+ **/
 std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 {
 	std::vector<PatternCodeRegion*> CodeRegions;
@@ -140,6 +174,11 @@ PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID)
 	this->ID = ID;
 } 
 
+/**
+ * @brief Get the lines of code for all PatternCodeRegion objects registered with this PatternOccurence.
+ *
+ * @return Sum of lines of code.
+ **/
 int PatternOccurence::GetTotalLinesOfCode() 
 {
 	int LOC = 0;	
@@ -152,6 +191,13 @@ int PatternOccurence::GetTotalLinesOfCode()
 	return LOC;
 }
 
+/**
+ * @brief Compare a PatternOccurence object with this object. The ID and the underlying HPCParallelPattern are compared.
+ *
+ * @param PatternOcc The PatternOccurence object to compare with.
+ *
+ * @return True if equal, false elsewise.
+ **/
 bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
 {
 	if (!this->ID.compare(PatternOcc->GetID()) && this->Pattern->Equals(PatternOcc->GetPattern()))
@@ -162,6 +208,9 @@ bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
 	return false;
 }
 
+/**
+ * @brief Prints the ID of this pattern occurence as well as all information from HPCParallelPattern::Print().
+ **/
 void PatternOccurence::Print()
 {
 	this->Pattern->Print();
@@ -188,16 +237,26 @@ void PatternCodeRegion::AddParent(PatternTreeNode* Parent)
 	Parents.push_back(Parent);
 }
 
+/**
+ * @brief Save the first line of the code region to keep track of the lines of code.
+ **/
 void PatternCodeRegion::SetFirstLine(int FirstLine)
 {
 	this->LinesOfCode = FirstLine;
 }
 
+/**
+ * @brief See PatternCodeRegion::SetFirstLine.
+ **/
 void PatternCodeRegion::SetLastLine(int LastLine)
 {
 	this->LinesOfCode = (LastLine - this->LinesOfCode) - 1;
 }
 
+
+/**
+ * @brief Print the lines of code plus all information from PatternOccurence::Print().
+ **/
 void PatternCodeRegion::Print()
 {
 	this->PatternOcc->Print();
@@ -214,6 +273,14 @@ HPCPatternDatabase::HPCPatternDatabase() : Patterns()
 	
 }
 
+/**
+ * @brief This function is used to look for a HPCParallelPattern object in the pattern database using the design space and the pattern name as search criteria.
+ *
+ * @param DesignSp The design space of the pattern we are looking for.
+ * @param PatternName The name of the pattern.
+ *
+ * @return HPCParallelPattern object that matches the search criteria or NULL.
+ **/
 HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(DesignSpace DesignSp, std::string PatternName)
 {
 	/* Go through the list of parallel patterns to find the parallel pattern with the given identifier */
@@ -228,6 +295,11 @@ HPCParallelPattern* HPCPatternDatabase::LookupParallelPattern(DesignSpace Design
 	return NULL;
 }
 
+/**
+ * @brief Adds a parallel pattern to the database. Returns an error message if the pattern already exists in the database.
+ *
+ * @param Pattern The parallel pattern that is added.
+ **/
 void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 {
 	if (LookupParallelPattern(Pattern->GetDesignSpace(), Pattern->GetPatternName()) != NULL)
@@ -239,7 +311,14 @@ void HPCPatternDatabase::AddParallelPattern(HPCParallelPattern* Pattern)
 	Patterns.push_back(Pattern);
 }
 
-/* Search and add pattern occurences */
+
+/**
+ * @brief Finds a PatternOccurence object in the database by its ID.
+ *
+ * @param ID The ID of the PatternOccurence we are searching.
+ *
+ * @return The PatternOccurence object if successful, NULL else.
+ **/
 PatternOccurence* HPCPatternDatabase::LookupPatternOccurence(std::string ID)
 {
 	for (PatternOccurence* PatternOcc : PatternOccurences)
@@ -253,6 +332,11 @@ PatternOccurence* HPCPatternDatabase::LookupPatternOccurence(std::string ID)
 	return NULL;
 }
 
+/**
+ * @brief Adds a PatternOccurence to the database. Displays an error message if duplicate.
+ *
+ * @param PatternOcc The PatternOccurence to add.
+ **/
 void HPCPatternDatabase::AddPatternOccurence(PatternOccurence* PatternOcc)
 {
 	if (LookupPatternOccurence(PatternOcc->GetID()) != NULL)
@@ -264,6 +348,11 @@ void HPCPatternDatabase::AddPatternOccurence(PatternOccurence* PatternOcc)
 	PatternOccurences.push_back(PatternOcc);
 }
 
+/**
+ * @brief Collects all PatternCodeRegion objects and returns them.
+ *
+ * @return All PatternCodeRegion objects linked to this PatternOccurence
+ **/
 std::vector<PatternCodeRegion*> HPCPatternDatabase::GetAllPatternCodeRegions()
 {
 	std::vector<PatternCodeRegion*> CodeRegions;
@@ -281,9 +370,13 @@ std::vector<PatternCodeRegion*> HPCPatternDatabase::GetAllPatternCodeRegions()
 
 
 
-/*
- * Design Space Helper Functions
- */
+/**
+ * @brief Converts a string to the corresponding design space enumeration value.
+ *
+ * @param str The string to translate.
+ *
+ * @return Corresponding design space.
+ **/
 DesignSpace StrToDesignSpace(std::string str)
 {
 	if (!str.compare("FindingConcurrency")) 
@@ -308,6 +401,13 @@ DesignSpace StrToDesignSpace(std::string str)
 	}
 }
 
+/**
+ * @brief Converts a design space enumeration value to the matching string.
+ *
+ * @param DesignSp The design space value to be converted.
+ *
+ * @return String corresponding to the design space.
+ **/
 std::string DesignSpaceToStr(DesignSpace DesignSp)
 {
 	if (DesignSp == FindingConcurrency)
@@ -339,11 +439,21 @@ std::string DesignSpaceToStr(DesignSpace DesignSp)
  */
 std::stack<PatternCodeRegion*> PatternContext;
 
-void AddToPatternStack(PatternCodeRegion* PatternOcc)
+/**
+ * @brief Add a PatternCodeRegion to the top of the pattern context stack.
+ *
+ * @param PatternReg Code Region to be placed on the stack.
+ **/
+void AddToPatternStack(PatternCodeRegion* PatternReg)
 {
-	PatternContext.push(PatternOcc);
+	PatternContext.push(PatternReg);
 }
 
+/**
+ * @brief Get the top of the pattern context stack.
+ *
+ * @return Top PatternCodeRegion or NULL if stack is empty.
+ **/
 PatternCodeRegion* GetTopPatternStack() 
 {
 	if (!PatternContext.empty())
@@ -356,6 +466,11 @@ PatternCodeRegion* GetTopPatternStack()
 	}
 }
 
+/**
+ * @brief Remove top of the pattern context from the stack if the ID matches with the function input. Prints an error message if not.
+ *
+ * @param ID The suspected ID of the pattern context top.
+ **/
 void RemoveFromPatternStack(std::string ID)
 {
 	if (!PatternContext.empty())

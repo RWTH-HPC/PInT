@@ -3,7 +3,9 @@
 #include "HPCParallelPattern.h"
 
 
-
+/**
+ * A class that implements (recursive) visualisation of the call tree.
+ */
 class CallTreeVisualisation 
 {
 public:

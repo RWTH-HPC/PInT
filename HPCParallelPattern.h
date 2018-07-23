@@ -8,7 +8,7 @@
 
 
 
-/*
+/**
  * Design Spaces
  */
 enum DesignSpace { Unknown, FindingConcurrency, AlgorithmStructure, SupportingStructure, ImplementationMechanism };
@@ -18,15 +18,17 @@ DesignSpace StrToDesignSpace(std::string str);
 std::string DesignSpaceToStr(DesignSpace DesignSp);
 
 
-/*
- * Pattern Tree Node
- *
+
+/**
  * This abstract class is a prototype for all pattern tree node classes following.
  * Descendants have to implement functionality to manage parents and children in the pattern tree.
  * Also, some variables about the connected components is saved in this class.
  */
 class PatternTreeNode {
 public:
+	/** 
+ 	* This enum is needed for LLVM type checking. New classes inheriting from this class should add their own enum values here.
+ 	*/
 	enum TreeNodeKind 
 	{
 		TNK_FnCall, 
@@ -63,12 +65,12 @@ private:
 
 
 
-/*
- * Function Declaration Database Entry
- *
- * A function declaration database is a node in the pattern tree, and has children and parents.
+/**
+ * A FunctionDeclarationDatabaseEntry is a node in the pattern tree (i.e. inherits from PatternTreeNode), and has children and parents.
  * It contains a hash value to uniquely identify a function declaration across compilation-units.
- */ 	
+ * This is useful if a function is called and we need information from the function body but the function is not defined within the current translation unit.
+ * Then, the reference is saved for later until the definition belonging to the function declaration is encountered.
+ */
 class FunctionDeclDatabaseEntry : public PatternTreeNode
 {
 public:
@@ -112,12 +114,12 @@ private:
 };
 
 
-/*
- * Function Declaration Database
- *
+/**
  * This singleton class implements a database for function entries.
  * It is needed to allow for cross-compilation-unit processing of the AST.
  * The class provides methods for lookup and addition of function declarations encountered in the code.
+ * For encountered function calls, bodies or declarations, a FunctionDeclDatabaseEntry is created in this database.
+ * Through ODR hashing, the entry can later be found again.
  */
 class FunctionDeclDatabase
 {
@@ -152,12 +154,10 @@ private:
 class PatternOccurence;
 class PatternCodeRegion;
 
-/*
- * HPC Parallel Pattern Class
- *
- * The pattern class describes the parallel pattern identified by the design space and the pattern name.
- * The pattern name is not the same as the pattern identifier.
- * This class contains references to all occurences of a pattern, hence indirectly to all code regions.
+/**
+ * This class describes a parallel pattern identified by the design space and the pattern name.
+ * The pattern name is not the same as the pattern identifier, as only PatternOccurence can have an identifier.
+ * A parallel pattern can have one or multiple PatternOccurences which are registered in this object.
  */
 class HPCParallelPattern
 {
@@ -193,12 +193,11 @@ private:
 
 
 
-/* 
- * Pattern Occurence Class
- *
- * The pattern occurence is a hypothetical construct that represents a collection for all code regions
+/**
+ * The PatternOccurence is a hypothetical construct that represents a collection for all code regions
  * with the same identifier.
- * It is linked to a unique pattern, which all the code regions implement.
+ * It is linked to a unique HPCParallelPattern.
+ * Each PatternCodeRegion with this identifier is accessible from this object.
  */
 class PatternOccurence
 {
@@ -231,12 +230,10 @@ private:
 
 
 
-/*
- * Pattern Code Region Class
- *
- * This class represents the block of code that is enclosed with the instrumentation calls.
+/**
+ * This class represents a block of code that is enclosed with the instrumentation calls.
  * It is a node in the pattern tree, hence has children and parents in the tree.
- * Every region belongs to a pattern occurence.
+ * A PatternCodeRegion belongs to a PatternOccurence.
  */
 class PatternCodeRegion : public PatternTreeNode
 {
@@ -279,9 +276,7 @@ private:
 
 
 
-/*
- * HPC Pattern Database Class
- *
+/**
  * This class contains references to all patterns and pattern occurences currently known.
  * It allows for comfortable and reliable lookup of patterns and occurences by name, resp. ID.
  */
@@ -326,9 +321,7 @@ private:
 
 
 
-/* 
- * Stack Management
- *
+/**
  * The pattern stack is used to keep track of the nesting of patterns.
  */
 extern std::stack<PatternCodeRegion*> PatternContext;

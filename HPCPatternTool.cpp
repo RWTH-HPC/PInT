@@ -18,9 +18,9 @@ static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpM
 
 static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic() };
 
-/*! \brief Tool entry point.
- *
- * The tool's entry point which calls the FrontEndAction on the code
+/** 
+ * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
+ * Register statistics and similarity measures here.
  */
 int main (int argc, const char** argv)
 {

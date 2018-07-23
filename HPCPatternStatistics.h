@@ -7,19 +7,39 @@
 #define CSV_SEPARATOR_CHAR ","
 
 
-
+/**
+ * Abstract class for pattern statistics.
+ * Statistics have to inherit from this class and implement the virtual methods.
+ */
 class HPCPatternStatistic
 {
 public:
+	/**
+	 * Calculate the statistics value(s).
+	 */
 	virtual void Calculate() = 0;
 
+	/**
+ 	 * Print the statistic in human-readable form to std::cout
+ 	 */ 	
 	virtual void Print() = 0;
 
+	/**
+ 	 * Export the statistic value(s) to a csv file.
+ 	 */
 	virtual void CSVExport(std::string FileName) = 0;
 };
 
 
 
+/**
+ * A statistic class that calculates the cyclomatic complexity as defined by McCabe.
+ * We adapted this software engineering metric for our pattern use case.
+ * The cyclomatic complexity is calculated as C = (edges - nodes) + 2 * ConnectedComponents
+ * Edges are countes as follows: the connection between two PatternCodeRegion is defined as an edge.
+ * Function nodes are ignored.
+ * The number of nodes is the number of unique PatternCodeRegions.
+ */
 class CyclomaticComplexityStatistic : public HPCPatternStatistic
 {
 public:
@@ -54,7 +74,9 @@ private:
 };
 
 
-
+/**
+ * A simple statistic class that prints the lines of code for each pattern.
+ */
 class LinesOfCodeStatistic : public HPCPatternStatistic
 {
 public:
@@ -66,7 +88,9 @@ public:
 };
 
 
-
+/**
+ * A statistic that prints for each pattern how many occurences there are.
+ */
 class SimplePatternCountStatistic : public HPCPatternStatistic
 {
 public:
@@ -81,7 +105,7 @@ public:
 
 
 
-/*
+/**
  * This statistic calculates the fan-in and fan-out numbers for every pattern which occurs in the code.
  * The fan-in number is calculated as the number of patterns which are a direct parent to the pattern in question.
  * The fan-out number is the number of patterns which are direct children to this pattern.

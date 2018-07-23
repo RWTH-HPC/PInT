@@ -23,6 +23,13 @@
 #define PATTERN_END_CXX_FNNAME "Pattern_End"
 
 
+
+/**
+ * A custom visitor, overriding functions from the RecursiveASTVisitor.
+ * It searches for function declarations to build connections between function declarations and calls.
+ * It also looks for call expressions in the code and links these expressions to the corresponding function declarations.
+ * If a pattern instrumentation call is encountered, a PatternCodeRegion is created/closed and registered with the HPCPatternDatabase.
+ */
 class HPCPatternInstrVisitor : public clang::RecursiveASTVisitor<HPCPatternInstrVisitor> 
 {
 public:
@@ -35,7 +42,14 @@ public:
 private:
 	clang::ASTContext *Context;
 	
+	/**
+ 	 * This is a match finder to extract the string argument from the pattern instrumentation call and pass it to the HPCPatternBeginInstrHandler
+ 	 */
 	clang::ast_matchers::MatchFinder PatternBeginFinder;
+	
+	/**
+ 	 * See HPCPatternInstrVisitor::PatternBeginFinder
+ 	 */ 	
 	clang::ast_matchers::MatchFinder PatternEndFinder;
 	
 	HPCPatternBeginInstrHandler PatternBeginHandler;
