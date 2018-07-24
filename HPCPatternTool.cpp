@@ -12,6 +12,34 @@
 #include "clang/Tooling/ArgumentsAdjusters.h"
 
 
+
+/** 
+ * @mainpage Clang Pattern Instrumentation Tool
+ *
+ * @section intro_sec Introduction
+ *
+ * This a a clang-based tool for automatic evaluation of instrumented codes containing parallel patterns.
+ * For a tutorial on how to use the tool, please consider: https://git.rwth-aachen.de/swienke/patternInstrumentation
+ * 
+ * @section source_sec About the source
+ *
+ * The source code can mainly be divided into two parts.
+ *  -# The detection of instrumentation calls, program and pattern structure in the source code using the clang libTooling library.
+ *  -# Further processing of the extracted information, i.e. inferring statistics about the patterns or identifying most common nested patterns.
+ *
+ * If you want to improve the tool or if you're just interested in how the interaction with clang works, take a look at the HPCPatternInstrVisitor.
+ *
+ * To implement your own statistics or similarity measures, take a look at HPCPatternStatistic or SimilarityMeasure interfaces. Examples are given by the actual statistic implementations.
+ * 
+ * Our internal data structure hierarchy for patterns looks as this:
+ * -# HPCParallelPattern is the class that represents actual patterns. A pattern is like a template that can occur anywhere in the code but it has no concrete location in the source code. It is more a theoretical construct.
+ * -# One instance of a pattern, i.e. an occurence of a pattern is represented by the PatternOccurence class. This pattern occurence still does not match to a specific source location. 
+ *  A pattern occurence can rather consist of many PatternCodeRegion with the same identifier.
+ * -# The code regions instrumented in the code are represnted by PatternCodeRegion objects in our tool. Every code region belongs to an occurence which 'has' a pattern.
+ */
+
+
+
 static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options");
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
