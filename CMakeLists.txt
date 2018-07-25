@@ -20,20 +20,24 @@ if (PRINT_DEBUG_INFORMATION)
 	add_definitions (-DPRINT_DEBUG)
 endif ()
 
-find_package(Clang REQUIRED)
-find_package(Clang REQUIRED clangTooling libClang)
+
+find_package(Clang REQUIRED clangTooling libClang clangAST)
 message (STATUS "Found clang ${CLANG_VERSION_STRING}")
 
-find_package (LLVM REQUIRED CONFIG)
+find_package(LLVM REQUIRED CONFIG)
 message (STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message (STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 include(AddLLVM)
 
+set(LLVM_USED_LIBS clangTooling clangBasic)
+
+
 include_directories(${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+
 
 add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp TreeAlgorithms.cpp SimilarityMetrics.cpp) 
-target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic libclang clangTooling clangFrontendTool)
+target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic clangTooling)
 
