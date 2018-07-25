@@ -8,7 +8,7 @@
 1) Change into the source directory<br>
 2) Create a new directory ('mkdir build')<br>
 3) Change into the new directory ('cd build')<br>
-4) Create the build system ('ccmake ..')<br>
+4) Create the build system ('cmake ..')<br>
 5) Compile the tool ('make')
 
 <h2>3. Using the tool</h2>
@@ -40,8 +40,8 @@ Please note that patterns that due to implementation, pattern regions have to be
 <h3>3.2 <b>Optional:</b> Create compile_commands.json</h3>
 1) Create a cmake project for your source files, or use an existing project<br>
 2) Set the variable "EXPORT_COMPILE_COMMANDS" to true<br>
-3) Create/update your build system ('mkdir build && cd build && ccmake ..')<br>
-4) Copy compile_commands.json to the directory with the sources<br>
+3) Create/update your build system ('mkdir build && cd build && cmake ..')<br>
+4) Copy compile_commands.json to the directory containing the sources<br>
 <b>OR</b><br>
 Write your compile_commands.json manually. But I would advise against doing that.<br>
 
