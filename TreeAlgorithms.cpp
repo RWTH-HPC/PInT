@@ -5,7 +5,7 @@
 
 /**
  * @brief A tree operation that marks every tree node with the label corresponding to its connected component.
- * Calls TreeAlgorithms::MarkConnectedComponents(PatternTreeNode*, int).
+ * Calls TreeAlgorithms::MarkConnectedComponents(PatternGraphNode*, int).
  */
 void TreeAlgorithms::MarkConnectedComponents()
 {
@@ -29,18 +29,18 @@ void TreeAlgorithms::MarkConnectedComponents()
  * @param Node The current node.
  * @param ComponentID ID of the connected component.
  **/
-void TreeAlgorithms::MarkConnectedComponents(PatternTreeNode* Node, int ComponentID)
+void TreeAlgorithms::MarkConnectedComponents(PatternGraphNode* Node, int ComponentID)
 {
 	if (Node->GetConnectedComponent() == -1)
 	{
 		Node->SetConnectedComponent(ComponentID);
 		
-		for (PatternTreeNode* Child : Node->GetChildren())
+		for (PatternGraphNode* Child : Node->GetChildren())
 		{
 			MarkConnectedComponents(Child, ComponentID);
 		}
 
-		for (PatternTreeNode* Parent : Node->GetParents())
+		for (PatternGraphNode* Parent : Node->GetParents())
 		{
 			MarkConnectedComponents(Parent, ComponentID);
 		}

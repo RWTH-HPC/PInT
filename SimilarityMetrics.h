@@ -172,7 +172,7 @@ protected:
 
 	std::vector<SimilarityPair*> Similarities;
 
-	void VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
+	void VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
 
 	HPCParallelPattern* RootPattern;
 

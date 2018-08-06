@@ -41,7 +41,7 @@ bool SimilarityMeasure::CompareBySimilarity(const SimilarityPair* SimPair1, cons
 
 /**
  * @brief Extracts the pattern sequences starting with the root pattern and saves them in SimilarityMeasure::PatternSequence objects.
- * Calls SimilarityMeasure::VisitPatternTreeNode().
+ * Calls SimilarityMeasure::VisitPatternGraphNode().
  *
  * @param PatternNode The starting code region.
  * @param dir Direction (children/parent) of descent.
@@ -57,7 +57,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
 	CurSeq = new PatternSequence;
 	CurSeq->Patterns.push_back(PatternNode->GetPatternOccurence()->GetPattern());
 
-	std::vector<PatternTreeNode*> Neighbours;
+	std::vector<PatternGraphNode*> Neighbours;
 
 	/* determine the direction in which to build the sequences */
 	if (dir ==  DIR_Children)
@@ -70,9 +70,9 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
 	}
 
 	/* Start with visiting the neighbours */
-	for (PatternTreeNode* Neighbour : Neighbours)
+	for (PatternGraphNode* Neighbour : Neighbours)
 	{
-		VisitPatternTreeNode(Neighbour, CurSeq, &Seqs, dir, 1, maxdepth);
+		VisitPatternGraphNode(Neighbour, CurSeq, &Seqs, dir, 1, maxdepth);
 	}
 
 	return Seqs;
@@ -88,7 +88,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
  * @param depth The current recursion depth.
  * @param maxdepth The maximum recursion depth.
  **/
-void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
+void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check if the current node is a pattern occurence node */
 	if (PatternCodeRegion* CurrentCodeReg = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
@@ -105,7 +105,7 @@ void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, Patte
 	if (CurrentSequence->Patterns.size() < this->maxlength && depth < maxdepth)
 	{
 		/* Get neighbours */
-		std::vector<PatternTreeNode*> Neighbours;
+		std::vector<PatternGraphNode*> Neighbours;
 
 		if (dir == DIR_Children)
 		{
@@ -117,9 +117,9 @@ void SimilarityMeasure::VisitPatternTreeNode(PatternTreeNode* CurrentNode, Patte
 		}
 		
 		/* Visit Neighbours */
-		for (PatternTreeNode* Neighbour : Neighbours)
+		for (PatternGraphNode* Neighbour : Neighbours)
 		{	
-			VisitPatternTreeNode(Neighbour, CurrentSequence, Sequences, dir, depth + 1, maxdepth);
+			VisitPatternGraphNode(Neighbour, CurrentSequence, Sequences, dir, depth + 1, maxdepth);
 		}
 	}
 }

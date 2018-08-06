@@ -18,7 +18,7 @@ std::regex EndParallelPatternRegex("([[:alnum:]]+)");
  *
  * @param FnEntry The function decl. of the body that is currently analysed.
  **/
-void HPCPatternBeginInstrHandler::SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry) 
+void HPCPatternBeginInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry) 
 {
 	CurrentFnEntry = FnEntry;
 }
@@ -123,7 +123,7 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
  *
  * @param FnEntry Current function declaration database entry.
  **/
-void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionDeclDatabaseEntry* FnEntry) 
+void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry) 
 {
 	CurrentFnEntry = FnEntry;
 }

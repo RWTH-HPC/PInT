@@ -59,7 +59,7 @@ void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
  *
  * @param Node The node that is set visited.
  **/
-void CyclomaticComplexityStatistic::SetNodeVisited(PatternTreeNode* Node)
+void CyclomaticComplexityStatistic::SetNodeVisited(PatternGraphNode* Node)
 {
 	if (!IsNodeVisited(Node))
 	{
@@ -74,9 +74,9 @@ void CyclomaticComplexityStatistic::SetNodeVisited(PatternTreeNode* Node)
  *
  * @return True if visited, false else.
  **/
-bool CyclomaticComplexityStatistic::IsNodeVisited(PatternTreeNode* Node)
+bool CyclomaticComplexityStatistic::IsNodeVisited(PatternGraphNode* Node)
 {
-	for (PatternTreeNode* N : VisitedNodes)
+	for (PatternGraphNode* N : VisitedNodes)
 	{
 		if (N == Node)
 		{
@@ -88,18 +88,18 @@ bool CyclomaticComplexityStatistic::IsNodeVisited(PatternTreeNode* Node)
 }
 
 /**
- * @brief Calls CyclomaticComplexityStatistic::CountEdges(PatternTreeNode*) with the entries of all functions in the FunctionDeclDatabase.
+ * @brief Calls CyclomaticComplexityStatistic::CountEdges(PatternGraphNode*) with the entries of all functions in the FunctionDeclDatabase.
  *
  * @return The number of edges in the pattern tree.
  **/
 int CyclomaticComplexityStatistic::CountEdges()
 {
 	/* Start the tree traversal from all functions */
-	std::vector<FunctionDeclDatabaseEntry*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
+	std::vector<FunctionNode*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
 
 	int edges = 0;
 
-	for (FunctionDeclDatabaseEntry* Fn : Functions)
+	for (FunctionNode* Fn : Functions)
 	{
 		edges += CountEdges(Fn);
 	}
@@ -114,7 +114,7 @@ int CyclomaticComplexityStatistic::CountEdges()
  *
  * @return The number of edges.
  **/
-int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
+int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
 {
 	int Edges = 0;
 	
@@ -134,7 +134,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternTreeNode* Current)
 		SetNodeVisited(Current);
 	
 		/* Count the Edges beginning from the children */
-		for (PatternTreeNode* Child : Current->GetChildren())
+		for (PatternGraphNode* Child : Current->GetChildren())
 		{
 			Edges += CountEdges(Child);
 		}
@@ -176,7 +176,7 @@ int CyclomaticComplexityStatistic::CountConnectedComponents()
 	TreeAlgorithms::MarkConnectedComponents();
 
 	std::vector<PatternCodeRegion*> CodeRegs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
-	std::vector<FunctionDeclDatabaseEntry*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
+	std::vector<FunctionNode*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
 
 	int ConnectedComponents = 0;
 
@@ -190,7 +190,7 @@ int CyclomaticComplexityStatistic::CountConnectedComponents()
 	}
 
 	/* Also check the function calls */
-	for (FunctionDeclDatabaseEntry* Fn : Functions)
+	for (FunctionNode* Fn : Functions)
 	{
 		if (Fn->GetConnectedComponent() > ConnectedComponents)
 		{
@@ -533,7 +533,7 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 }
 
 /**
- * @brief Core functionality for finding neightbours of a PatternTreeNode (in this case: PatternCodeRegion).
+ * @brief Core functionality for finding neightbours of a PatternGraphNode (in this case: PatternCodeRegion).
  * The direction of the recursive descent is passed as a parameter.
  *
  * @param Current The starting point of the recursive descent.
@@ -542,7 +542,7 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
  * @param depth The current depth of recursion.
  * @param maxdepth The maximum recursion depth.
  **/
-void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth)
+void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternGraphNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth)
 {
 	/* Check, if we reached the maximum depth */
 	if (depth >= maxdepth)
@@ -559,7 +559,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, st
 	else
 	{
 		/* Get the neighbouring nodes depending on the defined search direction */
-		std::vector<PatternTreeNode*> Neighbours;
+		std::vector<PatternGraphNode*> Neighbours;
 
 		if (dir == DIR_Parents)
 		{
@@ -571,7 +571,7 @@ void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternTreeNode* Current, st
 		}
 
 		/* Visit all the neighbouring nodes according to the given direction */
-		for (PatternTreeNode* Neighbour : Neighbours)
+		for (PatternGraphNode* Neighbour : Neighbours)
 		{
 			FindNeighbourPatternsRec(Neighbour, Results, dir, depth + 1, maxdepth);
 		}

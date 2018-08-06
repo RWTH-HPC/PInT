@@ -19,5 +19,5 @@ class TreeAlgorithms
 public:
 	static void MarkConnectedComponents();
 
-	static void MarkConnectedComponents(PatternTreeNode* Node, int ComponentID);
+	static void MarkConnectedComponents(PatternGraphNode* Node, int ComponentID);
 };

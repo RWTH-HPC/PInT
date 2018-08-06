@@ -13,7 +13,7 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth)
 {
 	FunctionDeclDatabase* FuncDB = FunctionDeclDatabase::GetInstance();
 	
-	FunctionDeclDatabaseEntry* MainFnEntry = FuncDB->GetMainFnEntry();
+	FunctionNode* MainFnEntry = FuncDB->GetMainFnEntry();
 	PrintFunction(MainFnEntry, 0, maxdepth);
 }
 
@@ -38,9 +38,9 @@ void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int dept
 
 	std::cout << "(" << CodeRegion->GetPatternOccurence()->GetID() << ")" << std::endl;
  
-	for (PatternTreeNode* Child : CodeRegion->GetChildren())
+	for (PatternGraphNode* Child : CodeRegion->GetChildren())
 	{
-		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
 			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
@@ -58,7 +58,7 @@ void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int dept
  * @param depth Current recursion depth.
  * @param maxdepth Maximum recursion depth.
  **/
-void CallTreeVisualisation::PrintFunction(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth)
+void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{	
@@ -68,9 +68,9 @@ void CallTreeVisualisation::PrintFunction(FunctionDeclDatabaseEntry* FnCall, int
 	PrintIndent(depth);
 	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
 
-	for (PatternTreeNode* Child : FnCall->GetChildren())
+	for (PatternGraphNode* Child : FnCall->GetChildren())
 	{
-		if (FunctionDeclDatabaseEntry* FnCall = clang::dyn_cast<FunctionDeclDatabaseEntry>(Child))
+		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
 			PrintFunction(FnCall, depth + 1, maxdepth);
 		}

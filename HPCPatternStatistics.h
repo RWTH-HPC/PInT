@@ -52,21 +52,21 @@ public:
 	void CSVExport(std::string FileName);
 
 private:
-	void SetNodeVisited(PatternTreeNode* Node);
+	void SetNodeVisited(PatternGraphNode* Node);
 
-	bool IsNodeVisited(PatternTreeNode* Node);
+	bool IsNodeVisited(PatternGraphNode* Node);
 
-	std::vector<PatternTreeNode*> VisitedNodes;
+	std::vector<PatternGraphNode*> VisitedNodes;
 
 	int CountEdges();
 
-	int CountEdges(PatternTreeNode* Root);
+	int CountEdges(PatternGraphNode* Root);
 
 	int CountNodes();
 
 	int CountConnectedComponents();
 
-	void MarkConnectedComponent(PatternTreeNode * Node, int ComponentID);
+	void MarkConnectedComponent(PatternGraphNode * Node, int ComponentID);
 
 	int Nodes, Edges, ConnectedComponents = 0;
 
@@ -129,7 +129,7 @@ private:
 		int FanOut = 0;
 	};
 
-	void VisitFunctionCall(FunctionDeclDatabaseEntry* FnEntry, int depth, int maxdepth);
+	void VisitFunctionCall(FunctionNode* FnEntry, int depth, int maxdepth);
 
 	void VisitPattern(PatternCodeRegion* PatternOcc, int depth, int maxdepth);
 
@@ -143,7 +143,7 @@ private:
 	
 	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth);
 
-	void FindNeighbourPatternsRec(PatternTreeNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth);
+	void FindNeighbourPatternsRec(PatternGraphNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	int maxdepth;
 

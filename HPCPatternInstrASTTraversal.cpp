@@ -13,7 +13,7 @@
 
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry. 
- * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionDeclDatabaseEntry for correct parent-child-relations. 
+ * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations. 
  *
  * @param Decl The clang object encountered by the visitor.
  *
@@ -91,7 +91,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		else
 		{
 			/* Look up the database entry for this function */
-			FunctionDeclDatabaseEntry* DBEntry = FunctionDB->Lookup(Callee);
+			FunctionNode* DBEntry = FunctionDB->Lookup(Callee);
 #ifdef PRINT_DEBUG
 			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
 #endif

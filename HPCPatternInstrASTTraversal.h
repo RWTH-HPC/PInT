@@ -58,7 +58,7 @@ private:
 	FunctionDeclDatabase* FunctionDB;
 
 	clang::FunctionDecl* CurrentFn;
-	FunctionDeclDatabaseEntry* CurrentFnEntry;
+	FunctionNode* CurrentFnEntry;
 };
 
 

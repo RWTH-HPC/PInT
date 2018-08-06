@@ -14,7 +14,7 @@ public:
 private:
 	static void PrintPattern(PatternCodeRegion* PatternCodeRegion, int depth, int maxdepth);
 	
-	static void PrintFunction(FunctionDeclDatabaseEntry* FnCall, int depth, int maxdepth);
+	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth);
 	
 	static void PrintIndent(int depth);
 };
