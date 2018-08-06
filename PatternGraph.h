@@ -112,81 +112,77 @@ private:
 };
 
 
-/**
- * This singleton class implements a database for function entries.
- * It is needed to allow for cross-compilation-unit processing of the AST.
- * The class provides methods for lookup and addition of function declarations encountered in the code.
- * For encountered function calls, bodies or declarations, a FunctionNode is created in this database.
- * Through ODR hashing, the entry can later be found again.
- */
-class FunctionDeclDatabase
+
+class PatternGraph
 {
 public:
-	FunctionNode* Lookup(clang::FunctionDecl* Decl);
+	PatternGraphNode* GetRootNode();
 
-	static FunctionDeclDatabase* GetInstance() 
-	{
-		static FunctionDeclDatabase Instance;
-		return &Instance;
-	}
+	/* Access to patterns */
+	bool RegisterPattern(HPCParallelPattern* Pattern);
 
-	std::vector<FunctionNode*> GetAllFunctionEntries() { return Entries; }
+	HPCParallelPattern* GetPattern(DesignSpace DesignSp, std::string Name);
 
-	FunctionNode* GetMainFnEntry() { return MainFnEntry; }
-
-private:
-	FunctionDeclDatabase();
-	
-	// Prevent construction of another instance by copying
-	FunctionDeclDatabase(const FunctionDeclDatabase&);
-	FunctionDeclDatabase& operator = (const FunctionDeclDatabase&);
-
-	std::vector<FunctionNode*> Entries;
-
-	FunctionNode* MainFnEntry;
-};
-
-
-
-/**
- * This class contains references to all patterns and pattern occurences currently known.
- * It allows for comfortable and reliable lookup of patterns and occurences by name, resp. ID.
- */
-class HPCPatternDatabase 
-{
-public:
-	/* Search and add patterns */
-	HPCParallelPattern* LookupParallelPattern(DesignSpace DesignSp, std::string PatternName);
-	
-	void AddParallelPattern(HPCParallelPattern* Pattern);
-
+	/**
+	 * @brief 
+	 *
+	 * @return All patterns registered in the graph. 
+	 **/
 	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
 
 
-	/* Search and add pattern occurences */
-	PatternOccurence* LookupPatternOccurence(std::string ID);
+	/* Access to pattern occurences */
+	bool RegisterPatternOccurence(PatternOccurence* PatternOcc);
 
-	void AddPatternOccurence(PatternOccurence* PatternOcc);
+	PatternOccurence* GetPatternOccurence(std::string ID);
 
-	std::vector<PatternOccurence*> GetAllPatternOccurences() { return PatternOccurences; }
+	/**
+	 * @brief 
+	 *
+	 * @return All pattern occurences registered in the graph.
+	 **/
+	std::vector<PatternOccurence*> GetAllPatternOccurence() { return PatternOccurences; }
 
 	std::vector<PatternCodeRegion*> GetAllPatternCodeRegions();
+	
+	/* Access to functions */
+	bool RegisterFunction(clang::FunctionDecl* Decl);
+
+	FunctionNode* GetFunctionNode(clang::FunctionDecl* Decl);
+
+	FunctionNode* GetFunctionNode(std::string Name);
 
 
-	static HPCPatternDatabase* GetInstance() 
+	/**
+	 * @brief 
+	 *
+	 * @return All functions registered in the graph.
+	 **/
+	std::vector<FunctionNode*> GetAllFunctions() { return Functions; }
+
+	/**
+	 * @brief Get the instance of the PatternGraph
+	 *
+	 * @return PatternGraph instance
+	 **/
+	static PatternGraph* GetInstance()
 	{
-		static HPCPatternDatabase Instance;
-		return &Instance;
+		static PatternGraph Graph;
+		return &Graph;
 	}
 
 private:
-	HPCPatternDatabase();
-
-	// Prevent construction of another instance by copying
-	HPCPatternDatabase(const HPCPatternDatabase&);
-	HPCPatternDatabase& operator = (const HPCPatternDatabase&);
-	
+	/* Save patterns, patternoccurences and functions for later requests and linear access. */
 	std::vector<HPCParallelPattern*> Patterns;
-
 	std::vector<PatternOccurence*> PatternOccurences;
+
+	std::vector<FunctionNode*> Functions;
+
+	/* Designated root node for output in "Treeifyed" display */
+	PatternGraphNode* RootNode;
+
+	/* Prevent object creation */
+	PatternGraph();
+	PatternGraph(const PatternGraph&);
+	PatternGraph& operator = (const PatternGraph&);
 };

@@ -85,9 +85,9 @@ int main (int argc, const char** argv)
 	Statistics[2]->CSVExport("LOC.csv");
 
 	/* Similarity Measures */
-	HPCParallelPattern* IMVI = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
-	HPCParallelPattern* FCGT = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSpace::FindingConcurrency, "GroupTask");
-	JaccardSimilarityStatistic Jaccard(FCGT, 2, 3, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
+	HPCParallelPattern* IMVI = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
+	HPCParallelPattern* FCGT = PatternGraph::GetInstance()->GetPattern(DesignSpace::FindingConcurrency, "GroupTask");
+	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
 
 	Jaccard.Calculate();
 	Jaccard.Print();

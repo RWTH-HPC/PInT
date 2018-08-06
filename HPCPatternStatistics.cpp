@@ -95,7 +95,7 @@ bool CyclomaticComplexityStatistic::IsNodeVisited(PatternGraphNode* Node)
 int CyclomaticComplexityStatistic::CountEdges()
 {
 	/* Start the tree traversal from all functions */
-	std::vector<FunctionNode*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
+	std::vector<FunctionNode*> Functions = PatternGraph::GetInstance()->GetAllFunctions();
 
 	int edges = 0;
 
@@ -150,8 +150,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
  **/
 int CyclomaticComplexityStatistic::CountNodes()
 {
-	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
-	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	int nodes = 0;
 
@@ -175,8 +174,8 @@ int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
 	TreeAlgorithms::MarkConnectedComponents();
 
-	std::vector<PatternCodeRegion*> CodeRegs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
-	std::vector<FunctionNode*> Functions = FunctionDeclDatabase::GetInstance()->GetAllFunctionEntries();
+	std::vector<PatternCodeRegion*> CodeRegs = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
+	std::vector<FunctionNode*> Functions = PatternGraph::GetInstance()->GetAllFunctions();
 
 	int ConnectedComponents = 0;
 
@@ -217,8 +216,7 @@ void LinesOfCodeStatistic::Calculate()
  */
 void LinesOfCodeStatistic::Print()
 {
-	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
-	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
@@ -248,8 +246,7 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 
 	File << "Patternname" << CSV_SEPARATOR_CHAR << "NumRegions" << CSV_SEPARATOR_CHAR << "LOCByRegions" << CSV_SEPARATOR_CHAR << "TotalLOCs\n";
 
-	HPCPatternDatabase* PDB = HPCPatternDatabase::GetInstance();
-	std::vector<HPCParallelPattern*> Patterns = PDB->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
@@ -298,7 +295,7 @@ void SimplePatternCountStatistic::Calculate()
  */
 void SimplePatternCountStatistic::Print()
 {
-	std::vector<HPCParallelPattern*> Patterns = HPCPatternDatabase::GetInstance()->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
@@ -318,7 +315,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 
 	File << "Patternname" << CSV_SEPARATOR_CHAR << "Count\n";
 
-	std::vector<HPCParallelPattern*> Patterns = HPCPatternDatabase::GetInstance()->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
@@ -348,8 +345,7 @@ FanInFanOutStatistic::FanInFanOutStatistic(int maxdepth) : FIFOCounter()
  */
 void FanInFanOutStatistic::Calculate()
 {
-	HPCPatternDatabase* DB = HPCPatternDatabase::GetInstance();
-	std::vector<HPCParallelPattern*> Patterns = DB->GetAllPatterns();
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{

@@ -22,7 +22,13 @@
 bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 {
 	CurrentFn = Decl;
-	CurrentFnEntry = FunctionDB->Lookup(Decl);
+
+	if ((CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl)) == NULL)
+	{
+		PatternGraph::GetInstance()->RegisterFunction(Decl);
+		CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
+	}
+
 #ifdef PRINT_DEBUG
 	std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 #endif
@@ -91,20 +97,27 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		else
 		{
 			/* Look up the database entry for this function */
-			FunctionNode* DBEntry = FunctionDB->Lookup(Callee);
+			FunctionNode* Func;
+			
+			if ((Func = PatternGraph::GetInstance()->GetFunctionNode(Callee)) == NULL)
+			{
+				PatternGraph::GetInstance()->RegisterFunction(Callee);
+				Func = PatternGraph::GetInstance()->GetFunctionNode(Callee);
+			}
+
 #ifdef PRINT_DEBUG
-			std::cout << DBEntry->GetFnName() << " (" << DBEntry->GetHash() << ")" << std::endl;
+			std::cout << Func->GetFnName() << " (" << Func->GetHash() << ")" << std::endl;
 #endif
 			PatternCodeRegion* Top;
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
-				Top->AddChild(DBEntry);
-				DBEntry->AddParent(Top);
+				Top->AddChild(Func);
+				Func->AddParent(Top);
 			}
 			else
 			{
-				CurrentFnEntry->AddChild(DBEntry);
-				DBEntry->AddParent(CurrentFnEntry);
+				CurrentFnEntry->AddChild(Func);
+				Func->AddParent(CurrentFnEntry);
 			}
 		}
 	}
@@ -119,8 +132,6 @@ HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Co
 	
 	PatternBeginFinder.addMatcher(StringArgumentMatcher, &PatternBeginHandler);
 	PatternEndFinder.addMatcher(StringArgumentMatcher, &PatternEndHandler);
-	
-	FunctionDB = FunctionDeclDatabase::GetInstance();
 }
 
 

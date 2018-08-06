@@ -9,7 +9,7 @@
  */
 void TreeAlgorithms::MarkConnectedComponents()
 {
-	std::vector<PatternCodeRegion*> PatternOccs = HPCPatternDatabase::GetInstance()->GetAllPatternCodeRegions();
+	std::vector<PatternCodeRegion*> PatternOccs = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
 
 	int ConnectedComponents = 0;
 

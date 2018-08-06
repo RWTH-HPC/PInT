@@ -55,8 +55,6 @@ private:
 	HPCPatternBeginInstrHandler PatternBeginHandler;
 	HPCPatternEndInstrHandler PatternEndHandler;
 
-	FunctionDeclDatabase* FunctionDB;
-
 	clang::FunctionDecl* CurrentFn;
 	FunctionNode* CurrentFnEntry;
 };

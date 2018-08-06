@@ -10,11 +10,17 @@
  * @param maxdepth The maximum recursion (i.e., output depth)
  **/
 void CallTreeVisualisation::PrintCallTree(int maxdepth)
-{
-	FunctionDeclDatabase* FuncDB = FunctionDeclDatabase::GetInstance();
+{	
+	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
 	
-	FunctionNode* MainFnEntry = FuncDB->GetMainFnEntry();
-	PrintFunction(MainFnEntry, 0, maxdepth);
+	if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
+	{
+		PrintFunction(Func, 0, maxdepth);
+	}
+	else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
+	{
+		PrintPattern(CodeRegion, 0, maxdepth);
+	}
 }
 
 /**

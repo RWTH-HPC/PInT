@@ -46,22 +46,22 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 
 	
 	/* Look if a pattern with this Design Space and Name already exists */
-	HPCParallelPattern* Pattern = HPCPatternDatabase::GetInstance()->LookupParallelPattern(DesignSp, PatternName);
+	HPCParallelPattern* Pattern = PatternGraph::GetInstance()->GetPattern(DesignSp, PatternName);
 
 	if (Pattern == NULL)
 	{
 		Pattern = new HPCParallelPattern(DesignSp, PatternName);
-		HPCPatternDatabase::GetInstance()->AddParallelPattern(Pattern);
+		PatternGraph::GetInstance()->RegisterPattern(Pattern);
 	}
 
 
 	/* Check if this code regions is part of an existing pattern occurence */
-	PatternOccurence* PatternOcc = HPCPatternDatabase::GetInstance()->LookupPatternOccurence(PatternID);
+	PatternOccurence* PatternOcc = PatternGraph::GetInstance()->GetPatternOccurence(PatternID);
 
 	if (PatternOcc == NULL)
 	{
 		PatternOcc = new PatternOccurence(Pattern, PatternID);
-		HPCPatternDatabase::GetInstance()->AddPatternOccurence(PatternOcc);
+		PatternGraph::GetInstance()->RegisterPatternOccurence(PatternOcc);
 		Pattern->AddOccurence(PatternOcc);
 	}
 	else
