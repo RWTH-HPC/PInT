@@ -36,6 +36,12 @@
  * -# One instance of a pattern, i.e. an occurence of a pattern is represented by the PatternOccurence class. This pattern occurence still does not match to a specific source location. 
  *  A pattern occurence can rather consist of many PatternCodeRegion with the same identifier.
  * -# The code regions instrumented in the code are represnted by PatternCodeRegion objects in our tool. Every code region belongs to an occurence which 'has' a pattern.
+ * 
+ * Another central class is the PatternGraph singleton class, which holds structual information about the patterns extracted from the analysed sourcecode. It provides access to lists of all patterns, all occurences and all code regions. Further, it holds a reference to a designated root node for tree or analysis purposes.
+ * 
+ * Own statistics or similarity measures can easily be implemented. Statistics should inherit from HPCPatternStatistic and similarity measures from SimilarityMeasure. The statistic classes can then be registered in the tool's main function, where they are initialised and the calculations are executed. 
+ * 
+ * When implementing statistics or sim. measures, the helper functions provided in the SetAlgorithm, GraphAlgorithm or PatternHelper namespaces might be convenient. Further helper functions will be added in the future, whenever it appears feasible.
  */
 
 

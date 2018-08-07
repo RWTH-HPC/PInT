@@ -119,7 +119,7 @@ public:
  		 *
  		 * @param Seq1 First sequence.
  		 * @param Seq2 Second sequence.
- 		 * @param Similaity Calculated similarity.
+ 		 * @param Similarity Calculated similarity.
  		 */
 		SimilarityPair(PatternSequence* Seq1, PatternSequence* Seq2, float Similarity)
 		{
