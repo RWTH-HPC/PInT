@@ -33,4 +33,6 @@ namespace GraphAlgorithms
 namespace SetAlgorithms
 {
 	extern std::vector<PatternOccurence*> GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs);
+
+	extern std::vector<HPCParallelPattern*> GetUniquePatternList(std::vector<HPCParallelPattern*> Patterns);
 }

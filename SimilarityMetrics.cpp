@@ -299,7 +299,7 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByDesignSp
 		}
 	}
 
-	return RemoveDuplicates(Intersection);
+	return SetAlgorithms::GetUniquePatternList(Intersection);
 }
 
 /**
@@ -327,7 +327,7 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPattern(
 		}
 	}
 
-	return RemoveDuplicates(Intersection);
+	return SetAlgorithms::GetUniquePatternList(Intersection);
 }
 
 /**
@@ -354,40 +354,6 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vecto
 		Union.push_back(Pattern);
 	}
 
-	return RemoveDuplicates(Union);
-}
-
-/**
- * @brief Removes duplicates from the input set.
- *
- * @param InSet Input set.
- *
- * @return Set free of duplicates.
- **/
-std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::RemoveDuplicates(std::vector<HPCParallelPattern*> InSet)
-{
-	std::vector<HPCParallelPattern*> OutSet;
-
-	for (HPCParallelPattern* Pattern : InSet)
-	{
-		bool duplicate = false;
-
-		/* Check, if the pattern has already been added to the output set */
-		for (HPCParallelPattern* Pattern2 : OutSet)
-		{
-			if (Pattern->Equals(Pattern2))
-			{
-				duplicate = true;
-				break;
-			}
-		}
-
-		if (!duplicate)
-		{
-			OutSet.push_back(Pattern);
-		}
-	}
-
-	return OutSet;
+	return SetAlgorithms::GetUniquePatternList(Union);
 }
 

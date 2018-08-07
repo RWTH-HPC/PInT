@@ -2,6 +2,15 @@
 #include <vector>
 
 
+/**
+ * @brief A helper function to retrieve all PatternOccurence objects from a list of PatternCodeRegions.
+ * On demand, the list is turned into a set.
+ *
+ * @param CodeRegions List of PatternCodeRegion objects.
+ * @param MakeUnique If true, all duplicates are removed from the container.
+ *
+ * @return A list of PatternOccurence objects, free from duplicates iff flag is set.
+ **/
 std::vector<PatternOccurence*> PatternHelpers::GetPatternOccurences(std::vector<PatternCodeRegion*> CodeRegions, bool MakeUnique)
 {
 	/* Retrieve all pattern occurences from the code regions */
@@ -79,7 +88,7 @@ void GraphAlgorithms::FindParentPatternCodeRegions(PatternCodeRegion* Start, std
 }
 
 /**
- * @brief Finds the child patterns from a starting point. See FindParentPatternCodeRegions().
+ * @brief Finds the child patterns from a starting point. See GraphAlgorithms::FindParentPatternCodeRegions().
  **/
 void GraphAlgorithms::FindChildPatternCodeRegions(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth)
 {
@@ -166,3 +175,39 @@ std::vector<PatternOccurence*> SetAlgorithms::GetUniquePatternOccList(std::vecto
 
 	return Res;
 }
+
+/**
+ * @brief Removes duplicates from the input set.
+ * The criterion is HPCParallelPattern::Equals().
+ *
+ * @param Patterns Input set.
+ *
+ * @return Set free of duplicates.
+ **/
+std::vector<HPCParallelPattern*> SetAlgorithms::GetUniquePatternList(std::vector<HPCParallelPattern*> Patterns)
+{
+	std::vector<HPCParallelPattern*> Res;
+
+	for (HPCParallelPattern* Pattern : Patterns)
+	{
+		bool duplicate = false;
+
+		/* Check, if the pattern has already been added to the output set */
+		for (HPCParallelPattern* Pattern2 : Res)
+		{
+			if (Pattern->Equals(Pattern2))
+			{
+				duplicate = true;
+				break;
+			}
+		}
+
+		if (!duplicate)
+		{
+			Res.push_back(Pattern);
+		}
+	}
+
+	return Res;
+}
+
