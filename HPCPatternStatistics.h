@@ -2,7 +2,7 @@
 
 #include "HPCParallelPattern.h"
 #include <string>
-#include "TreeAlgorithms.h"
+#include "Helpers.h"
 
 #define CSV_SEPARATOR_CHAR ","
 
@@ -137,13 +137,9 @@ private:
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
-	std::vector<PatternOccurence*> GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs);
-
 	void FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Parents, int maxdepth);
 	
 	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth);
-
-	void FindNeighbourPatternsRec(PatternGraphNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth);
 
 	int maxdepth;
 

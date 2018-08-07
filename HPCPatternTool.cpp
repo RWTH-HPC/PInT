@@ -2,7 +2,7 @@
 #include "TreeVisualisation.h"
 #include "HPCPatternStatistics.h"
 #include "HPCParallelPattern.h"
-#include "TreeAlgorithms.h"
+#include "Helpers.h"
 #include "SimilarityMetrics.h"
 
 #include <iostream>
@@ -87,7 +87,7 @@ int main (int argc, const char** argv)
 	/* Similarity Measures */
 	HPCParallelPattern* IMVI = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
 	HPCParallelPattern* FCGT = PatternGraph::GetInstance()->GetPattern(DesignSpace::FindingConcurrency, "GroupTask");
-	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, SearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
+	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, GraphSearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
 
 	Jaccard.Calculate();
 	Jaccard.Print();

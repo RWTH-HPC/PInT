@@ -159,11 +159,11 @@ public:
 
 	static bool CompareBySimilarity(const SimilarityPair* SimPair1, const SimilarityPair* SimPair2);
 
-	SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir);
+	SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, GraphSearchDirection dir);
 
 	static void SortBySimilarity(std::vector<SimilarityPair*>& Sims);
 
-	std::vector<PatternSequence*> FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth);
+	std::vector<PatternSequence*> FindPatternSeqs(PatternCodeRegion* PatternNode, GraphSearchDirection dir, int maxdepth);
 
 	std::vector<PatternSequence*> FilterSequencesByLength(std::vector<PatternSequence*> Sequences, int minlength, int maxlength);
 
@@ -172,13 +172,13 @@ protected:
 
 	std::vector<SimilarityPair*> Similarities;
 
-	void VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth);
+	void VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, GraphSearchDirection dir, int depth, int maxdepth);
 
 	HPCParallelPattern* RootPattern;
 
 	int maxlength;
 	
-	SearchDirection dir;
+	GraphSearchDirection dir;
 };
 
 
@@ -195,7 +195,7 @@ protected:
 class JaccardSimilarityStatistic : public HPCPatternStatistic, public SimilarityMeasure
 {
 public:
-	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit, int outputlen);
+	JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, GraphSearchDirection dir, SimilarityCriterion Crit, int outputlen);
 
 	void Calculate();
 

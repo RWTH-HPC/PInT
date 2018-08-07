@@ -165,14 +165,14 @@ int CyclomaticComplexityStatistic::CountNodes()
 }
 
 /**
- * @brief Connected components are marked by call of TreeAlgorithms::MarkConnectedComponents().
+ * @brief Connected components are marked by call of GraphAlgorithms::MarkConnectedComponents().
  * Then, the number of connected components is calculated.
  *
  * @return The number of connected components.
  **/
 int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
-	TreeAlgorithms::MarkConnectedComponents();
+	GraphAlgorithms::MarkConnectedComponents();
 
 	std::vector<PatternCodeRegion*> CodeRegs = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
 	std::vector<FunctionNode*> Functions = PatternGraph::GetInstance()->GetAllFunctions();
@@ -392,48 +392,13 @@ void FanInFanOutStatistic::Calculate()
 		}
 
 		/* Filter out the duplicates */
-		Parents = GetUniquePatternOccList(Parents);
-		Children = GetUniquePatternOccList(Children);
+		Parents = SetAlgorithms::GetUniquePatternOccList(Parents);
+		Children = SetAlgorithms::GetUniquePatternOccList(Children);
 
 		/* Calculate the resulting fan-in and fan-out numbers */
 		Counter->FanIn += Parents.size();
 		Counter->FanOut += Children.size();
 	}
-}
-
-/**
- * @brief Remove duplicates from a list of PatternOccurence.
- * The criterion is defined by PatternOccurence::Equals().
- *
- * @param PatternOccs List of PatternOccurence objects containing duplicates.
- *
- * @return List of PatternOccurence objects free from duplicates.
- **/
-std::vector<PatternOccurence*> FanInFanOutStatistic::GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs)
-{
-	std::vector<PatternOccurence*> Res;
-
-	for (PatternOccurence* PatternOcc : PatternOccs)
-	{
-		/* Search the pattern list, whether this is a duplicate */
-		bool duplicate = false;
-
-		for (PatternOccurence* ResOcc : Res)
-		{
-			if (PatternOcc == ResOcc || PatternOcc->Equals(ResOcc))
-			{
-				duplicate = true;
-				break;
-			} 
-		}
-
-		if (!duplicate)
-		{
-			Res.push_back(PatternOcc);
-		}
-	}
-
-	return Res;
 }
 
 /**
@@ -517,7 +482,11 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
  **/
 void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Parents, int maxdepth)
 {
-	FindNeighbourPatternsRec(Start, Parents, DIR_Parents, 0, maxdepth);
+	/* Find the parent pattern code regions using API functionality */
+	std::vector<PatternCodeRegion*> CodeRegions;
+	GraphAlgorithms::FindParentPatternCodeRegions(Start, CodeRegions, maxdepth);
+
+	Parents = PatternHelpers::GetPatternOccurences(CodeRegions, true);
 }
 
 /**
@@ -525,51 +494,9 @@ void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vec
  **/
 void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth)
 {
-	FindNeighbourPatternsRec(Start, Children, DIR_Children, 0, maxdepth);
-}
+	/* Find child pattern code regions using API */
+	std::vector<PatternCodeRegion*> CodeRegions;
+	GraphAlgorithms::FindChildPatternCodeRegions(Start, CodeRegions, maxdepth);
 
-/**
- * @brief Core functionality for finding neightbours of a PatternGraphNode (in this case: PatternCodeRegion).
- * The direction of the recursive descent is passed as a parameter.
- *
- * @param Current The starting point of the recursive descent.
- * @param Results Vector of PatternOccurence neighbours.
- * @param dir The search direction (Children or parents)
- * @param depth The current depth of recursion.
- * @param maxdepth The maximum recursion depth.
- **/
-void FanInFanOutStatistic::FindNeighbourPatternsRec(PatternGraphNode* Current, std::vector<PatternOccurence*>& Results, SearchDirection dir, int depth, int maxdepth)
-{
-	/* Check, if we reached the maximum depth */
-	if (depth >= maxdepth)
-	{
-		return;
-	}
-
-	PatternCodeRegion* Pattern = clang::dyn_cast<PatternCodeRegion>(Current);
-
-	if (depth > 0 && Pattern != NULL)
-	{
-		Results.push_back(Pattern->GetPatternOccurence());
-	}
-	else
-	{
-		/* Get the neighbouring nodes depending on the defined search direction */
-		std::vector<PatternGraphNode*> Neighbours;
-
-		if (dir == DIR_Parents)
-		{
-			Neighbours = Current->GetParents();
-		}
-		else if (dir == DIR_Children)
-		{
-			Neighbours = Current->GetChildren();
-		}
-
-		/* Visit all the neighbouring nodes according to the given direction */
-		for (PatternGraphNode* Neighbour : Neighbours)
-		{
-			FindNeighbourPatternsRec(Neighbour, Results, dir, depth + 1, maxdepth);
-		}
-	}
+	Children = PatternHelpers::GetPatternOccurences(CodeRegions, true);
 }

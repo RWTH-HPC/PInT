@@ -9,7 +9,7 @@
  * @param maxlength The maximum sequence length.
  * @param dir The direction (children/parents) in which the sequences are extracted.
  **/
-SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, SearchDirection dir)
+SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, GraphSearchDirection dir)
 {
 	this->RootPattern = RootPattern;
 	this->maxlength = maxlength;
@@ -49,7 +49,7 @@ bool SimilarityMeasure::CompareBySimilarity(const SimilarityPair* SimPair1, cons
  *
  * @return A list of pattern sequences.
  **/
-std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternSeqs(PatternCodeRegion* PatternNode, SearchDirection dir, int maxdepth)
+std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternSeqs(PatternCodeRegion* PatternNode, GraphSearchDirection dir, int maxdepth)
 {
 	std::vector<PatternSequence*> Seqs;
 
@@ -88,7 +88,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
  * @param depth The current recursion depth.
  * @param maxdepth The maximum recursion depth.
  **/
-void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, SearchDirection dir, int depth, int maxdepth)
+void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, GraphSearchDirection dir, int depth, int maxdepth)
 {
 	/* Check if the current node is a pattern occurence node */
 	if (PatternCodeRegion* CurrentCodeReg = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
@@ -161,7 +161,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequen
  * @param Crit The similarity criterion used.
  * @param outputlen Length of the textual output: how many entries are displayed.
  **/
-JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, SearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
+JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, GraphSearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
 {
 	this->minlength = minlength;
 	this->Crit = Crit;
