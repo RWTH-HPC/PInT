@@ -25,7 +25,7 @@ void HPCPatternBeginInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry)
 
 /**
  * @brief Analyse the match results from the pattern begin matcher to extract information about the pattern.
- * After extracting design space, pattern name and pattern identifier, HPCParallelPattern and PatternOccurence objects are looked up in the database.
+ * After extracting design space, pattern name and pattern identifier, HPCParallelPattern and PatternOccurrence objects are looked up in the database.
  * If they do not already exist, they are created.
  * Then, a PatternCodeRegion object is created for this particular encounter.
  *
@@ -55,24 +55,24 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	}
 
 
-	/* Check if this code regions is part of an existing pattern occurence */
-	PatternOccurence* PatternOcc = PatternGraph::GetInstance()->GetPatternOccurence(PatternID);
+	/* Check if this code regions is part of an existing pattern occurrence */
+	PatternOccurrence* PatternOcc = PatternGraph::GetInstance()->GetPatternOccurrence(PatternID);
 
 	if (PatternOcc == NULL)
 	{
-		PatternOcc = new PatternOccurence(Pattern, PatternID);
-		PatternGraph::GetInstance()->RegisterPatternOccurence(PatternOcc);
-		Pattern->AddOccurence(PatternOcc);
+		PatternOcc = new PatternOccurrence(Pattern, PatternID);
+		PatternGraph::GetInstance()->RegisterPatternOccurrence(PatternOcc);
+		Pattern->AddOccurrence(PatternOcc);
 	}
 	else
 	{
 		if (!PatternOcc->GetPattern()->Equals(Pattern))
 		{
-			std::cout << "\033[31m" << "Pattern Occurences with same identifier have different underlying pattern:\033[0m" << PatternID << std::endl;
+			std::cout << "\033[31m" << "Pattern Occurrences with same identifier have different underlying pattern:\033[0m" << PatternID << std::endl;
 		}
 	}
 
-	/* Create a new object for pattern occurence */
+	/* Create a new object for pattern occurrence */
 	PatternCodeRegion* CodeRegion = new PatternCodeRegion(PatternOcc);
 	PatternOcc->AddCodeRegion(CodeRegion);
 

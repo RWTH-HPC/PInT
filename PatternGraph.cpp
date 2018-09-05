@@ -27,7 +27,7 @@ void FunctionNode::AddParent(PatternGraphNode* Parent)
 
 
 
-PatternGraph::PatternGraph() : Functions(), Patterns(), PatternOccurences()
+PatternGraph::PatternGraph() : Functions(), Patterns(), PatternOccurrences()
 {
 
 }
@@ -162,15 +162,15 @@ bool PatternGraph::RegisterPattern(HPCParallelPattern* Pattern)
 
 
 /**
- * @brief Finds a PatternOccurence object in the database by its ID.
+ * @brief Finds a PatternOccurrence object in the database by its ID.
  *
- * @param ID The ID of the PatternOccurence we are searching.
+ * @param ID The ID of the PatternOccurrence we are searching.
  *
- * @return The PatternOccurence object if successful, NULL else.
+ * @return The PatternOccurrence object if successful, NULL else.
  **/
-PatternOccurence* PatternGraph::GetPatternOccurence(std::string ID)
+PatternOccurrence* PatternGraph::GetPatternOccurrence(std::string ID)
 {
-	for (PatternOccurence* PatternOcc : PatternOccurences)
+	for (PatternOccurrence* PatternOcc : PatternOccurrences)
 	{
 		if (!ID.compare(PatternOcc->GetID()))
 		{
@@ -182,20 +182,20 @@ PatternOccurence* PatternGraph::GetPatternOccurence(std::string ID)
 }
 
 /**
- * @brief Adds a PatternOccurence to the database.
+ * @brief Adds a PatternOccurrence to the database.
  *
- * @param PatternOcc The PatternOccurence to add.
+ * @param PatternOcc The PatternOccurrence to add.
  *
- * @return False if the pattern occurence is already registered. Else, true.
+ * @return False if the pattern occurrence is already registered. Else, true.
  **/
-bool PatternGraph::RegisterPatternOccurence(PatternOccurence* PatternOcc)
+bool PatternGraph::RegisterPatternOccurrence(PatternOccurrence* PatternOcc)
 {
-	if (GetPatternOccurence(PatternOcc->GetID()) != NULL)
+	if (GetPatternOccurrence(PatternOcc->GetID()) != NULL)
 	{
 		return false;
 	}
 	
-	PatternOccurences.push_back(PatternOcc);
+	PatternOccurrences.push_back(PatternOcc);
 
 	return true;
 }
@@ -203,13 +203,13 @@ bool PatternGraph::RegisterPatternOccurence(PatternOccurence* PatternOcc)
 /**
  * @brief Collects all PatternCodeRegion objects and returns them.
  *
- * @return All PatternCodeRegion objects linked to this PatternOccurence
+ * @return All PatternCodeRegion objects linked to this PatternOccurrence
  **/
 std::vector<PatternCodeRegion*> PatternGraph::GetAllPatternCodeRegions()
 {
 	std::vector<PatternCodeRegion*> CodeRegions;
 
-	for (PatternOccurence* PatternOcc : PatternOccurences)
+	for (PatternOccurrence* PatternOcc : PatternOccurrences)
 	{
 		for (PatternCodeRegion* CodeRegion : PatternOcc->GetCodeRegions())
 		{

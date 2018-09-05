@@ -154,7 +154,7 @@ int CyclomaticComplexityStatistic::CountNodes()
 
 	int nodes = 0;
 
-	/* Count all occurences for all patterns */
+	/* Count all occurrences for all patterns */
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
 		std::vector<PatternCodeRegion*> CodeRegs = Pattern->GetCodeRegions();
@@ -212,7 +212,7 @@ void LinesOfCodeStatistic::Calculate()
 }
 
 /**
- * @brief Prints statistics about lines of code for each HPCParallelPattern and PatternOccurence.
+ * @brief Prints statistics about lines of code for each HPCParallelPattern and PatternOccurrence.
  */
 void LinesOfCodeStatistic::Print()
 {
@@ -222,10 +222,10 @@ void LinesOfCodeStatistic::Print()
 	{
 		std::cout << "\033[33m" << Pattern->GetPatternName() << "\033[0m" << " has " << Pattern->GetTotalLinesOfCode() << " line(s) of code in total." << std::endl;
 
-		std::vector<PatternOccurence*> Occurences = Pattern->GetOccurences();
-		std::cout << Occurences.size() << " occurences in code." << std::endl;
+		std::vector<PatternOccurrence*> Occurrences = Pattern->GetOccurrences();
+		std::cout << Occurrences.size() << " occurrences in code." << std::endl;
 
-		for (PatternOccurence* PatternOcc : Occurences)
+		for (PatternOccurrence* PatternOcc : Occurrences)
 		{
 			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
 		}
@@ -299,7 +299,7 @@ void SimplePatternCountStatistic::Print()
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		std::cout << "Pattern \033[33m" << Pattern->GetPatternName() << "\033[0m occurs " << Pattern->GetOccurences().size() << " times." << std::endl;
+		std::cout << "Pattern \033[33m" << Pattern->GetPatternName() << "\033[0m occurs " << Pattern->GetOccurrences().size() << " times." << std::endl;
 	}
 }
 
@@ -319,7 +319,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
-		File << Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Pattern->GetOccurences().size() << "\n";
+		File << Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Pattern->GetOccurrences().size() << "\n";
 	}	
 
 	File.close();
@@ -339,7 +339,7 @@ FanInFanOutStatistic::FanInFanOutStatistic(int maxdepth) : FIFOCounter()
 
 /**
  * @brief Calculates the Fan-In and Fan-Out statistic for each Pattern.
- * First, all children and parents for all PatternOccurence and PatternCodeRegions are gathered.
+ * First, all children and parents for all PatternOccurrence and PatternCodeRegions are gathered.
  * Then, duplicates are removed.
  * The remaining patterns are counted and saved in FanInFanOutStatistic::FanInFanOutCounter objects.
  */
@@ -356,9 +356,9 @@ void FanInFanOutStatistic::Calculate()
 			Counter = AddFIFOCounter(Pattern);
 		}
 		
-		/* We want to count the number of pattern occurences */
-		std::vector<PatternOccurence*> Parents;
-		std::vector<PatternOccurence*> Children;
+		/* We want to count the number of pattern occurrences */
+		std::vector<PatternOccurrence*> Parents;
+		std::vector<PatternOccurrence*> Children;
 
 		for (PatternCodeRegion* CodeReg : Pattern->GetCodeRegions())
 		{
@@ -371,7 +371,7 @@ void FanInFanOutStatistic::Calculate()
 #ifdef PRINT_DEBUG
 			std::cout << "List of parents: " << std::endl;			
 
-			for (PatternOccurence* Parent : Parents)
+			for (PatternOccurrence* Parent : Parents)
 			{
 				Parent->Print();
 				std::cout << std::endl;
@@ -381,7 +381,7 @@ void FanInFanOutStatistic::Calculate()
 #ifdef PRINT_DEBUG
 			std::cout << "List of children: " << std::endl;
 
-			for (PatternOccurence* Child : Children)
+			for (PatternOccurrence* Child : Children)
 			{
 				Child->Print();
 				std::cout << std::endl;
@@ -474,29 +474,29 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
 
 /**
  * @brief Finds the parent patterns, beginning from a PatternCodeRegion.
- * Saves the parent patterns in the list of PatternOccurence passed as second parameter.
+ * Saves the parent patterns in the list of PatternOccurrence passed as second parameter.
  *
  * @param Start Initial PatternCodeRegion from which the search is started.
- * @param Parents Reference to a std::vector of PatternOccurence* in which the encountered occurences are saved.
+ * @param Parents Reference to a std::vector of PatternOccurrence* in which the encountered occurrences are saved.
  * @param maxdepth Maximum depth of the recursion.
  **/
-void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Parents, int maxdepth)
+void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Parents, int maxdepth)
 {
 	/* Find the parent pattern code regions using API functionality */
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindParentPatternCodeRegions(Start, CodeRegions, maxdepth);
 
-	Parents = PatternHelpers::GetPatternOccurences(CodeRegions, true);
+	Parents = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 }
 
 /**
  * @brief Finds the child patterns from a starting point. See FanInFanOutStatistic::FindParentPatterns().
  **/
-void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth)
+void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Children, int maxdepth)
 {
 	/* Find child pattern code regions using API */
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindChildPatternCodeRegions(Start, CodeRegions, maxdepth);
 
-	Children = PatternHelpers::GetPatternOccurences(CodeRegions, true);
+	Children = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 }

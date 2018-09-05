@@ -89,7 +89,7 @@ public:
 
 
 /**
- * A statistic that prints for each pattern how many occurences there are.
+ * A statistic that prints for each pattern how many occurrences there are.
  */
 class SimplePatternCountStatistic : public HPCPatternStatistic
 {
@@ -137,9 +137,9 @@ private:
 
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
-	void FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Parents, int maxdepth);
+	void FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Parents, int maxdepth);
 	
-	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurence*>& Children, int maxdepth);
+	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Children, int maxdepth);
 
 	int maxdepth;
 

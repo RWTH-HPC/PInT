@@ -8,7 +8,7 @@
 
 /**
  * This class handles the callback that is issued when a pattern begin instrumentation call is encountered and the string argument is matched.
- * It extracts all information about the pattern and patternoccurence from the string argument and initiates creation of all involved objects.
+ * It extracts all information about the pattern and patternoccurrence from the string argument and initiates creation of all involved objects.
  */
 class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::MatchCallback 
 {

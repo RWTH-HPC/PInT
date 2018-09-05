@@ -12,15 +12,15 @@
 
 
 /* Forward declarations */
-class PatternOccurence;
+class PatternOccurrence;
 class PatternCodeRegion;
 
 
 
 /**
  * This class describes a parallel pattern identified by the design space and the pattern name.
- * The pattern name is not the same as the pattern identifier, as only PatternOccurence can have an identifier.
- * A parallel pattern can have one or multiple PatternOccurences which are registered in this object.
+ * The pattern name is not the same as the pattern identifier, as only PatternOccurrence can have an identifier.
+ * A parallel pattern can have one or multiple PatternOccurrences which are registered in this object.
  */
 class HPCParallelPattern
 {
@@ -31,9 +31,9 @@ public:
 
 	void PrintShort();
 
-	void AddOccurence(PatternOccurence* Occurence);
+	void AddOccurrence(PatternOccurrence* Occurrence);
 
-	std::vector<PatternOccurence*> GetOccurences() { return this->Occurences; }
+	std::vector<PatternOccurrence*> GetOccurrences() { return this->Occurrences; }
 
 	std::vector<PatternCodeRegion*> GetCodeRegions();
 	
@@ -51,21 +51,21 @@ private:
 	DesignSpace DesignSp;
 	std::string PatternName;
 
-	std::vector<PatternOccurence*> Occurences;
+	std::vector<PatternOccurrence*> Occurrences;
 };
 
 
 
 /**
- * The PatternOccurence is a hypothetical construct that represents a collection for all code regions
+ * The PatternOccurrence is a hypothetical construct that represents a collection for all code regions
  * with the same identifier.
  * It is linked to a unique HPCParallelPattern.
  * Each PatternCodeRegion with this identifier is accessible from this object.
  */
-class PatternOccurence
+class PatternOccurrence
 {
 public:
-	PatternOccurence(HPCParallelPattern* Pattern, std::string ID);
+	PatternOccurrence(HPCParallelPattern* Pattern, std::string ID);
 
 	HPCParallelPattern* GetPattern() { return this->Pattern; }
 
@@ -81,7 +81,7 @@ public:
 
 	int GetNumberOfCodeRegions() { return this->CodeRegions.size(); }
 
-	bool Equals(PatternOccurence* PatternOcc);
+	bool Equals(PatternOccurrence* PatternOcc);
 	
 private:
 	HPCParallelPattern* Pattern;
@@ -96,14 +96,14 @@ private:
 /**
  * This class represents a block of code that is enclosed with the instrumentation calls.
  * It is a node in the pattern tree, hence has children and parents in the tree.
- * A PatternCodeRegion belongs to a PatternOccurence.
+ * A PatternCodeRegion belongs to a PatternOccurrence.
  */
 class PatternCodeRegion : public PatternGraphNode
 {
 public:
-	PatternCodeRegion(PatternOccurence* PatternOcc);
+	PatternCodeRegion(PatternOccurrence* PatternOcc);
 
-	PatternOccurence* GetPatternOccurence() { return this->PatternOcc; }
+	PatternOccurrence* GetPatternOccurrence() { return this->PatternOcc; }
 
 	static bool classof(const PatternGraphNode* Node)
 	{
@@ -129,7 +129,7 @@ public:
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
 private:
-	PatternOccurence* PatternOcc;	
+	PatternOccurrence* PatternOcc;	
 
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;

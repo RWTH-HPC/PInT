@@ -14,7 +14,7 @@ enum GraphSearchDirection
 
 namespace PatternHelpers
 {
-	extern std::vector<PatternOccurence*> GetPatternOccurences(std::vector<PatternCodeRegion*> CodeRegions, bool MakeUnique);
+	extern std::vector<PatternOccurrence*> GetPatternOccurrences(std::vector<PatternCodeRegion*> CodeRegions, bool MakeUnique);
 }
 
 namespace GraphAlgorithms
@@ -32,7 +32,7 @@ namespace GraphAlgorithms
 
 namespace SetAlgorithms
 {
-	extern std::vector<PatternOccurence*> GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs);
+	extern std::vector<PatternOccurrence*> GetUniquePatternOccList(std::vector<PatternOccurrence*> PatternOccs);
 
 	extern std::vector<HPCParallelPattern*> GetUniquePatternList(std::vector<HPCParallelPattern*> Patterns);
 }

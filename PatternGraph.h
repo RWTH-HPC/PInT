@@ -12,7 +12,7 @@
 
 /* Forward declarations */
 class HPCParallelPattern;
-class PatternOccurence;
+class PatternOccurrence;
 class PatternCodeRegion;
 
 
@@ -131,17 +131,17 @@ public:
 	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
 
 
-	/* Access to pattern occurences */
-	bool RegisterPatternOccurence(PatternOccurence* PatternOcc);
+	/* Access to pattern occurrences */
+	bool RegisterPatternOccurrence(PatternOccurrence* PatternOcc);
 
-	PatternOccurence* GetPatternOccurence(std::string ID);
+	PatternOccurrence* GetPatternOccurrence(std::string ID);
 
 	/**
 	 * @brief 
 	 *
-	 * @return All pattern occurences registered in the graph.
+	 * @return All pattern occurrences registered in the graph.
 	 **/
-	std::vector<PatternOccurence*> GetAllPatternOccurence() { return PatternOccurences; }
+	std::vector<PatternOccurrence*> GetAllPatternOccurrence() { return PatternOccurrences; }
 
 	std::vector<PatternCodeRegion*> GetAllPatternCodeRegions();
 	
@@ -172,9 +172,9 @@ public:
 	}
 
 private:
-	/* Save patterns, patternoccurences and functions for later requests and linear access. */
+	/* Save patterns, patternoccurrences and functions for later requests and linear access. */
 	std::vector<HPCParallelPattern*> Patterns;
-	std::vector<PatternOccurence*> PatternOccurences;
+	std::vector<PatternOccurrence*> PatternOccurrences;
 
 	std::vector<FunctionNode*> Functions;
 

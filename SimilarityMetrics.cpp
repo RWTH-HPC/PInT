@@ -55,7 +55,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
 
 	PatternSequence* CurSeq;
 	CurSeq = new PatternSequence;
-	CurSeq->Patterns.push_back(PatternNode->GetPatternOccurence()->GetPattern());
+	CurSeq->Patterns.push_back(PatternNode->GetPatternOccurrence()->GetPattern());
 
 	std::vector<PatternGraphNode*> Neighbours;
 
@@ -90,18 +90,18 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FindPatternS
  **/
 void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, PatternSequence* CurrentSequence, std::vector<PatternSequence*>* Sequences, GraphSearchDirection dir, int depth, int maxdepth)
 {
-	/* Check if the current node is a pattern occurence node */
+	/* Check if the current node is a pattern occurrence node */
 	if (PatternCodeRegion* CurrentCodeReg = clang::dyn_cast<PatternCodeRegion>(CurrentNode))
 	{
 		/* Branch a new sequence from the previous */
 		PatternSequence* NewSequence = CurrentSequence->Fork();
-		NewSequence->Patterns.push_back(CurrentCodeReg->GetPatternOccurence()->GetPattern());
+		NewSequence->Patterns.push_back(CurrentCodeReg->GetPatternOccurrence()->GetPattern());
 		Sequences->push_back(NewSequence);
 
 		CurrentSequence = NewSequence;
 	}
 
-	/* If we can still add new occurences, then continue */	
+	/* If we can still add new occurrences, then continue */	
 	if (CurrentSequence->Patterns.size() < this->maxlength && depth < maxdepth)
 	{
 		/* Get neighbours */
@@ -175,7 +175,7 @@ JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootP
  */
 void JaccardSimilarityStatistic::Calculate()
 {
-	/* Iterate over all occurences and all code regions of the root pattern to find all sequences starting from this pattern */
+	/* Iterate over all occurrences and all code regions of the root pattern to find all sequences starting from this pattern */
 	for (PatternCodeRegion* CodeRegion : RootPattern->GetCodeRegions())
 	{
 		std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, 10);

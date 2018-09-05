@@ -3,31 +3,31 @@
 
 
 /**
- * @brief A helper function to retrieve all PatternOccurence objects from a list of PatternCodeRegions.
+ * @brief A helper function to retrieve all PatternOccurrence objects from a list of PatternCodeRegions.
  * On demand, the list is turned into a set.
  *
  * @param CodeRegions List of PatternCodeRegion objects.
  * @param MakeUnique If true, all duplicates are removed from the container.
  *
- * @return A list of PatternOccurence objects, free from duplicates iff flag is set.
+ * @return A list of PatternOccurrence objects, free from duplicates iff flag is set.
  **/
-std::vector<PatternOccurence*> PatternHelpers::GetPatternOccurences(std::vector<PatternCodeRegion*> CodeRegions, bool MakeUnique)
+std::vector<PatternOccurrence*> PatternHelpers::GetPatternOccurrences(std::vector<PatternCodeRegion*> CodeRegions, bool MakeUnique)
 {
-	/* Retrieve all pattern occurences from the code regions */
-	std::vector<PatternOccurence*> PatternOccurences;
+	/* Retrieve all pattern occurrences from the code regions */
+	std::vector<PatternOccurrence*> PatternOccurrences;
 
 	for (PatternCodeRegion* CodeReg : CodeRegions)
 	{
-		PatternOccurences.push_back(CodeReg->GetPatternOccurence());
+		PatternOccurrences.push_back(CodeReg->GetPatternOccurrence());
 	}
 
 	/* Clean the list from duplicates if the parameter is set */
 	if (MakeUnique)
 	{
-		PatternOccurences = SetAlgorithms::GetUniquePatternOccList(PatternOccurences);
+		PatternOccurrences = SetAlgorithms::GetUniquePatternOccList(PatternOccurrences);
 	}
 
-	return PatternOccurences;
+	return PatternOccurrences;
 }
 
 /**
@@ -76,10 +76,10 @@ void GraphAlgorithms::MarkConnectedComponents(PatternGraphNode* Node, int Compon
 
 /**
  * @brief Finds the parent patterns, beginning from a PatternCodeRegion.
- * Saves the parent patterns in the list of PatternOccurence passed as second parameter.
+ * Saves the parent patterns in the list of PatternOccurrence passed as second parameter.
  *
  * @param Start Initial PatternCodeRegion from which the search is started.
- * @param Parents Reference to a std::vector of PatternOccurence* in which the encountered occurences are saved.
+ * @param Parents Reference to a std::vector of PatternOccurrence* in which the encountered occurrences are saved.
  * @param maxdepth Maximum depth of the recursion.
  **/
 void GraphAlgorithms::FindParentPatternCodeRegions(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Parents, int maxdepth)
@@ -142,23 +142,23 @@ void GraphAlgorithms::FindNeighbourPatternCodeRegions(PatternGraphNode* Current,
 }
 
 /**
- * @brief Remove duplicates from a list of PatternOccurence.
- * The criterion is defined by PatternOccurence::Equals().
+ * @brief Remove duplicates from a list of PatternOccurrence.
+ * The criterion is defined by PatternOccurrence::Equals().
  *
- * @param PatternOccs List of PatternOccurence objects containing duplicates.
+ * @param PatternOccs List of PatternOccurrence objects containing duplicates.
  *
- * @return List of PatternOccurence objects free from duplicates.
+ * @return List of PatternOccurrence objects free from duplicates.
  **/
-std::vector<PatternOccurence*> SetAlgorithms::GetUniquePatternOccList(std::vector<PatternOccurence*> PatternOccs)
+std::vector<PatternOccurrence*> SetAlgorithms::GetUniquePatternOccList(std::vector<PatternOccurrence*> PatternOccs)
 {
-	std::vector<PatternOccurence*> Res;
+	std::vector<PatternOccurrence*> Res;
 
-	for (PatternOccurence* PatternOcc : PatternOccs)
+	for (PatternOccurrence* PatternOcc : PatternOccs)
 	{
 		/* Search the pattern list, whether this is a duplicate */
 		bool duplicate = false;
 
-		for (PatternOccurence* ResOcc : Res)
+		for (PatternOccurrence* ResOcc : Res)
 		{
 			if (PatternOcc == ResOcc || PatternOcc->Equals(ResOcc))
 			{

@@ -39,10 +39,10 @@ void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int dept
 	
 	PrintIndent(depth);
 
-	HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurence()->GetPattern();
+	HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurrence()->GetPattern();
 	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
 
-	std::cout << "(" << CodeRegion->GetPatternOccurence()->GetID() << ")" << std::endl;
+	std::cout << "(" << CodeRegion->GetPatternOccurrence()->GetID() << ")" << std::endl;
  
 	for (PatternGraphNode* Child : CodeRegion->GetChildren())
 	{

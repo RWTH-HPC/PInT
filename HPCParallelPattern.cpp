@@ -8,21 +8,21 @@
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName) : Occurences()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName) : Occurrences()
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
 }
 
 /**
- * @brief Prints design space, pattern name and number of occurences.
+ * @brief Prints design space, pattern name and number of occurrences.
  **/
 void HPCParallelPattern::Print() 
 {
 	std::cout << "Pattern Info" << std::endl;
 	std::cout << "Pattern Design Space: " << DesignSpaceToStr(this->DesignSp) << std::endl;
 	std::cout << "Pattern Name: " << this->PatternName << std::endl;
-	std::cout << this->Occurences.size() << " Occurences." << std::endl;
+	std::cout << this->Occurrences.size() << " Occurrences." << std::endl;
 }
 
 /**
@@ -33,13 +33,13 @@ void HPCParallelPattern::PrintShort()
 	std::cout << "\033[33m" << DesignSpaceToStr(this->DesignSp) << "\033[0m" << this->PatternName;
 }
 
-void HPCParallelPattern::AddOccurence(PatternOccurence* Occurence)
+void HPCParallelPattern::AddOccurrence(PatternOccurrence* Occurrence)
 {
-	this->Occurences.push_back(Occurence);
+	this->Occurrences.push_back(Occurrence);
 }
 
 /**
- * @brief Returns the sum of lines of code from all pattern occurences.
+ * @brief Returns the sum of lines of code from all pattern occurrences.
  *
  * @return Sum of lines of code.
  **/
@@ -47,7 +47,7 @@ int HPCParallelPattern::GetTotalLinesOfCode()
 {
 	int LOC = 0;
 
-	for (PatternOccurence* PatternOcc : this->Occurences)
+	for (PatternOccurrence* PatternOcc : this->Occurrences)
 	{
 		LOC += PatternOcc->GetTotalLinesOfCode();
 	}
@@ -71,15 +71,15 @@ bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
 }
 
 /**
- * @brief Get all code regions from all pattern occurences.
+ * @brief Get all code regions from all pattern occurrences.
  *
- * @return Return pointers to all PatternCodeRegion objects from all PatternOccurence objects.
+ * @return Return pointers to all PatternCodeRegion objects from all PatternOccurrence objects.
  **/
 std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 {
 	std::vector<PatternCodeRegion*> CodeRegions;
 
-	for (PatternOccurence* PatternOcc : this->GetOccurences())
+	for (PatternOccurrence* PatternOcc : this->GetOccurrences())
 	{
 		for (PatternCodeRegion* CodeReg : PatternOcc->GetCodeRegions())
 		{
@@ -93,20 +93,20 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 
 
 /*
- * Pattern Occurence Class Functions
+ * Pattern Occurrence Class Functions
  */
-PatternOccurence::PatternOccurence(HPCParallelPattern* Pattern, std::string ID)
+PatternOccurrence::PatternOccurrence(HPCParallelPattern* Pattern, std::string ID)
 {
 	this->Pattern = Pattern;
 	this->ID = ID;
 } 
 
 /**
- * @brief Get the lines of code for all PatternCodeRegion objects registered with this PatternOccurence.
+ * @brief Get the lines of code for all PatternCodeRegion objects registered with this PatternOccurrence.
  *
  * @return Sum of lines of code.
  **/
-int PatternOccurence::GetTotalLinesOfCode() 
+int PatternOccurrence::GetTotalLinesOfCode() 
 {
 	int LOC = 0;	
 
@@ -119,13 +119,13 @@ int PatternOccurence::GetTotalLinesOfCode()
 }
 
 /**
- * @brief Compare a PatternOccurence object with this object. The ID and the underlying HPCParallelPattern are compared.
+ * @brief Compare a PatternOccurrence object with this object. The ID and the underlying HPCParallelPattern are compared.
  *
- * @param PatternOcc The PatternOccurence object to compare with.
+ * @param PatternOcc The PatternOccurrence object to compare with.
  *
  * @return True if equal, false elsewise.
  **/
-bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
+bool PatternOccurrence::Equals(PatternOccurrence* PatternOcc)
 {
 	if (!this->ID.compare(PatternOcc->GetID()) && this->Pattern->Equals(PatternOcc->GetPattern()))
 	{
@@ -136,9 +136,9 @@ bool PatternOccurence::Equals(PatternOccurence* PatternOcc)
 }
 
 /**
- * @brief Prints the ID of this pattern occurence as well as all information from HPCParallelPattern::Print().
+ * @brief Prints the ID of this pattern occurrence as well as all information from HPCParallelPattern::Print().
  **/
-void PatternOccurence::Print()
+void PatternOccurrence::Print()
 {
 	this->Pattern->Print();
 	std::cout << this->GetID() << std::endl;
@@ -149,7 +149,7 @@ void PatternOccurence::Print()
 /*
  * Pattern Code Region Class Functions
  */
-PatternCodeRegion::PatternCodeRegion(PatternOccurence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
+PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;
 }
@@ -182,7 +182,7 @@ void PatternCodeRegion::SetLastLine(int LastLine)
 
 
 /**
- * @brief Print the lines of code plus all information from PatternOccurence::Print().
+ * @brief Print the lines of code plus all information from PatternOccurrence::Print().
  **/
 void PatternCodeRegion::Print()
 {
