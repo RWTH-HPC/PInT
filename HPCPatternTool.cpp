@@ -77,7 +77,7 @@ int main (int argc, const char** argv)
 
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
-	CallTreeVisualisation::PrintCallTree(10);
+	//CallTreeVisualisation::PrintCallTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{
@@ -91,13 +91,20 @@ int main (int argc, const char** argv)
 	Statistics[2]->CSVExport("LOC.csv");
 
 	/* Similarity Measures */
+	std::vector<HPCParallelPattern*> SimPatterns;
+
 	HPCParallelPattern* IMVI = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
 	HPCParallelPattern* FCGT = PatternGraph::GetInstance()->GetPattern(DesignSpace::FindingConcurrency, "GroupTask");
-	JaccardSimilarityStatistic Jaccard(IMVI, 2, 3, GraphSearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 5);
+	HPCParallelPattern* IMCO = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Communication");
+	HPCParallelPattern* IMSY = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Synchronization");	
+	
+	SimPatterns.push_back(IMCO);
+	SimPatterns.push_back(IMSY);
 
+	JaccardSimilarityStatistic Jaccard(SimPatterns, 2, 4, GraphSearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 1000);
+	
 	Jaccard.Calculate();
 	Jaccard.Print();
-
 
 	return retcode;
 }

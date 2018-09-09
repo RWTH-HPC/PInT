@@ -9,9 +9,9 @@
  * @param maxlength The maximum sequence length.
  * @param dir The direction (children/parents) in which the sequences are extracted.
  **/
-SimilarityMeasure::SimilarityMeasure(HPCParallelPattern* RootPattern, int maxlength, GraphSearchDirection dir)
+SimilarityMeasure::SimilarityMeasure(std::vector<HPCParallelPattern*> RootPatterns, int maxlength, GraphSearchDirection dir)
 {
-	this->RootPattern = RootPattern;
+	this->RootPatterns = RootPatterns;
 	this->maxlength = maxlength;
 	this->dir = dir;
 }
@@ -161,7 +161,7 @@ std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequen
  * @param Crit The similarity criterion used.
  * @param outputlen Length of the textual output: how many entries are displayed.
  **/
-JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootPattern, int minlength, int maxlength, GraphSearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
+JaccardSimilarityStatistic::JaccardSimilarityStatistic(std::vector<HPCParallelPattern*> RootPattern, int minlength, int maxlength, GraphSearchDirection dir, SimilarityCriterion Crit, int outputlen) : SimilarityMeasure(RootPattern, maxlength, dir)
 {
 	this->minlength = minlength;
 	this->Crit = Crit;
@@ -175,14 +175,17 @@ JaccardSimilarityStatistic::JaccardSimilarityStatistic(HPCParallelPattern* RootP
  */
 void JaccardSimilarityStatistic::Calculate()
 {
-	/* Iterate over all occurrences and all code regions of the root pattern to find all sequences starting from this pattern */
-	for (PatternCodeRegion* CodeRegion : RootPattern->GetCodeRegions())
+	/* Iterate over all occurrences and all code regions of the root patterns to find all sequences starting from this pattern */
+	for (HPCParallelPattern* RootPattern : RootPatterns)
 	{
-		std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, 10);
-
-		for (PatternSequence* Seq : Seqs)
+		for (PatternCodeRegion* CodeRegion : RootPattern->GetCodeRegions())
 		{
-			this->PatternSequences.push_back(Seq);
+			std::vector<PatternSequence*> Seqs = FindPatternSeqs(CodeRegion, this->dir, 10);
+
+			for (PatternSequence* Seq : Seqs)
+			{
+				this->PatternSequences.push_back(Seq);
+			}
 		}
 	}
 
@@ -218,6 +221,8 @@ void JaccardSimilarityStatistic::Print()
 		Seq->Print();
 	}
 #endif
+
+	std::cout << "Outputlen: " << outputlen << " Similarities: " << this->Similarities.size() << std::endl;
 
 	for (int i = 0; i < std::min((ulong)outputlen, this->Similarities.size()); i++)
 	{
