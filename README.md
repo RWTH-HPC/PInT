@@ -37,9 +37,10 @@ and the Identifier is a name for this exact occurence of the pattern.<br>
 Identifiers can be re-used to indicate to the tool, that two (or more) code regions belong together.<br><br>
 Please note that patterns that due to implementation, pattern regions have to be closed in the opposite order in which they are opened (First Opened - Last Closed).
 
-<h3>3.2 <b>Optional:</b> Create compile_commands.json</h3>
+<h3>3.2 Creating a Compilation Database</h3>
+<b>If you have a CMake project for your source code</b>
 1) Create a cmake project for your source files, or use an existing project<br>
-2) Set the variable "EXPORT_COMPILE_COMMANDS" to true<br>
+1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS, ON)</code><br>
 3) Create/update your build system ('mkdir build && cd build && cmake ..')<br>
 4) Copy compile_commands.json to the directory containing the sources<br>
 <b>OR</b><br>
