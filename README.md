@@ -53,7 +53,12 @@ Make sure to copy this compilation database to the directory of the source code.
 
 <b>If you want to write the compilation database yourself</b> consider the follwing tutorials: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> and <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
 
+<h3>3.3 Optional: copy the instrumentation headers to the source directory</h3>
+To use the instrumentation headers, they either have to be copied to the source directory or be included through a compiler flag when launching the tool.
+For the latter, see the next section.
+
 <h3>3.3 Running the tool</h3>
-1) If you created no compilation database: think of the parameters you would want to pass to the clang compiler<br>
-2) Call the tool ('./HPC-pattern-tool /path/to/your/code.cpp [path/to/your/codeN.cpp] -- -extra-args=Your-Args-Go-Here')<br>
-3) Check output on screen and in csv files if statistics with csv export are used
+You can call the tool from its build directory like this: <code>./HPC-pattern-tool /path/to/your/code.cpp</code>.
+If you did not copy the instrumentation headers to the source directory as mentioned in section 3.3, you'll have to tell PInT where the header files are located.
+You can do so by passing an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/home/fs694067/PatternInstrumentation</code>.
+Arbitrary arguments can be passed after <code>--extra-arg=</code>.
