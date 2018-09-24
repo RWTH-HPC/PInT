@@ -38,15 +38,20 @@ Identifiers can be re-used to indicate to the tool, that two (or more) code regi
 Please note that patterns that due to implementation, pattern regions have to be closed in the opposite order in which they are opened (First Opened - Last Closed).
 
 <h3>3.2 Creating a Compilation Database</h3>
-<b>If you have a CMake project for your source code</b>
-1) Create a cmake project for your source files, or use an existing project<br>
-1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS, ON)</code><br>
-3) Create/update your build system ('mkdir build && cd build && cmake ..')<br>
-4) Copy compile_commands.json to the directory containing the sources<br>
-<b>OR</b><br>
-Write your compile_commands.json manually. But I would advise against doing that.<br>
+PInT is a clang-based tool.
+Therefore, it requires compilation databases in order to obtain the compiler flags used to build your source code.<br>
 
-If you have trouble with this explanation, consider: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> or <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
+<b>If you have a CMake project for your source code</b><br>
+1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS, ON)</code><br>
+2) Create/update your build system: <code>mkdir build && cd build && cmake ..</code><br>
+3) Copy compile_commands.json to the directory containing the sources: <code>cp compilation_commands.json path/to/src<br>
+
+<b>If you use make (or another build tool) to build your source code</b><br>
+Install the <a href="https://github.com/rizsotto/Bear">Bear Tool</a>.
+The tool intercepts the exec calls made by your build tool and creates a compilation database from this.
+Make sure to copy this compilation database to the directory of the source code.
+
+<b>If you want to write the compilation database yourself</b> consider the follwing tutorials: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> and <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
 
 <h3>3.3 Running the tool</h3>
 1) If you created no compilation database: think of the parameters you would want to pass to the clang compiler<br>
