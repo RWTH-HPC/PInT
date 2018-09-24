@@ -1,15 +1,15 @@
 <h1>How to install and use the tool</h1>
 <h2>1. Prerequisites</h2>
 1) Install clang 5 with libTooling support<br>
-2) Install cmake (preferably 3.4.1, not tested with older versions)<br>
-3) Clone the git repository to your machine
+2) Install cmake 3.4.1 (There appear to be problems with other versions)<br>
+3) Clone this git repository to your machine
 
 <h2>2. Installing the tool</h2>
 1) Change into the source directory<br>
-2) Create a new directory ('mkdir build')<br>
-3) Change into the new directory ('cd build')<br>
-4) Create the build system ('cmake ..')<br>
-5) Compile the tool ('make')
+2) Create a new directory: <code>mkdir build</code><br>
+3) Change into the new directory: <code>cd build</code><br>
+4) Create the build system: <code>cmake ..</code><br>
+5) Compile the tool: <code>make</code>
 
 <h2>3. Using the tool</h2>
 <h3>3.1 Instrumentation of your code</h3>
@@ -42,7 +42,7 @@ PInT is a clang-based tool.
 Therefore, it requires compilation databases in order to obtain the compiler flags used to build your source code.<br>
 
 <b>If you have a CMake project for your source code</b><br>
-1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS, ON)</code><br>
+1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS 1)</code><br>
 2) Create/update your build system: <code>mkdir build && cd build && cmake ..</code><br>
 3) Copy compile_commands.json to the directory containing the sources: <code>cp compilation_commands.json path/to/src<br>
 
@@ -50,15 +50,14 @@ Therefore, it requires compilation databases in order to obtain the compiler fla
 Install the <a href="https://github.com/rizsotto/Bear">Bear Tool</a>.
 The tool intercepts the exec calls made by your build tool and creates a compilation database from this.
 Make sure to copy this compilation database to the directory of the source code.
+If you don't want to install the Bear Tool, you can copy the compilation commands from the make file.
+The syntax of the compilation database is covered in the <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>.
 
-<b>If you want to write the compilation database yourself</b> consider the follwing tutorials: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> and <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
-
-<h3>3.3 Optional: copy the instrumentation headers to the source directory</h3>
-To use the instrumentation headers, they either have to be copied to the source directory or be included through a compiler flag when launching the tool.
-For the latter, see the next section.
+<b>If you want to write the compilation database from scratch by yourself</b> consider the following tutorials: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> and <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
 
 <h3>3.3 Running the tool</h3>
 You can call the tool from its build directory like this: <code>./HPC-pattern-tool /path/to/your/code.cpp</code>.
-If you did not copy the instrumentation headers to the source directory as mentioned in section 3.3, you'll have to tell PInT where the header files are located.
-You can do so by passing an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/home/fs694067/PatternInstrumentation</code>.
+You'll have to tell PInT where the instrumentation header files are located.
+You can copy the instrumentation header files to the source directory.
+Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/home/fs694067/PatternInstrumentation</code>.
 Arbitrary arguments can be passed after <code>--extra-arg=</code>.
