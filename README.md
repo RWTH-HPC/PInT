@@ -57,7 +57,9 @@ The syntax of the compilation database is covered in the <a href="https://clang.
 
 <h3>3.3 Running the tool</h3>
 You can call the tool from its build directory like this: <code>./HPC-pattern-tool /path/to/your/code.cpp</code>.
+Arbitrary additional arguments can be passed after <code>--extra-arg=</code>.<br><br>
 You'll have to tell PInT where the instrumentation header files are located.
 You can copy the instrumentation header files to the source directory.
-Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/home/fs694067/PatternInstrumentation</code>.
-Arbitrary arguments can be passed after <code>--extra-arg=</code>.
+Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/path/to/headers</code> to your tool call.
+<b>If you use cmake</b>, you can instead add the flag to the list of include directories with <code>include_directories(/path/to/headers)</code>.
+Finally, you can also add the <code>-I/path/to/headers</code> flag to the compilation database for the files where the instrumentation header is used.
