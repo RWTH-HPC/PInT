@@ -8,16 +8,17 @@
 /*
  * HPC Parallel Pattern Class Functions
  */
-HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName) : Occurrences()
+HPCParallelPattern::HPCParallelPattern(DesignSpace DesignSp, std::string PatternName)
 {
 	this->DesignSp = DesignSp;
 	this->PatternName = PatternName;
+	this->Occurrences = std::vector<PatternOccurrence*>();
 }
 
 /**
  * @brief Prints design space, pattern name and number of occurrences.
  **/
-void HPCParallelPattern::Print() 
+void HPCParallelPattern::Print()
 {
 	std::cout << "Pattern Info" << std::endl;
 	std::cout << "Pattern Design Space: " << DesignSpaceToStr(this->DesignSp) << std::endl;
@@ -26,7 +27,7 @@ void HPCParallelPattern::Print()
 }
 
 /**
- * @brief Like Print() but output is only a single line. 
+ * @brief Like Print() but output is only a single line.
  **/
 void HPCParallelPattern::PrintShort()
 {
@@ -66,8 +67,17 @@ bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
 	{
 		return true;
 	}
-	
+
 	return false;
+}
+
+std::vector<PatternOccurrence*> HPCParallelPattern::GetOccurrences() {
+	if(!this->Occurrences.empty()){
+	  	return this->Occurrences;
+	}
+	else{
+		  return std::vector<PatternOccurrence*>();
+	}
 }
 
 /**
@@ -77,7 +87,7 @@ bool HPCParallelPattern::Equals(HPCParallelPattern* Pattern)
  **/
 std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 {
-	std::vector<PatternCodeRegion*> CodeRegions;
+	std::vector<PatternCodeRegion*> CodeRegions = std::vector<PatternCodeRegion*>();
 
 	for (PatternOccurrence* PatternOcc : this->GetOccurrences())
 	{
@@ -86,7 +96,7 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 			CodeRegions.push_back(CodeReg);
 		}
 	}
-	
+
 	return CodeRegions;
 }
 
@@ -99,16 +109,16 @@ PatternOccurrence::PatternOccurrence(HPCParallelPattern* Pattern, std::string ID
 {
 	this->Pattern = Pattern;
 	this->ID = ID;
-} 
+}
 
 /**
  * @brief Get the lines of code for all PatternCodeRegion objects registered with this PatternOccurrence.
  *
  * @return Sum of lines of code.
  **/
-int PatternOccurrence::GetTotalLinesOfCode() 
+int PatternOccurrence::GetTotalLinesOfCode()
 {
-	int LOC = 0;	
+	int LOC = 0;
 
 	for (PatternCodeRegion* CodeReg : this->CodeRegions)
 	{
@@ -131,7 +141,7 @@ bool PatternOccurrence::Equals(PatternOccurrence* PatternOcc)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -154,7 +164,7 @@ PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGra
 	this->PatternOcc = PatternOcc;
 }
 
-void PatternCodeRegion::AddChild(PatternGraphNode* Child) 
+void PatternCodeRegion::AddChild(PatternGraphNode* Child)
 {
 	Children.push_back(Child);
 }
@@ -212,7 +222,7 @@ void AddToPatternStack(PatternCodeRegion* PatternReg)
  *
  * @return Top PatternCodeRegion or NULL if stack is empty.
  **/
-PatternCodeRegion* GetTopPatternStack() 
+PatternCodeRegion* GetTopPatternStack()
 {
 	if (!PatternContext.empty())
 	{
@@ -233,13 +243,13 @@ void RemoveFromPatternStack(std::string ID)
 {
 	if (!PatternContext.empty())
 	{
-		PatternCodeRegion* Top = PatternContext.top();	
-		
+		PatternCodeRegion* Top = PatternContext.top();
+
 		if (ID.compare(Top->GetID()))
 		{
 			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
 		}
-		
+
 		PatternContext.pop();
 	}
 }

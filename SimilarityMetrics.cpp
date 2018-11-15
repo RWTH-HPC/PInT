@@ -23,7 +23,7 @@ SimilarityMeasure::SimilarityMeasure(std::vector<HPCParallelPattern*> RootPatter
  **/
 void SimilarityMeasure::SortBySimilarity(std::vector<SimilarityPair*>& Sims)
 {
-	std::sort(Sims.begin(), Sims.end(), SimilarityMeasure::CompareBySimilarity);	
+	std::sort(Sims.begin(), Sims.end(), SimilarityMeasure::CompareBySimilarity);
 }
 
 /**
@@ -101,7 +101,7 @@ void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, Pat
 		CurrentSequence = NewSequence;
 	}
 
-	/* If we can still add new occurrences, then continue */	
+	/* If we can still add new occurrences, then continue */
 	if (CurrentSequence->Patterns.size() < this->maxlength && depth < maxdepth)
 	{
 		/* Get neighbours */
@@ -115,10 +115,10 @@ void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, Pat
 		{
 			Neighbours = CurrentNode->GetParents();
 		}
-		
+
 		/* Visit Neighbours */
 		for (PatternGraphNode* Neighbour : Neighbours)
-		{	
+		{
 			VisitPatternGraphNode(Neighbour, CurrentSequence, Sequences, dir, depth + 1, maxdepth);
 		}
 	}
@@ -129,13 +129,13 @@ void SimilarityMeasure::VisitPatternGraphNode(PatternGraphNode* CurrentNode, Pat
  *
  * @param PatternSequences Input list of PatternSequence objects.
  * @param minlength The minimum length.
- * @param maxlength The maximum length. 
+ * @param maxlength The maximum length.
  *
  * @return Input list clear of sequences that are longer than maxlength and shorter than minlength.
  **/
 std::vector<SimilarityMeasure::PatternSequence*> SimilarityMeasure::FilterSequencesByLength(std::vector<PatternSequence*> PatternSequences, int minlength, int maxlength)
 {
-	std::vector<PatternSequence*> FilteredSequences;	
+	std::vector<PatternSequence*> FilteredSequences;
 
 	/* Iterate over all sequences and check the length of the pattern list */
 	for (PatternSequence* Seq : PatternSequences)
@@ -189,12 +189,12 @@ void JaccardSimilarityStatistic::Calculate()
 		}
 	}
 
-	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, this->minlength, this->maxlength);		
+	this->PatternSequences = FilterSequencesByLength(this->PatternSequences, this->minlength, this->maxlength);
 
 
 	/* Calculate the similarities for all pairs of pattern sequences */
 	for (PatternSequence* Seq1 : this->PatternSequences)
-	{	
+	{
 		for (PatternSequence* Seq2 : this->PatternSequences)
 		{
 			if (Seq1 != Seq2 && !Seq1->Equals(Seq2))
@@ -206,7 +206,7 @@ void JaccardSimilarityStatistic::Calculate()
 			}
 		}
 	}
-		
+
 	SortBySimilarity(this->Similarities);
 }
 
@@ -227,7 +227,7 @@ void JaccardSimilarityStatistic::Print()
 	for (int i = 0; i < std::min((ulong)outputlen, this->Similarities.size()); i++)
 	{
 		this->Similarities.at(i)->Print();
-	}	
+	}
 }
 
 /**
@@ -254,7 +254,7 @@ float JaccardSimilarityStatistic::Similarity(PatternSequence* Seq1, PatternSeque
 {
 	int num, denom;
 	std::vector<HPCParallelPattern*> numset, denomset;
-	
+
 	denomset = UnionSet(Seq1->Patterns, Seq2->Patterns);
 
 	switch (Crit)
@@ -319,7 +319,7 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByDesignSp
 std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::IntersectByPattern(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2)
 {
 	std::vector<HPCParallelPattern*> Intersection;
-	
+
 	/* Add all patterns which are equal to one another */
 	for (HPCParallelPattern* Pattern1 : Seq1)
 	{
@@ -348,7 +348,7 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vecto
 {
 	std::vector<HPCParallelPattern*> Union;
 
-	/* Unite both sets by adding all patterns */	
+	/* Unite both sets by adding all patterns */
 	for (HPCParallelPattern* Pattern : Seq1)
 	{
 		Union.push_back(Pattern);
@@ -361,4 +361,3 @@ std::vector<HPCParallelPattern*> JaccardSimilarityStatistic::UnionSet(std::vecto
 
 	return SetAlgorithms::GetUniquePatternList(Union);
 }
-
