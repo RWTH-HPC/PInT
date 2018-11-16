@@ -6,6 +6,17 @@
 
 #define CSV_SEPARATOR_CHAR ","
 
+#ifndef HPCPATTERNASTTREVERSAL_H
+
+#include "HPCPatternInstrHandler.h"
+
+#endif
+
+#ifndef HPCPATTERNINSTRASTTRAVERSAL_H
+
+#include "HPCPatternInstrASTTraversal.h"
+
+#endif
 
 /**
  * Abstract class for pattern statistics.
@@ -21,7 +32,7 @@ public:
 
 	/**
  	 * Print the statistic in human-readable form to std::cout
- 	 */ 	
+ 	 */
 	virtual void Print() = 0;
 
 	/**
@@ -44,7 +55,7 @@ class CyclomaticComplexityStatistic : public HPCPatternStatistic
 {
 public:
 	CyclomaticComplexityStatistic();
-	
+
 	void Calculate();
 
 	void Print();
@@ -81,7 +92,7 @@ class LinesOfCodeStatistic : public HPCPatternStatistic
 {
 public:
 	void Calculate();
-	
+
 	void Print();
 
 	void CSVExport(std::string FileName);
@@ -94,7 +105,7 @@ public:
 class SimplePatternCountStatistic : public HPCPatternStatistic
 {
 public:
-	SimplePatternCountStatistic();	
+	SimplePatternCountStatistic();
 
 	void Calculate();
 
@@ -138,10 +149,65 @@ private:
 	FanInFanOutCounter* AddFIFOCounter(HPCParallelPattern* Pattern);
 
 	void FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Parents, int maxdepth);
-	
+
 	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Children, int maxdepth);
 
 	int maxdepth;
 
 	std::vector<FanInFanOutCounter*> FIFOCounter;
 };
+
+//int HalsteadAnzOperator;
+
+class Halstead : public HPCPatternStatistic{
+public:
+
+	Halstead(const char** argv);
+
+	void Calculate();
+
+	void Print();
+
+	void CSVExport(std::string FileName);
+
+	void incrementOperators();
+
+	int getHalsteadAnzOperators();
+
+	int HalsteadAnzOperator;
+
+private:
+
+};
+
+/*
+class HalsteadMetrikPattern : public HPCPatternStatistic
+{
+public:
+ HalsteadMetrikPattern();
+
+ void Calculate();
+
+ void Print();
+
+ void CSVExport(std::string FileName);
+
+private:
+int CalculateProgrammLength();
+
+int CalculateVolume();
+
+int CalculateDifficulty();
+
+int CalculateEffort();
+
+int CalculateHalsteadTime();
+
+int CalculateNumberOfOperands();
+
+int CalculateNumberOfOperators();
+
+bool IsOperand(HPCParallelPattern* Pattern);
+
+bool IsOperator(HPCParallelPattern* Pattern);
+}*/

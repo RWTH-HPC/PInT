@@ -50,7 +50,7 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
-static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic() };
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), };
 
 /**
  * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
@@ -58,6 +58,8 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  */
 int main (int argc, const char** argv)
 {
+	Statistics[4] = new Halstead(argv);
+
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), OptsParser.getSourcePathList());
 

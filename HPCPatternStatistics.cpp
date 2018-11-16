@@ -500,3 +500,192 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 
 	Children = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 }
+
+/* eigentlich HALSTEADMETRIK*/
+
+Halstead::Halstead (const char** argv){
+	char** argv2 = (char**)argv;
+	clang::tooling::runToolOnCode(new HalsteadClassAction, argv2[1]);
+}
+
+void Halstead::Calculate(){
+	//HalsteadAnzOperator= HVisitor.getAnzVisitorOperators();
+}
+
+void Halstead::Print(){
+	std::cout << "Es gibt " << Halstead::HalsteadAnzOperator << " im Code" <<'\n';
+}
+
+void Halstead::CSVExport(std::string FileName){
+
+}
+
+
+
+void Halstead::incrementOperators(){
+
+	Halstead::HalsteadAnzOperator ++;
+}
+
+int Halstead::getHalsteadAnzOperators(){
+	return Halstead::HalsteadAnzOperator;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*  HALSTEAD METRIK (Patternbezogen)
+
+HalsteadMetrikPattern::HalsteadMetrikPattern()
+{
+}
+
+void HalsteadMetrikPattern::Calculate()
+{
+}
+
+void HalsteadMetrikPattern::Print()
+{
+}
+
+void HalsteadMetrikPattern::CSVExport()
+{
+}
+
+--------------- private Funktionen ---------------
+int HalsteadMetrikPattern::CalculateProgrammLength()
+{
+	int Operand = 0;
+	int Operator = 0;
+
+	Vektor mit allen im Code auftauchenden Pattern
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		für jedes erscheinen (Occurrence) des Pattern schauen wir ob die Occurrence ein Operand ist oder ein Operator
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Parents;
+				GraphAlgorithms::FindParentPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Parents.empty())) //--> PatternOcc ist Operand
+				{
+					Operand++;
+				}
+
+				std::vector<PatternCodeRegion*> Children;
+				GraphAlgorithms::FindChildPatternCodeRegions(OccCodeReg, Children, 1)
+
+				if(!(Children.empty())) //--> PatternOcc ist ein Operator
+				{
+					Operator++;
+				}
+
+			}
+		}
+	}
+ return Operand + Operator;
+}
+
+int HalsteadMetrikPattern::CalculateVolume()
+{
+ int n1 = 0; // Anzahl einzigartiger Operatoren
+ int n2 = 0; // Anzahl einzigartiger Operanden
+
+ std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+ for(HPCParallelPattern* Patterns : Pattern)
+ {
+	 if(IsOperator(Pattern)){ n1++; }
+	 if(IsOperand(Pattern)){ n2++; }
+ }
+
+ // das Volumen ist N log n. wobei N die Halstead-änge des Programm ist
+return HalsteadMetrikPattern::CalculateVolume() * std::log2(n1+n2);
+}
+
+int HalsteadMetrikPattern::CalculateDifficulty()
+{
+
+}
+
+int HalsteadMetrikPattern::CalculateEffort()
+{
+}
+
+int HalsteadMetrikPattern::CalculateHalsteadTime()
+{
+}
+
+bool IsOperand(HPCParallelPattern* Pattern)
+{
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Parents;
+				GraphAlgorithms::FindParentPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Parents.empty())) //--> PatternOcc ist Operand
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool IsOperator(HPCParallelPattern* Pattern)
+{
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Children;
+				GraphAlgorithms::FindChildPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Children.empty())) //--> PatternOcc ist Operator
+				{
+					return true;
+				}
+			}
+		}
+	}
+ }
+*/
