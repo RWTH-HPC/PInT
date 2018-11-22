@@ -134,6 +134,18 @@ HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Co
 	PatternEndFinder.addMatcher(StringArgumentMatcher, &PatternEndHandler);
 }
 
+Halstead* currentHlst;
+
+HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
+{
+	if(isset(currentHlst)){
+		HalsteadVisitor::currentHalstead = currentHlst;
+	}
+	else{
+		printf("Was oist schief gelaufen\n");
+	}
+	printf("sind in der Konstruktionsfunktion des HalsteadVisitors\n");
+}
 
 
 /*
@@ -147,8 +159,10 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	//	EsthersVisitor.TraverseDecl(Context.getTranslationUnitDecl());
 }
 
-bool HalsteadVisitor::VisitBinaryOperatorsAndCount(clang::BinaryOperator *BinarOp){
-	anzVisitorOperators++;
+bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
+
+	currentHalstead_->HalsteadAnzOperator++;
+	printf("%i\n", currentHalstead->HalsteadAnzOperator);
 /*	HalsteadObj->incrementOperators();
 	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
 	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
@@ -157,9 +171,6 @@ std::cout << "found one" << '\n';
 	return true;
 }
 
-int HalsteadVisitor::getAnzVisitorOperators(){
-	return HalsteadVisitor::anzVisitorOperators;
-}
 /*
  * Frontend action function implementations
  */
@@ -167,4 +178,9 @@ std::unique_ptr<clang::ASTConsumer> HPCPatternInstrAction::CreateASTConsumer(cla
 {
 	DEBUG_MESSAGE("Creating consumer object!")
 	return std::unique_ptr<clang::ASTConsumer>(new HPCPatternInstrConsumer(&Compiler.getASTContext()));
+}
+
+
+void setCurrentHalsteadObj(Halstead* currentHalstd){
+	currentHlst = currentHalstd;
 }

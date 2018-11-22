@@ -50,7 +50,7 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
-static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), };
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), new Halstead()};
 
 /**
  * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
@@ -58,7 +58,6 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  */
 int main (int argc, const char** argv)
 {
-	Statistics[4] = new Halstead(argv);
 
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), OptsParser.getSourcePathList());
@@ -79,6 +78,7 @@ int main (int argc, const char** argv)
 
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	//CallTreeVisualisation::PrintCallTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)
@@ -108,5 +108,5 @@ int main (int argc, const char** argv)
 	Jaccard.Calculate();
 	Jaccard.Print();
 */
-	return retcode;
+	return retcode && halstead;
 }

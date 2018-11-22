@@ -23,11 +23,11 @@
 #define PATTERN_END_CXX_FNNAME "Pattern_End"
 
 
-#ifndef HPCPATTERNSTATISTICS_H
+
 
 #include "HPCPatternStatistics.h"
 
-#endif
+
 
 
 /**
@@ -65,14 +65,22 @@ private:
 	FunctionNode* CurrentFnEntry;
 };
 
+
 class HalsteadVisitor : public clang::RecursiveASTVisitor<HalsteadVisitor> {
 public:
   //bool VisitAllOperatorsAndCount(CXXRecordDecl *Declaration);
-	int anzVisitorOperators = 0;
+	explicit HalsteadVisitor(clang::ASTContext *Context);
 
-	bool VisitBinaryOperatorsAndCount(clang::BinaryOperator *BinarOp);
-	int getAnzVisitorOperators();
+	void incrementHalsteadOperators(){
+		Halstead::HalsteadAnzOperator++;
+	}
 
+	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
+
+	Halstead* currentHalstead;
+
+private:
+	clang::ASTContext *Context;
 };
 
 
@@ -91,15 +99,19 @@ private:
 
 class HalsteadConsumer : public clang::ASTConsumer {
 public:
+	explicit HalsteadConsumer(clang::ASTContext *Context) : HVisitor(Context)
+	{
+	}
+
   virtual void HandleTranslationUnit(clang::ASTContext &Context) {
     // Traversing the translation unit decl via a RecursiveASTVisitor
     // will visit all nodes in the AST.
     HVisitor.TraverseDecl(Context.getTranslationUnitDecl());
   }
 	// A RecursiveASTVisitor implementation.
-	HalsteadVisitor HVisitor;
-private:
 
+private:
+		HalsteadVisitor HVisitor;
 };
 
 class HPCPatternInstrAction : public clang::ASTFrontendAction
@@ -111,9 +123,10 @@ public:
 
 class HalsteadClassAction : public clang::ASTFrontendAction {
 public:
-  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-    clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
-    return std::unique_ptr<clang::ASTConsumer>(
-        new HalsteadConsumer);
+  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
+	{
+		return std::unique_ptr<clang::ASTConsumer>(new HalsteadConsumer(&Compiler.getASTContext()));
   }
 };
+
+void setCurrentHalsteadObj(Halstead* currentHalstd);

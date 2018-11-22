@@ -503,16 +503,17 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 
 /* eigentlich HALSTEADMETRIK*/
 
-Halstead::Halstead (const char** argv){
-	char** argv2 = (char**)argv;
-	clang::tooling::runToolOnCode(new HalsteadClassAction, argv2[1]);
+Halstead::Halstead () {
+	//clang::tooling::runToolOnCode(new HalsteadClassAction, "main.cpp");
+	
+	setCurrentHalsteadObj(this);
 }
 
 void Halstead::Calculate(){
-	//HalsteadAnzOperator= HVisitor.getAnzVisitorOperators();
 }
 
 void Halstead::Print(){
+	printf("Sind in Halstead Print\n");
 	std::cout << "Es gibt " << Halstead::HalsteadAnzOperator << " im Code" <<'\n';
 }
 

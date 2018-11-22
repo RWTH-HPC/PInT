@@ -162,7 +162,7 @@ private:
 class Halstead : public HPCPatternStatistic{
 public:
 
-	Halstead(const char** argv);
+	Halstead();
 
 	void Calculate();
 
