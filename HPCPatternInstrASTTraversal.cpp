@@ -138,12 +138,6 @@ Halstead* currentHlst;
 
 HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
 {
-	if(isset(currentHlst)){
-		HalsteadVisitor::currentHalstead = currentHlst;
-	}
-	else{
-		printf("Was oist schief gelaufen\n");
-	}
 	printf("sind in der Konstruktionsfunktion des HalsteadVisitors\n");
 }
 
@@ -161,8 +155,6 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 
-	currentHalstead_->HalsteadAnzOperator++;
-	printf("%i\n", currentHalstead->HalsteadAnzOperator);
 /*	HalsteadObj->incrementOperators();
 	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
 	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
@@ -180,7 +172,7 @@ std::unique_ptr<clang::ASTConsumer> HPCPatternInstrAction::CreateASTConsumer(cla
 	return std::unique_ptr<clang::ASTConsumer>(new HPCPatternInstrConsumer(&Compiler.getASTContext()));
 }
 
-
-void setCurrentHalsteadObj(Halstead* currentHalstd){
-	currentHlst = currentHalstd;
+std::unique_ptr<clang::ASTConsumer> HalsteadClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
+{
+	return std::unique_ptr<clang::ASTConsumer>(new HalsteadConsumer(&Compiler.getASTContext()));
 }

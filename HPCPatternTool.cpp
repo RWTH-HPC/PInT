@@ -5,6 +5,8 @@
 #include "Helpers.h"
 #include "SimilarityMetrics.h"
 
+#include "HPCRunningStats.h"
+
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -79,6 +81,9 @@ int main (int argc, const char** argv)
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
+
+	size_t sizeOfStats = sizeof(Statistics)/sizeof(Statistics[0]);
+	setActualStats(Statistics);
 	//CallTreeVisualisation::PrintCallTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)

@@ -71,13 +71,7 @@ public:
   //bool VisitAllOperatorsAndCount(CXXRecordDecl *Declaration);
 	explicit HalsteadVisitor(clang::ASTContext *Context);
 
-	void incrementHalsteadOperators(){
-		Halstead::HalsteadAnzOperator++;
-	}
-
 	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
-
-	Halstead* currentHalstead;
 
 private:
 	clang::ASTContext *Context;
@@ -123,10 +117,5 @@ public:
 
 class HalsteadClassAction : public clang::ASTFrontendAction {
 public:
-  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
-	{
-		return std::unique_ptr<clang::ASTConsumer>(new HalsteadConsumer(&Compiler.getASTContext()));
-  }
+  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
 };
-
-void setCurrentHalsteadObj(Halstead* currentHalstd);

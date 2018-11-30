@@ -170,12 +170,6 @@ public:
 
 	void CSVExport(std::string FileName);
 
-	void incrementOperators();
-
-	int getHalsteadAnzOperators();
-
-	int HalsteadAnzOperator;
-
 private:
 
 };
