@@ -52,7 +52,9 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
-static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), new Halstead()};
+Halstead* actHalstead = new Halstead();
+
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
 
 /**
  * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
@@ -82,8 +84,7 @@ int main (int argc, const char** argv)
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 
-	size_t sizeOfStats = sizeof(Statistics)/sizeof(Statistics[0]);
-	setActualStats(Statistics);
+	setHalsteadActualStat(actHalstead);
 	//CallTreeVisualisation::PrintCallTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)

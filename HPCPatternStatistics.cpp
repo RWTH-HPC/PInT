@@ -529,9 +529,6 @@ void Halstead::CSVExport(std::string FileName){
 
 
 
-
-
-
 /*  HALSTEAD METRIK (Patternbezogen)
 
 HalsteadMetrikPattern::HalsteadMetrikPattern()

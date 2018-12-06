@@ -22,11 +22,7 @@
 #define PATTERN_BEGIN_CXX_FNNAME "Pattern_Begin"
 #define PATTERN_END_CXX_FNNAME "Pattern_End"
 
-
-
-
-#include "HPCPatternStatistics.h"
-
+#include "HPCRunningStats.h"
 
 
 
@@ -75,6 +71,7 @@ public:
 
 private:
 	clang::ASTContext *Context;
+	Halstead* actHalstead;
 };
 
 

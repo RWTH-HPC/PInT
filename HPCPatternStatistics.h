@@ -4,6 +4,7 @@
 #include <string>
 #include "Helpers.h"
 
+#define NUMOFDIFFSTATS 5
 #define CSV_SEPARATOR_CHAR ","
 
 #ifndef HPCPATTERNASTTREVERSAL_H
@@ -12,11 +13,11 @@
 
 #endif
 
-#ifndef HPCPATTERNINSTRASTTRAVERSAL_H
+/*#ifndef HPCPATTERNINSTRASTTRAVERSAL_H
 
 #include "HPCPatternInstrASTTraversal.h"
 
-#endif
+#endif*/
 
 /**
  * Abstract class for pattern statistics.

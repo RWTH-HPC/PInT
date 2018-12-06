@@ -1,11 +1,12 @@
 #include "HPCRunningStats.h"
 
-HPCPatternStatistic* actualStats;
+Halstead* actualHal;
 
-void setActualStats(HPCPatternStatistic* actualStatistics[]){
-    actualStats = *actualStatistics;
+void setHalsteadActualStat(Halstead* actualHalstead){
+    actualHal = actualHalstead;
+    printf("actuelle statistik gesetzt 'runningStsts:setActualStats'\n");
 }
 
-HPCPatternStatistic* getActualStats(){
-    return actualStats;
+Halstead* getActualHalstead(){
+    return actualHal;
 }

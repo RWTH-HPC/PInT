@@ -138,6 +138,7 @@ Halstead* currentHlst;
 
 HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
 {
+	actHalstead = getActualHalstead();
 	printf("sind in der Konstruktionsfunktion des HalsteadVisitors\n");
 }
 
@@ -162,6 +163,7 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 std::cout << "found one" << '\n';
 	return true;
 }
+
 
 /*
  * Frontend action function implementations
