@@ -2,5 +2,5 @@
 
 #include "HPCPatternStatistics.h"
 
-void setHalsteadActualStat(Halstead* actualHalstead);
+void setActualHalstead(Halstead* actualHalstead);
 Halstead* getActualHalstead();

@@ -2,9 +2,8 @@
 
 Halstead* actualHal;
 
-void setHalsteadActualStat(Halstead* actualHalstead){
+void setActualHalstead(Halstead* actualHalstead){
     actualHal = actualHalstead;
-    printf("actuelle statistik gesetzt 'runningStsts:setActualStats'\n");
 }
 
 Halstead* getActualHalstead(){

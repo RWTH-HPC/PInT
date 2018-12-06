@@ -171,8 +171,10 @@ public:
 
 	void CSVExport(std::string FileName);
 
-private:
+	void incrementNumOfOperators();
 
+private:
+	int numOfOperators;
 };
 
 /*

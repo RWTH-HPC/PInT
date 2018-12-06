@@ -80,11 +80,11 @@ int main (int argc, const char** argv)
 	clang::tooling::ArgumentsAdjuster ArgsAdjuster = clang::tooling::getInsertArgumentAdjuster(Arguments, clang::tooling::ArgumentInsertPosition::END);
 	HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);
 
+	setActualHalstead(actHalstead);
+
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
-
-	setHalsteadActualStat(actHalstead);
 	//CallTreeVisualisation::PrintCallTree(10);
 
 	for (HPCPatternStatistic* Stat : Statistics)

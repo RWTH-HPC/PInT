@@ -139,7 +139,6 @@ Halstead* currentHlst;
 HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
 {
 	actHalstead = getActualHalstead();
-	printf("sind in der Konstruktionsfunktion des HalsteadVisitors\n");
 }
 
 
@@ -159,8 +158,7 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 /*	HalsteadObj->incrementOperators();
 	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
 	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
-
-std::cout << "found one" << '\n';
+actHalstead->incrementNumOfOperators();
 	return true;
 }
 
