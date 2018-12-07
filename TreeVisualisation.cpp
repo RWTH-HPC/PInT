@@ -9,17 +9,17 @@
  *
  * @param maxdepth The maximum recursion (i.e., output depth)
  **/
-void CallTreeVisualisation::PrintCallTree(int maxdepth)
-{	
+void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
+{
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
-	
+
 	if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
 	{
-		PrintFunction(Func, 0, maxdepth);
+		PrintFunction(Func, 0, maxdepth, onlyPattern);
 	}
 	else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
 	{
-		PrintPattern(CodeRegion, 0, maxdepth);
+		PrintPattern(CodeRegion, 0, maxdepth, onlyPattern);
 	}
 }
 
@@ -30,63 +30,63 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth)
  * @param depth The current depth of recursion.
  * @param maxdepth The maximum depth of recursion.
  **/
-void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int depth, int maxdepth)
+void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int depth, int maxdepth, bool onlyPattern)
 {
 	if (depth > maxdepth)
-	{	
+	{
 		return;
 	}
-	
+
 	PrintIndent(depth);
 
 	HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurrence()->GetPattern();
 	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
 
 	std::cout << "(" << CodeRegion->GetPatternOccurrence()->GetID() << ")" << std::endl;
- 
+
 	for (PatternGraphNode* Child : CodeRegion->GetChildren())
 	{
 		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
-			PrintFunction(FnCall, depth + 1, maxdepth);
+			PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
 		}
 		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
-			PrintPattern(CodeRegion, depth + 1, maxdepth);
+			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
 		}
 	}
 }
-	
+
 /**
- * @brief Prints a function in the pattern tree with indent. 
+ * @brief Prints a function in the pattern tree with indent.
  *
  * @param FnCall Function call.
  * @param depth Current recursion depth.
  * @param maxdepth Maximum recursion depth.
  **/
-void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int maxdepth)
+void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int maxdepth,  bool onlyPattern)
 {
 	if (depth > maxdepth)
-	{	
+	{
 		return;
 	}
-
-	PrintIndent(depth);
-	std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
-
+	if (!onlyPattern){
+		PrintIndent(depth);
+		std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
+	}
 	for (PatternGraphNode* Child : FnCall->GetChildren())
 	{
 		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
-			PrintFunction(FnCall, depth + 1, maxdepth);
+			PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
 		}
 		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
-			PrintPattern(CodeRegion, depth + 1, maxdepth);
+			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
 		}
 	}
 }
-	
+
 /**
  * @brief Prints an indent according to the passed depth.
  *
