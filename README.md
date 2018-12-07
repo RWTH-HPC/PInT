@@ -63,3 +63,5 @@ You can copy the instrumentation header files to the source directory.
 Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/path/to/headers</code> to your tool call.
 <b>If you use cmake</b>, you can instead add the flag to the list of include directories with <code>include_directories(/path/to/headers)</code>.
 Finally, you can also add the <code>-I/path/to/headers</code> flag to the compilation database for the files where the instrumentation header is used.
+If you want to see the Patterntree without the function calls you can set the onption -onlyPattern=1. <br>
+<code>./HPC-pattern-tool /path/to/your/code.cpp -onlyPattern=1 --extra-arg=-I/path/to/headers</code>
