@@ -513,7 +513,7 @@ void Halstead::Calculate(){
 
 void Halstead::Print(){
 	printf("Sind in Halstead Print\n");
-	std::cout << "Num of Operators in Code: " << Halstead::numOfOperators << '\n';
+	std::cout << "Num of Operators in Code: " << Halstead::numOfOperators << "This is not correct, DONT USE THIS INFORMATION" <<'\n';
 }
 
 void Halstead::CSVExport(std::string FileName){

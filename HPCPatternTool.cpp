@@ -52,6 +52,11 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
+static llvm::cl::OptionCategory onlyPattern("Patterntree without function calls");
+static llvm::cl::extrahelp Help("Turn this on if you want to see the Patterntree without function calls");
+static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern));
+
+
 Halstead* actHalstead = new Halstead();
 
 static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
@@ -85,7 +90,8 @@ int main (int argc, const char** argv)
 	/* Run the tool with options and source files provided */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
-	//CallTreeVisualisation::PrintCallTree(10);
+
+	CallTreeVisualisation::PrintCallTree(10, OnlyPatterns.getValue());
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{
