@@ -26,28 +26,28 @@ class HPCParallelPattern
 {
 public:
 	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName);
-	
+
 	void Print();
 
 	void PrintShort();
 
 	void AddOccurrence(PatternOccurrence* Occurrence);
 
-	std::vector<PatternOccurrence*> GetOccurrences() { return this->Occurrences; }
+	std::vector<PatternOccurrence*> GetOccurrences();
 
 	std::vector<PatternCodeRegion*> GetCodeRegions();
-	
+
 	std::string GetPatternName() { return this->PatternName; }
 
 	std::string GetDesignSpaceStr() { return DesignSpaceToStr(this->DesignSp); }
 
 	DesignSpace GetDesignSpace() { return DesignSp; }
-	
+
 	int GetTotalLinesOfCode();
 
 	bool Equals(HPCParallelPattern* Pattern);
 
-private:	
+private:
 	DesignSpace DesignSp;
 	std::string PatternName;
 
@@ -82,12 +82,12 @@ public:
 	int GetNumberOfCodeRegions() { return this->CodeRegions.size(); }
 
 	bool Equals(PatternOccurrence* PatternOcc);
-	
+
 private:
 	HPCParallelPattern* Pattern;
 
 	std::vector<PatternCodeRegion*> CodeRegions;
-	
+
 	std::string ID;
 };
 
@@ -129,7 +129,7 @@ public:
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
 private:
-	PatternOccurrence* PatternOcc;	
+	PatternOccurrence* PatternOcc;
 
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;

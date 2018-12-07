@@ -37,28 +37,28 @@ public:
 	{
 		/**
  		 * The patterns contained in this pattern sequence
- 		 */ 
+ 		 */
 		std::vector<HPCParallelPattern*> Patterns;
 		/**
  		 * Similarities to other Pattern Sequences
- 		 */ 
+ 		 */
 		std::vector<SimilarityPair*> Similarities;
-	
+
 		/**
- 		 * A convenient fork operator which copies the patterns to the new objects. 
- 		 * Similarities are not copied. 
- 		 * 
+ 		 * A convenient fork operator which copies the patterns to the new objects.
+ 		 * Similarities are not copied.
+ 		 *
  		 * @returns A new PatternSequence object with same patterns.
 		 */
 		PatternSequence* Fork()
 		{
 			PatternSequence* PS;
 			PS = new PatternSequence;
-		
+
 			PS->Patterns = this->Patterns;
 			return PS;
 		}
-	
+
 		/**
  		 * Prints all the information for this pattern sequence.
  		 * Calls HPCParallelPattern::PrintShort()
@@ -70,10 +70,10 @@ public:
 				Pattern->PrintShort();
 				std::cout << std::endl;
 			}
-	
+
 			std::cout << std::endl;
 		}
-		
+
 		/**
  		 * Function for comparison of PatternSequence objects.
  		 * @param Seq Sequence to compare against.
@@ -85,7 +85,7 @@ public:
 			/* Check for equality by iterating over the list of patterns until a difference is found */
 			if (this->Patterns.size() == Seq->Patterns.size())
 			{
-				for (int i = 0; i < this->Patterns.size(); i++)
+				for (unsigned long i = 0; i < this->Patterns.size(); i++)
 				{
 					if (!this->Patterns.at(i)->Equals(Seq->Patterns.at(i)))
 					{
@@ -93,9 +93,9 @@ public:
 					}
 				}
 
-				return true;	
+				return true;
 			}
-			
+
 			return false;
 		}
 
@@ -105,8 +105,8 @@ public:
 		}
 	};
 
-	/** 
- 	 * Datastructure to save the similarity between two sequences 
+	/**
+ 	 * Datastructure to save the similarity between two sequences
  	 */
 	struct SimilarityPair
 	{
@@ -126,7 +126,7 @@ public:
 			this->Seq1 = Seq1;
 			this->Seq2 = Seq2;
 			this->Similarity = Similarity;
-		}	
+		}
 
 		/**
  		 * Prints the information contained in this object.
@@ -142,14 +142,14 @@ public:
 				{
 					this->Seq1->Patterns.at(i)->PrintShort();
 				}
-		
+
 				std::cout << "\033[31m  - \033[0m";
-				
+
 				if (i < this->Seq2->Size())
 				{
 					this->Seq2->Patterns.at(i)->PrintShort();
 				}
-				
+
 				std::cout << std::endl;
 			}
 
@@ -177,7 +177,7 @@ protected:
 	std::vector<HPCParallelPattern*> RootPatterns;
 
 	int maxlength;
-	
+
 	GraphSearchDirection dir;
 };
 
@@ -212,7 +212,7 @@ private:
 	std::vector<HPCParallelPattern*> IntersectByPattern(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
 
 	std::vector<HPCParallelPattern*> UnionSet(std::vector<HPCParallelPattern*> Seq1, std::vector<HPCParallelPattern*> Seq2);
-	
+
 	std::vector<HPCParallelPattern*> RemoveDuplicates(std::vector<HPCParallelPattern*> InSet);
 
 	int outputlen;
@@ -221,4 +221,3 @@ private:
 
 	SimilarityCriterion Crit;
 };
-

@@ -17,13 +17,13 @@ CyclomaticComplexityStatistic::CyclomaticComplexityStatistic() : VisitedNodes()
  * @brief Calls CyclomaticComplexityStatistic::CountEdges(), CyclomaticComplexityStatistic::CountNodes() and CyclomaticComplexityStatistic::CountConnectedComponents() to calculate the Cyclomatic Complexity Statistic C = (Edges - Nodes) + 2 * ConnectedComponents
  */
 void CyclomaticComplexityStatistic::Calculate()
-{	
+{
 	Edges = CountEdges();
 	Nodes = CountNodes();
 	ConnectedComponents = CountConnectedComponents();
-	
+
 	/* C = #Edges - #Nodes + 2 * #ConnectedComponents */
-	CyclomaticComplexity = (Edges - Nodes) + 2 * ConnectedComponents; 
+	CyclomaticComplexity = (Edges - Nodes) + 2 * ConnectedComponents;
 }
 
 /**
@@ -50,7 +50,7 @@ void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
 
 	File << "CyclComplexity" << CSV_SEPARATOR_CHAR << "NumEdges" << CSV_SEPARATOR_CHAR << "NumNodes" << CSV_SEPARATOR_CHAR << "NumConnectedComps\n";
 	File << CyclomaticComplexity << CSV_SEPARATOR_CHAR << Edges << CSV_SEPARATOR_CHAR << Nodes << CSV_SEPARATOR_CHAR << ConnectedComponents;
-	
+
 	File.close();
 }
 
@@ -117,7 +117,7 @@ int CyclomaticComplexityStatistic::CountEdges()
 int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
 {
 	int Edges = 0;
-	
+
 	/* If we visit a pattern, add the incoming edge */
 	if (PatternCodeRegion* Pattern = clang::dyn_cast<PatternCodeRegion>(Current))
 	{
@@ -132,7 +132,7 @@ int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
 	else
 	{
 		SetNodeVisited(Current);
-	
+
 		/* Count the Edges beginning from the children */
 		for (PatternGraphNode* Child : Current->GetChildren())
 		{
@@ -251,23 +251,23 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
 		File << Pattern->GetPatternName()  << CSV_SEPARATOR_CHAR;
-		
+
 		std::vector<PatternCodeRegion*> PatternCodeRegions = Pattern->GetCodeRegions();
-		File << PatternCodeRegions.size() << CSV_SEPARATOR_CHAR;	
+		File << PatternCodeRegions.size() << CSV_SEPARATOR_CHAR;
 
 		/* Print the list of lines of code for this pattern */
-		File << "\"";	
-	
-		for (int i = 0; i < PatternCodeRegions.size() - 1; i++)
+		File << "\"";
+
+		for (unsigned long i = 0; i < PatternCodeRegions.size() - 1; i++)
 		{
 			File << PatternCodeRegions.at(i)->GetLinesOfCode() << ", ";
 		}
 
 		File << PatternCodeRegions.at(PatternCodeRegions.size() - 1)->GetLinesOfCode();
 		File << "\"" << CSV_SEPARATOR_CHAR;
-	
+
 		File << Pattern->GetTotalLinesOfCode() << "\n";
-	}	
+	}
 
 	File.close();
 }
@@ -280,7 +280,7 @@ void LinesOfCodeStatistic::CSVExport(std::string FileName)
 SimplePatternCountStatistic::SimplePatternCountStatistic()
 {
 
-}	
+}
 
 /**
  * @brief Dummy function.
@@ -320,7 +320,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 	for (HPCParallelPattern* Pattern : Patterns)
 	{
 		File << Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Pattern->GetOccurrences().size() << "\n";
-	}	
+	}
 
 	File.close();
 }
@@ -335,7 +335,7 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 FanInFanOutStatistic::FanInFanOutStatistic(int maxdepth) : FIFOCounter()
 {
 	this->maxdepth = maxdepth;
-} 
+}
 
 /**
  * @brief Calculates the Fan-In and Fan-Out statistic for each Pattern.
@@ -355,7 +355,7 @@ void FanInFanOutStatistic::Calculate()
 		{
 			Counter = AddFIFOCounter(Pattern);
 		}
-		
+
 		/* We want to count the number of pattern occurrences */
 		std::vector<PatternOccurrence*> Parents;
 		std::vector<PatternOccurrence*> Children;
@@ -369,7 +369,7 @@ void FanInFanOutStatistic::Calculate()
 			/* Search in Parent and Child Directions */
 			FindParentPatterns(CodeReg, Parents, maxdepth);
 #ifdef PRINT_DEBUG
-			std::cout << "List of parents: " << std::endl;			
+			std::cout << "List of parents: " << std::endl;
 
 			for (PatternOccurrence* Parent : Parents)
 			{
@@ -429,7 +429,7 @@ void FanInFanOutStatistic::CSVExport(std::string FileName)
 	for (FanInFanOutCounter* Counter : FIFOCounter)
 	{
 		File << Counter->Pattern->GetPatternName() << CSV_SEPARATOR_CHAR << Counter->FanIn << CSV_SEPARATOR_CHAR << Counter->FanOut << "\n";
-	}	
+	}
 
 	File.close();
 }
@@ -459,7 +459,7 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::LookupFIFOCounte
  * @brief Create a fan-in fan-out counter for a pattern.
  * Adds the counter to the list of counters.
  *
- * @param Pattern 
+ * @param Pattern
  *
  * @return The counter created.
  **/
@@ -500,3 +500,183 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 
 	Children = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 }
+
+/* eigentlich HALSTEADMETRIK*/
+
+Halstead::Halstead () {
+	int numOfOperators = 0;
+	//clang::tooling::runToolOnCode(new HalsteadClassAction, "main.cpp");
+}
+
+void Halstead::Calculate(){
+}
+
+void Halstead::Print(){
+	printf("Sind in Halstead Print\n");
+	std::cout << "Num of Operators in Code: " << Halstead::numOfOperators << '\n';
+}
+
+void Halstead::CSVExport(std::string FileName){
+
+}
+
+void Halstead::incrementNumOfOperators(){
+	Halstead::numOfOperators ++;
+}
+
+
+
+
+
+
+
+
+
+
+
+/*  HALSTEAD METRIK (Patternbezogen)
+
+HalsteadMetrikPattern::HalsteadMetrikPattern()
+{
+}
+
+void HalsteadMetrikPattern::Calculate()
+{
+}
+
+void HalsteadMetrikPattern::Print()
+{
+}
+
+void HalsteadMetrikPattern::CSVExport()
+{
+}
+
+--------------- private Funktionen ---------------
+int HalsteadMetrikPattern::CalculateProgrammLength()
+{
+	int Operand = 0;
+	int Operator = 0;
+
+	Vektor mit allen im Code auftauchenden Pattern
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		für jedes erscheinen (Occurrence) des Pattern schauen wir ob die Occurrence ein Operand ist oder ein Operator
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Parents;
+				GraphAlgorithms::FindParentPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Parents.empty())) //--> PatternOcc ist Operand
+				{
+					Operand++;
+				}
+
+				std::vector<PatternCodeRegion*> Children;
+				GraphAlgorithms::FindChildPatternCodeRegions(OccCodeReg, Children, 1)
+
+				if(!(Children.empty())) //--> PatternOcc ist ein Operator
+				{
+					Operator++;
+				}
+
+			}
+		}
+	}
+ return Operand + Operator;
+}
+
+int HalsteadMetrikPattern::CalculateVolume()
+{
+ int n1 = 0; // Anzahl einzigartiger Operatoren
+ int n2 = 0; // Anzahl einzigartiger Operanden
+
+ std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+ for(HPCParallelPattern* Patterns : Pattern)
+ {
+	 if(IsOperator(Pattern)){ n1++; }
+	 if(IsOperand(Pattern)){ n2++; }
+ }
+
+ // das Volumen ist N log n. wobei N die Halstead-änge des Programm ist
+return HalsteadMetrikPattern::CalculateVolume() * std::log2(n1+n2);
+}
+
+int HalsteadMetrikPattern::CalculateDifficulty()
+{
+
+}
+
+int HalsteadMetrikPattern::CalculateEffort()
+{
+}
+
+int HalsteadMetrikPattern::CalculateHalsteadTime()
+{
+}
+
+bool IsOperand(HPCParallelPattern* Pattern)
+{
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Parents;
+				GraphAlgorithms::FindParentPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Parents.empty())) //--> PatternOcc ist Operand
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool IsOperator(HPCParallelPattern* Pattern)
+{
+	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
+
+	for(HPCParallelPattern* Patterns : Pattern)
+	{
+		std::vector<PatternOccurrence*> PatternOcc;
+		PatternOcc = Pattern->GetOccurrence();
+
+		for(PatternOccurrence* PatternOcc : Occ)
+		{
+			std::vector<PatternCodeRegion*> CodeRegOfOcc = Occ->GetCodeRegions();
+
+			for(PatternCodeRegion* CodeRegOfOcc : OccCodeReg)
+			{
+				std::vector<PatternCodeRegion*> Children;
+				GraphAlgorithms::FindChildPatternCodeRegions(OccCodeReg, Parents, 1);
+
+				if(!(Children.empty())) //--> PatternOcc ist Operator
+				{
+					return true;
+				}
+			}
+		}
+	}
+ }
+*/

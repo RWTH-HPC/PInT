@@ -12,8 +12,8 @@
 
 
 /**
- * @brief If a function declaration is encountered, look up the corresponding database entry. 
- * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations. 
+ * @brief If a function declaration is encountered, look up the corresponding database entry.
+ * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations.
  *
  * @param Decl The clang object encountered by the visitor.
  *
@@ -52,15 +52,15 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
  **/
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
-	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace()) 
-	{	
+	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace())
+	{
 		clang::FunctionDecl* Callee = CallExpr->getDirectCallee();
 
 #ifdef PRINT_DEBUG
 		std::cout << Callee->getNameInfo().getName().getAsString() << std::endl;
-#endif	
-	
-		std::string FnName = Callee->getNameInfo().getName().getAsString();	
+#endif
+
+		std::string FnName = Callee->getNameInfo().getName().getAsString();
 
 		// Is this a call to our pattern functions?
 		if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
@@ -69,7 +69,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			Args[0]->dump();
 #endif
-			PatternBeginFinder.match(*Args[0], *Context);	
+			PatternBeginFinder.match(*Args[0], *Context);
 			PatternCodeRegion* PatternOcc = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
@@ -89,7 +89,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
-			clang::SourceLocation LocEnd = CallExpr->getLocEnd();		
+			clang::SourceLocation LocEnd = CallExpr->getLocEnd();
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 			PatternOcc->SetLastLine(SourceLoc.getLineNumber());
 		}
@@ -98,7 +98,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		{
 			/* Look up the database entry for this function */
 			FunctionNode* Func;
-			
+
 			if ((Func = PatternGraph::GetInstance()->GetFunctionNode(Callee)) == NULL)
 			{
 				PatternGraph::GetInstance()->RegisterFunction(Callee);
@@ -127,25 +127,40 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 HPCPatternInstrVisitor::HPCPatternInstrVisitor (clang::ASTContext* Context) : Context(Context)
 {
-	using namespace clang::ast_matchers;	
-	StatementMatcher StringArgumentMatcher = hasDescendant(stringLiteral().bind("patternstr"));	
-	
+	using namespace clang::ast_matchers;
+	StatementMatcher StringArgumentMatcher = hasDescendant(stringLiteral().bind("patternstr"));
+
 	PatternBeginFinder.addMatcher(StringArgumentMatcher, &PatternBeginHandler);
 	PatternEndFinder.addMatcher(StringArgumentMatcher, &PatternEndHandler);
 }
 
+Halstead* currentHlst;
+
+HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
+{
+	actHalstead = getActualHalstead();
+}
 
 
-/* 
+/*
  * Consumer function implementations
  */
-void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context) 
+void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 {
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
 	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
+	//	EsthersVisitor.TraverseDecl(Context.getTranslationUnitDecl());
 }
 
+bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
+
+/*	HalsteadObj->incrementOperators();
+	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
+	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
+actHalstead->incrementNumOfOperators();
+	return true;
+}
 
 
 /*
@@ -153,6 +168,11 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
  */
 std::unique_ptr<clang::ASTConsumer> HPCPatternInstrAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
 {
-	DEBUG_MESSAGE("Creating consumer object!")	
-	return std::unique_ptr<clang::ASTConsumer>(new HPCPatternInstrConsumer(&Compiler.getASTContext()));	
+	DEBUG_MESSAGE("Creating consumer object!")
+	return std::unique_ptr<clang::ASTConsumer>(new HPCPatternInstrConsumer(&Compiler.getASTContext()));
+}
+
+std::unique_ptr<clang::ASTConsumer> HalsteadClassAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile)
+{
+	return std::unique_ptr<clang::ASTConsumer>(new HalsteadConsumer(&Compiler.getASTContext()));
 }
