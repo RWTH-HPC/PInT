@@ -101,7 +101,7 @@ private:
 class PatternCodeRegion : public PatternGraphNode
 {
 public:
-	PatternCodeRegion(PatternOccurrence* PatternOcc);
+	PatternCodeRegion(PatternOccurrence* PatternOcc, clang::SourceLocation SourceLoc);
 
 	PatternOccurrence* GetPatternOccurrence() { return this->PatternOcc; }
 
@@ -130,6 +130,7 @@ public:
 
 private:
 	PatternOccurrence* PatternOcc;
+	clang::SourceLocation SurLoc;
 
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;

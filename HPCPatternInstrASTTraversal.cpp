@@ -65,18 +65,20 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		// Is this a call to our pattern functions?
 		if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
 		{
+			/*Delivers the children of the current node*/
 			clang::Expr** Args = CallExpr->getArgs();
-#ifdef PRINT_DEBUG
+//#ifdef PRINT_DEBUG
 			Args[0]->dump();
-#endif
+//#endif
+			/*calls all registered callbacks on all matches on the given node */
 			PatternBeginFinder.match(*Args[0], *Context);
-			PatternCodeRegion* PatternOcc = PatternBeginHandler.GetLastPattern();
+			PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocStart = CallExpr->getLocStart();
 			clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
-			PatternOcc->SetFirstLine(SourceLoc.getLineNumber());
+			PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
 		}
 		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 		{
@@ -85,13 +87,13 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			Args[0]->dump();
 #endif
 			PatternEndFinder.match(*Args[0], *Context);
-			PatternCodeRegion* PatternOcc = PatternEndHandler.GetLastPattern();
+			PatternCodeRegion* PatternCodeReg = PatternEndHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-			PatternOcc->SetLastLine(SourceLoc.getLineNumber());
+			PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 		}
 		// If no: search the called function for patterns
 		else
@@ -141,9 +143,7 @@ HalsteadVisitor::HalsteadVisitor(clang::ASTContext *Context) : Context(Context)
 	actHalstead = getActualHalstead();
 }
 
-
-/*
- * Consumer function implementations
+ /* Consumer function implementations
  */
 void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 {

@@ -159,9 +159,10 @@ void PatternOccurrence::Print()
 /*
  * Pattern Code Region Class Functions
  */
-PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
+PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc, clang::SourceLocation SourceLoc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;
+	this->SurLoc = SourceLoc;
 }
 
 void PatternCodeRegion::AddChild(PatternGraphNode* Child)

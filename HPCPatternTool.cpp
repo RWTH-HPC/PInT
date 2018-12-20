@@ -53,7 +53,7 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
 static llvm::cl::OptionCategory onlyPattern("Patterntree without function calls");
-static llvm::cl::extrahelp Help("Turn this on if you want to see the Patterntree without function calls");
+static llvm::cl::extrahelp Help("Turn this on (onlyPattern=1) if you want to see the Patterntree without function calls");
 static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern));
 
 
