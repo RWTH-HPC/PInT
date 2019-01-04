@@ -67,9 +67,9 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		{
 			/*Delivers the children of the current node*/
 			clang::Expr** Args = CallExpr->getArgs();
-//#ifdef PRINT_DEBUG
+#ifdef PRINT_DEBUG
 			Args[0]->dump();
-//#endif
+#endif
 			/*calls all registered callbacks on all matches on the given node */
 			PatternBeginFinder.match(*Args[0], *Context);
 			PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
