@@ -78,9 +78,11 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 		}
 	}
 
+	/* register the PatternOcc in the Pattern Stack for the Halstead metric*/
+	OccStackForHalstead.push(PatternOcc);
+
 	/* Create a new object for pattern occurrence */
-	clang::SourceLocation surLoc = patternstr->getLocStart();
-	PatternCodeRegion* CodeRegion = new PatternCodeRegion(PatternOcc, surLoc);
+	PatternCodeRegion* CodeRegion = new PatternCodeRegion(PatternOcc);
 	PatternOcc->AddCodeRegion(CodeRegion);
 
 

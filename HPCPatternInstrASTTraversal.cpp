@@ -77,8 +77,12 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			/* Get the location of the fn call which denotes the beginning of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocStart = CallExpr->getLocStart();
+			//std::cout << "Sourcelocation vom begindes Patterns"<<LocStart.printToString(SourceMan);
+
 			clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
 			PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
+			PatternCodeReg->SetStartSourceLoc(LocStart);
+
 		}
 		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 		{
@@ -89,11 +93,14 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			PatternEndFinder.match(*Args[0], *Context);
 			PatternCodeRegion* PatternCodeReg = PatternEndHandler.GetLastPattern();
 
+
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();
+			std::cout << '\n'<<"Sourcelocation vom Ende des Patterns"<<LocEnd.printToString(SourceMan);
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 			PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
+			PatternCodeReg->SetEndSourceLoc(LocEnd);
 		}
 		// If no: search the called function for patterns
 		else
@@ -154,12 +161,20 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 }
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
-
+	HPCParallelPattern actualPatt = HalsteadVisitor::IsBinOpInAPatt(BinarOp);
 /*	HalsteadObj->incrementOperators();
 	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
 	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
 actHalstead->incrementNumOfOperators();
 	return true;
+}
+
+HPCParallelPattern IsBinOpInAPatt(clang::BinaryOperator *BinarOp){
+	for (PatternOccurrence* PatOcc : OccStackForHalstead){
+		for(PatternCodeRegion* CodeReg : PatOcc->GetCodeRegions()){
+
+		}
+	}
 }
 
 

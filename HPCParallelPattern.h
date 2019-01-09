@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <queue>
 #include "clang/AST/Decl.h"
 #include "llvm/Support/Casting.h"
 
@@ -45,11 +46,14 @@ public:
 
 	int GetTotalLinesOfCode();
 
+	int GetNumbeOfOperands();
+
 	bool Equals(HPCParallelPattern* Pattern);
 
 private:
 	DesignSpace DesignSp;
 	std::string PatternName;
+	int NumberOfOperants;
 
 	std::vector<PatternOccurrence*> Occurrences;
 };
@@ -91,8 +95,6 @@ private:
 	std::string ID;
 };
 
-
-
 /**
  * This class represents a block of code that is enclosed with the instrumentation calls.
  * It is a node in the pattern tree, hence has children and parents in the tree.
@@ -101,7 +103,7 @@ private:
 class PatternCodeRegion : public PatternGraphNode
 {
 public:
-	PatternCodeRegion(PatternOccurrence* PatternOcc, clang::SourceLocation SourceLoc);
+	PatternCodeRegion(PatternOccurrence* PatternOcc);
 
 	PatternOccurrence* GetPatternOccurrence() { return this->PatternOcc; }
 
@@ -124,14 +126,22 @@ public:
 
 	void SetLastLine (int LastLine);
 
+
+	void SetStartSourceLoc(clang::SourceLocation StartLoc);
+
+	void SetEndSourceLoc(clang::SourceLocation EndLoc);
+
 	int GetLinesOfCode() { return this->LinesOfCode; }
 
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
 private:
 	PatternOccurrence* PatternOcc;
+	//
 	clang::SourceLocation SurLoc;
 
+	clang::SourceLocation StartSLocation;
+	clang::SourceLocation EndSLocation;
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;
 
@@ -144,6 +154,8 @@ private:
  * The pattern stack is used to keep track of the nesting of patterns.
  */
 extern std::stack<PatternCodeRegion*> PatternContext;
+
+extern std::queue<PatternOccurrence*> OccStackForHalstead;
 
 void AddToPatternStack(PatternCodeRegion* PatternOcc);
 
