@@ -19,6 +19,8 @@
  *
  * @return Always true to signal that the tree traversal should be continued.
  **/
+
+
 bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 {
 	CurrentFn = Decl;
@@ -161,20 +163,32 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 }
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
-	HPCParallelPattern actualPatt = HalsteadVisitor::IsBinOpInAPatt(BinarOp);
-/*	HalsteadObj->incrementOperators();
-	//std::cout << clang::BinaryOperator::getOpcodeStr(BinarOp)  << '\n';
-	std::cout << HalsteadObj->getHalsteadAnzOperators() << '\n';*/
-actHalstead->incrementNumOfOperators();
-	return true;
+	HPCParallelPattern* actualPatt = HalsteadVisitor::IsBinOpInAPatt(BinarOp);
+	if(actualPatt->GetPatternName()== "Dummy"){
+			return true;
+	}
+	else{
+		actualPatt->incrementNumOfOperators();
+		return true;
+	}
 }
 
-HPCParallelPattern IsBinOpInAPatt(clang::BinaryOperator *BinarOp){
-	for (PatternOccurrence* PatOcc : OccStackForHalstead){
-		for(PatternCodeRegion* CodeReg : PatOcc->GetCodeRegions()){
+HPCParallelPattern* HalsteadVisitor::IsBinOpInAPatt(clang::BinaryOperator *BinarOp){
+	std::vector<PatternOccurrence*> WorkOccStackForHalstead = OccStackForHalstead;
+	for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
+		
+		PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
+		clang::SourceManager& SourceMan = Context->getSourceManager();
+		std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
 
+		for(int i = 0; i < CodeRegions.size(); i++){
+			PatternCodeRegion* CodeReg = CodeRegions[i];
+			if(SourceMan.isPointWithin(BinarOp->getExprLoc(), CodeReg->GetStartLoc(), CodeReg->GetEndLoc())){
+				return PatOcc->GetPattern();
+			}
 		}
 	}
+	return new HPCParallelPattern( StrToDesignSpace("Dummy"), "Dummy");
 }
 
 

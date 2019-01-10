@@ -100,8 +100,12 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 	return CodeRegions;
 }
 
-int HPCParallelPattern::GetNumbeOfOperands(){
-	return this->NumberOfOperants;
+void HPCParallelPattern::incrementNumOfOperators(){
+	this->numOfOperators++;
+}
+
+int HPCParallelPattern::GetNumOfOperators(){
+	return this->numOfOperators;
 }
 
 /*
@@ -210,6 +214,13 @@ void PatternCodeRegion::Print()
 	std::cout << this->GetLinesOfCode() << " lines of code." << std::endl;
 }
 
+clang::SourceLocation PatternCodeRegion::GetStartLoc(){
+	return this->StartSLocation;
+}
+
+clang::SourceLocation PatternCodeRegion::GetEndLoc(){
+	return this->EndSLocation;
+}
 
 
 /*
@@ -265,4 +276,4 @@ void RemoveFromPatternStack(std::string ID)
 }
 
 /*Stack for Halstead */
-std::queue<PatternOccurrence*> OccStackForHalstead;
+std::vector<PatternOccurrence*> OccStackForHalstead;

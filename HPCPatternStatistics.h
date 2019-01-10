@@ -171,10 +171,11 @@ public:
 
 	void CSVExport(std::string FileName);
 
-	void incrementNumOfOperators();
+	void insertPattern(HPCParallelPattern* Pat);
 
 private:
 	int numOfOperators;
+	std::vector <HPCParallelPattern*> HPatterns;
 };
 
 /*

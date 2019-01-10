@@ -68,7 +68,7 @@ public:
 	explicit HalsteadVisitor(clang::ASTContext *Context);
 
 	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
-	HPCParallelPattern IsBinOpInAPatt(clang::BinaryOperator *BinarOp);
+	HPCParallelPattern* IsBinOpInAPatt(clang::BinaryOperator *BinarOp);
 private:
 	clang::ASTContext *Context;
 	Halstead* actHalstead;

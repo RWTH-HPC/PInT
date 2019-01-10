@@ -46,14 +46,17 @@ public:
 
 	int GetTotalLinesOfCode();
 
-	int GetNumbeOfOperands();
-
 	bool Equals(HPCParallelPattern* Pattern);
+
+	void incrementNumOfOperators();
+
+	int GetNumOfOperators();
 
 private:
 	DesignSpace DesignSp;
 	std::string PatternName;
-	int NumberOfOperants;
+
+	int numOfOperators = 0;
 
 	std::vector<PatternOccurrence*> Occurrences;
 };
@@ -131,13 +134,17 @@ public:
 
 	void SetEndSourceLoc(clang::SourceLocation EndLoc);
 
+	clang::SourceLocation GetStartLoc();
+
+	clang::SourceLocation GetEndLoc();
+
 	int GetLinesOfCode() { return this->LinesOfCode; }
 
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
 private:
 	PatternOccurrence* PatternOcc;
-	//
+
 	clang::SourceLocation SurLoc;
 
 	clang::SourceLocation StartSLocation;
@@ -155,7 +162,7 @@ private:
  */
 extern std::stack<PatternCodeRegion*> PatternContext;
 
-extern std::queue<PatternOccurrence*> OccStackForHalstead;
+extern std::vector<PatternOccurrence*> OccStackForHalstead;
 
 void AddToPatternStack(PatternCodeRegion* PatternOcc);
 
