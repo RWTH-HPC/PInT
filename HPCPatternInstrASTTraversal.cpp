@@ -99,7 +99,6 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			/* Get the location of the fn call which denotes the end of this pattern */
 			clang::SourceManager& SourceMan = Context->getSourceManager();
 			clang::SourceLocation LocEnd = CallExpr->getLocEnd();
-			std::cout << '\n'<<"Sourcelocation vom Ende des Patterns"<<LocEnd.printToString(SourceMan);
 			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 			PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 			PatternCodeReg->SetEndSourceLoc(LocEnd);
@@ -163,6 +162,7 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 }
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
+
 	HPCParallelPattern* actualPatt = HalsteadVisitor::IsBinOpInAPatt(BinarOp);
 	if(actualPatt->GetPatternName()== "Dummy"){
 			return true;
@@ -173,8 +173,43 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	}
 }
 
-HPCParallelPattern* HalsteadVisitor::IsBinOpInAPatt(clang::BinaryOperator *BinarOp){
+bool HalsteadVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr){
+	HPCParallelPattern* actualPatt = HalsteadVisitor::IsBinOpInAPatt(CXXOperatorCallExpr);
+	if(actualPatt->GetPatternName()== "Dummy"){
+			return true;
+	}
+	else{
+		actualPatt->incrementNumOfOperators();
+		return true;
+	}
+}
+
+bool HalsteadVisitor::VisitUnaryOperator(clang::UnaryOperator *UnaryOperator){
+	HPCParallelPattern* actualPatt = HalsteadVisitor::IsBinOpInAPatt(UnaryOperator);
+	if(actualPatt->GetPatternName()== "Dummy"){
+			return true;
+	}
+	else{
+		actualPatt->incrementNumOfOperators();
+		return true;
+	}
+}
+
+bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt * DeclStmt){
+	HPCParallelPattern* actualPatt = HalsteadVisitor::IsDeclStmtInAPatt(DeclStmt);
+	if(actualPatt->GetPatternName()== "Dummy"){
+			return true;
+	}
+	else{
+		actualPatt->incrementNumOfOperators();
+		return true;
+	}
+}
+
+HPCParallelPattern* HalsteadVisitor::IsBinOpInAPatt(clang::Expr *BinarOp){
+
 	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
+
 	for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
 
 		PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
@@ -182,13 +217,38 @@ HPCParallelPattern* HalsteadVisitor::IsBinOpInAPatt(clang::BinaryOperator *Binar
 		std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
 
 		for(int i = 0; i < CodeRegions.size(); i++){
+
 			PatternCodeRegion* CodeReg = CodeRegions[i];
 			if(SourceMan.isPointWithin(BinarOp->getExprLoc(), CodeReg->GetStartLoc(), CodeReg->GetEndLoc())){
+				getActualHalstead()->insertPattern(PatOcc->GetPattern());
 				return PatOcc->GetPattern();
 			}
 		}
 	}
 	return new HPCParallelPattern( StrToDesignSpace("Dummy"), "Dummy");
+}
+
+HPCParallelPattern*	 HalsteadVisitor::IsDeclStmtInAPatt(clang::DeclStmt *DeclStmt){
+
+	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
+
+	for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
+
+		PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
+		clang::SourceManager& SourceMan = Context->getSourceManager();
+		std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
+
+		for(int i = 0; i < CodeRegions.size(); i++){
+
+			PatternCodeRegion* CodeReg = CodeRegions[i];
+			if(SourceMan.isPointWithin(DeclStmt->getEndLoc(), CodeReg->GetStartLoc(), CodeReg->GetEndLoc())){
+				getActualHalstead()->insertPattern(PatOcc->GetPattern());
+				return PatOcc->GetPattern();
+			}
+		}
+	}
+	return new HPCParallelPattern( StrToDesignSpace("Dummy"), "Dummy");
+
 }
 
 

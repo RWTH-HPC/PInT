@@ -512,11 +512,12 @@ void Halstead::Calculate(){
 }
 
 void Halstead::Print(){
-	printf("Halstead metric\n");
+	printf("Halstead metric\n \n");
+	std::cout << "HPatterns.size() = "<< HPatterns.size() << '\n';
 
 	for(int i = 0; i < HPatterns.size(); i++){
-		std::cout << "Pattern Info" << std::endl;
-		std::cout << "Pattern Design Space: " << HPatterns[i]->GetDesignSpaceStr() << std::endl;
+		
+		std::cout << "\n \n Pattern Design Space: " << HPatterns[i]->GetDesignSpaceStr() << std::endl;
 		std::cout << "Pattern Name: " << HPatterns[i]->GetPatternName() << std::endl;
 		std::cout <<"Pattern number of operants: "<< HPatterns[i]->GetNumOfOperators() <<std::endl;
 	}
@@ -528,7 +529,15 @@ void Halstead::CSVExport(std::string FileName){
 }
 
 void Halstead::insertPattern(HPCParallelPattern* Pat){
-	HPatterns[HPatterns.size()] = Pat;
+	bool patRegistered = false;
+	for(int i = 0; i < (int) HPatterns.size(); i++){
+		if(HPatterns[i]->Equals(Pat)){
+			patRegistered = true;
+		}
+	}
+	if(!patRegistered){
+		HPatterns.push_back(Pat);
+	}
 }
 
 
