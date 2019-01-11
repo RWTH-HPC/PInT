@@ -174,9 +174,9 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 }
 
 HPCParallelPattern* HalsteadVisitor::IsBinOpInAPatt(clang::BinaryOperator *BinarOp){
-	std::vector<PatternOccurrence*> WorkOccStackForHalstead = OccStackForHalstead;
+	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
 	for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
-		
+
 		PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
 		clang::SourceManager& SourceMan = Context->getSourceManager();
 		std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
