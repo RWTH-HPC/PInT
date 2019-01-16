@@ -68,6 +68,12 @@ public:
 	explicit HalsteadVisitor(clang::ASTContext *Context);
 
 	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
+	bool VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr);
+	bool VisitUnaryOperator(clang::UnaryOperator *UnaryOperator);
+	bool VisitDeclStmt(clang::DeclStmt *DeclStmt);
+
+	void IsBinOpInAPatt(clang::Expr *BinarOp, std::vector<HPCParallelPattern*> *isInPatterns);
+	void IsDeclStmtInAPatt(clang::DeclStmt *DeclStmt, std::vector<HPCParallelPattern*> *isInPatterns);
 
 private:
 	clang::ASTContext *Context;

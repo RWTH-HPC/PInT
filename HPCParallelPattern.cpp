@@ -100,7 +100,13 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 	return CodeRegions;
 }
 
+void HPCParallelPattern::incrementNumOfOperators(){
+	this->numOfOperators++;
+}
 
+int HPCParallelPattern::GetNumOfOperators(){
+	return this->numOfOperators;
+}
 
 /*
  * Pattern Occurrence Class Functions
@@ -159,10 +165,9 @@ void PatternOccurrence::Print()
 /*
  * Pattern Code Region Class Functions
  */
-PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc, clang::SourceLocation SourceLoc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
+PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;
-	this->SurLoc = SourceLoc;
 }
 
 void PatternCodeRegion::AddChild(PatternGraphNode* Child)
@@ -191,6 +196,14 @@ void PatternCodeRegion::SetLastLine(int LastLine)
 	this->LinesOfCode = (LastLine - this->LinesOfCode) - 1;
 }
 
+void PatternCodeRegion::SetStartSourceLoc(clang::SourceLocation StartLoc)
+{
+	this->StartSLocation = StartLoc;
+}
+
+void PatternCodeRegion::SetEndSourceLoc(clang::SourceLocation EndLoc){
+	this->EndSLocation = EndLoc;
+}
 
 /**
  * @brief Print the lines of code plus all information from PatternOccurrence::Print().
@@ -201,6 +214,13 @@ void PatternCodeRegion::Print()
 	std::cout << this->GetLinesOfCode() << " lines of code." << std::endl;
 }
 
+clang::SourceLocation PatternCodeRegion::GetStartLoc(){
+	return this->StartSLocation;
+}
+
+clang::SourceLocation PatternCodeRegion::GetEndLoc(){
+	return this->EndSLocation;
+}
 
 
 /*
@@ -254,3 +274,6 @@ void RemoveFromPatternStack(std::string ID)
 		PatternContext.pop();
 	}
 }
+
+/*Stack for Halstead */
+std::vector<PatternOccurrence*> OccStackForHalstead;

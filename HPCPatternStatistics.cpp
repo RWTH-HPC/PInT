@@ -512,16 +512,31 @@ void Halstead::Calculate(){
 }
 
 void Halstead::Print(){
-	printf("Sind in Halstead Print\n");
-	std::cout << "Num of Operators in Code: " << Halstead::numOfOperators << "This is not correct, DONT USE THIS INFORMATION" <<'\n';
+	printf("Halstead metric\n\n");
+
+	for(int i = 0; i < HPatterns.size(); i++){
+
+		std::cout << "Pattern Design Space: " << HPatterns[i]->GetDesignSpaceStr() << std::endl;
+		std::cout << "Pattern Name: " << HPatterns[i]->GetPatternName() << std::endl;
+		std::cout <<"Pattern number of operants: "<< HPatterns[i]->GetNumOfOperators() <<'\n'<<std::endl;
+	}
+
 }
 
 void Halstead::CSVExport(std::string FileName){
 
 }
 
-void Halstead::incrementNumOfOperators(){
-	Halstead::numOfOperators ++;
+void Halstead::insertPattern(HPCParallelPattern* Pat){
+	bool patRegistered = false;
+	for(int i = 0; i < (int) HPatterns.size(); i++){
+		if(HPatterns[i]->Equals(Pat)){
+			patRegistered = true;
+		}
+	}
+	if(!patRegistered){
+		HPatterns.push_back(Pat);
+	}
 }
 
 
