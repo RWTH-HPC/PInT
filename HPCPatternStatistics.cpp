@@ -512,14 +512,13 @@ void Halstead::Calculate(){
 }
 
 void Halstead::Print(){
-	printf("Halstead metric\n \n");
-	std::cout << "HPatterns.size() = "<< HPatterns.size() << '\n';
+	printf("Halstead metric\n\n");
 
 	for(int i = 0; i < HPatterns.size(); i++){
-		
-		std::cout << "\n \n Pattern Design Space: " << HPatterns[i]->GetDesignSpaceStr() << std::endl;
+
+		std::cout << "Pattern Design Space: " << HPatterns[i]->GetDesignSpaceStr() << std::endl;
 		std::cout << "Pattern Name: " << HPatterns[i]->GetPatternName() << std::endl;
-		std::cout <<"Pattern number of operants: "<< HPatterns[i]->GetNumOfOperators() <<std::endl;
+		std::cout <<"Pattern number of operants: "<< HPatterns[i]->GetNumOfOperators() <<'\n'<<std::endl;
 	}
 
 }
