@@ -164,7 +164,7 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	std::vector<HPCParallelPattern*> isInPatterns;
-	IsBinOpInAPatt(BinarOp, &isInPatterns);
+	IsStmtInAPatt(BinarOp, &isInPatterns);
  	//std::cout << "groesse isInPatterns: "<<isInPatterns.size() << '\n';
 	if(isInPatterns.empty()){
 			return true;
@@ -180,7 +180,7 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 bool HalsteadVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
-	IsBinOpInAPatt(CXXOperatorCallExpr, &isInPatterns);
+	IsStmtInAPatt(CXXOperatorCallExpr, &isInPatterns);
 
 	if(isInPatterns.empty()){
 			return true;
@@ -196,7 +196,7 @@ bool HalsteadVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOp
 bool HalsteadVisitor::VisitUnaryOperator(clang::UnaryOperator *UnaryOp){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
-	IsBinOpInAPatt(UnaryOp, &isInPatterns);
+	IsStmtInAPatt(UnaryOp, &isInPatterns);
 
 	if(isInPatterns.empty()){
 			return true;
@@ -212,7 +212,7 @@ bool HalsteadVisitor::VisitUnaryOperator(clang::UnaryOperator *UnaryOp){
 bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DeclStmt){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
-	IsDeclStmtInAPatt(DeclStmt, &isInPatterns);
+	IsStmtInAPatt(DeclStmt, &isInPatterns);
 
 	if(isInPatterns.empty()){
 			return true;
@@ -225,8 +225,87 @@ bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DeclStmt){
 	return true;
 }
 
+bool HalsteadVisitor::VisitCompoundAssignOperator(clang::CompoundAssignOperator *CompAsOp){
 
-	void HalsteadVisitor::IsBinOpInAPatt(clang::Expr *BinarOp, std::vector<HPCParallelPattern*> *isInPatterns){
+		std::vector<HPCParallelPattern*> isInPatterns;
+		IsStmtInAPatt(CompAsOp, &isInPatterns);
+
+		if(isInPatterns.empty()){
+				return true;
+		}
+		else{
+			for(HPCParallelPattern* Pat : isInPatterns){
+				Pat->incrementNumOfOperators();
+			}
+		}
+		return true;
+}
+
+bool HalsteadVisitor::VisitMemberExpr(clang::MemberExpr *MemExpr){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsStmtInAPatt(MemExpr, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		for(HPCParallelPattern* Pat : isInPatterns){
+			Pat->incrementNumOfOperators();
+		}
+	}
+	return true;
+}
+
+bool HalsteadVisitor::VisitStringLiteral(clang::StringLiteral *StrgLit){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsStmtInAPatt(StrgLit, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		for(HPCParallelPattern* Pat : isInPatterns){
+			Pat->incrementNumOfOperators();
+		}
+	}
+	return true;
+}
+bool HalsteadVisitor::VisitCharacterLiteral(clang::CharacterLiteral *CharLit){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsStmtInAPatt(CharLit, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		for(HPCParallelPattern* Pat : isInPatterns){
+			Pat->incrementNumOfOperators();
+		}
+	}
+	return true;
+}
+/*bisher werden nur die TypeQualifiers gezählt. will man noch einmal die Decl selbst mit zählen muss man plus 1 rechnen*/
+bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsDeclInAPatt(VrDcl, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		int numTypeQual = HalsteadVisitor::countQual(VrDcl);
+		/*countQual return the number of TypeQualifiers excluding the default qualifier
+		  If numTypeQual = 0 the for loop should be computed once if numTypeQual = n the
+			loop shoulb be enteren n+1 times */
+		for(HPCParallelPattern* Pat : isInPatterns){
+			for (size_t i = 0; i <= numTypeQual; i++) {
+					Pat->incrementNumOfOperators();
+			}
+		}
+	}
+	return true;
+}
+	void HalsteadVisitor::IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns){
 
 	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
 	// WorkOccStackForHalstead is correctly initialized
@@ -241,7 +320,7 @@ bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DeclStmt){
 		for(int i = 0; i < CodeRegions.size(); i++){
 
 			PatternCodeRegion* CodeReg = CodeRegions[i];
-			bool ExprAfterBegStmt = SourceMan.isPointWithin (BinarOp->getExprLoc(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
+			bool ExprAfterBegStmt = SourceMan.isPointWithin (Stm->getLocEnd(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
 			//std::cout << "wer von ExprAfterBegStmt: " <<ExprAfterBegStmt<< '\n';
 			//bool ExprBeforEndStmt = SourceMan.isBeforeInTranslationUnit(DeclStmt->getEndLoc(), CodeReg->GetEndLoc());
 
@@ -255,32 +334,39 @@ bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DeclStmt){
 	}
 }
 
+	void HalsteadVisitor::IsDeclInAPatt(clang::Decl *Dcl, std::vector<HPCParallelPattern*> *isInPatterns){
 
-void HalsteadVisitor::IsDeclStmtInAPatt(clang::DeclStmt *DeclStmt, std::vector<HPCParallelPattern*> *isInPatterns){
+			std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
 
-		std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
+			clang::SourceManager& SourceMan = Context->getSourceManager();
 
-		clang::SourceManager& SourceMan = Context->getSourceManager();
+			for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
 
-		for (int i = 0; i < WorkOccStackForHalstead.size(); i++){
+				PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
+				std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
+				getActualHalstead()->insertPattern(PatOcc->GetPattern());
 
-			PatternOccurrence* PatOcc = WorkOccStackForHalstead[i];
-			std::vector<PatternCodeRegion*> CodeRegions = PatOcc->GetCodeRegions();
-			getActualHalstead()->insertPattern(PatOcc->GetPattern());
+				for(int i = 0; i < CodeRegions.size(); i++){
 
-			for(int i = 0; i < CodeRegions.size(); i++){
+					PatternCodeRegion* CodeReg = CodeRegions[i];
+					bool ExprAfterBegStmt = SourceMan.isPointWithin (Dcl->getLocation(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
 
-				PatternCodeRegion* CodeReg = CodeRegions[i];
-				bool ExprAfterBegStmt = SourceMan.isPointWithin (DeclStmt->getEndLoc(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
-
-				if(ExprAfterBegStmt){
-					isInPatterns->push_back(PatOcc->GetPattern());
+					if(ExprAfterBegStmt){
+						isInPatterns->push_back(PatOcc->GetPattern());
+					}
 				}
 			}
 		}
+
+	int HalsteadVisitor::countQual(clang::VarDecl* VDecl){
+			clang::QualType type = VDecl->getType();
+			std::string typeStr = type.getAsString();
+			int numWords = 0;
+			for(int i = 0; i < (int)typeStr.length(); i++){
+				if(isspace(typeStr[i])) numWords ++;
+			}
+			return numWords;
 	}
-
-
 /*
  * Frontend action function implementations
  */

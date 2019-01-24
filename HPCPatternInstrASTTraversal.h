@@ -71,10 +71,15 @@ public:
 	bool VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr);
 	bool VisitUnaryOperator(clang::UnaryOperator *UnaryOperator);
 	bool VisitDeclStmt(clang::DeclStmt *DeclStmt);
+	bool VisitCompoundAssignOperator(clang::CompoundAssignOperator *CompAsOp);
+	bool VisitMemberExpr(clang::MemberExpr *MemExpr);
+	bool VisitStringLiteral(clang::StringLiteral *StrgLit);
+	bool VisitCharacterLiteral(clang::CharacterLiteral *CharLit);
+	bool VisitVarDecl(clang::VarDecl *VrDcl);
 
-	void IsBinOpInAPatt(clang::Expr *BinarOp, std::vector<HPCParallelPattern*> *isInPatterns);
-	void IsDeclStmtInAPatt(clang::DeclStmt *DeclStmt, std::vector<HPCParallelPattern*> *isInPatterns);
-
+	void IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns);
+	void IsDeclInAPatt(clang::Decl *Dcl, std::vector<HPCParallelPattern*> *isInPatterns);
+	int countQual(clang::VarDecl* VDecl);
 private:
 	clang::ASTContext *Context;
 	Halstead* actHalstead;
