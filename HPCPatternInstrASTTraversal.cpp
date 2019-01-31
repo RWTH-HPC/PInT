@@ -1,6 +1,8 @@
 #include "HPCPatternInstrASTTraversal.h"
 #include "Debug.h"
 #include "HPCParallelPattern.h"
+#include <string>
+
 
 #include <iostream>
 #include "clang/AST/RawCommentList.h"
@@ -8,6 +10,7 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/SourceLocation.h"
 #include <string>
+#include "llvm/ADT/SmallVector.h"
 
 
 
@@ -176,6 +179,20 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	}
 	return true;
 }
+bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DclStmt){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsStmtInAPatt(DclStmt, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		for(HPCParallelPattern* Pat : isInPatterns){
+			Pat->incrementNumOfOperators();
+		}
+	}
+	return true;
+}
 
 bool HalsteadVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr){
 
@@ -197,22 +214,6 @@ bool HalsteadVisitor::VisitUnaryOperator(clang::UnaryOperator *UnaryOp){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(UnaryOp, &isInPatterns);
-
-	if(isInPatterns.empty()){
-			return true;
-	}
-	else{
-		for(HPCParallelPattern* Pat : isInPatterns){
-			Pat->incrementNumOfOperators();
-		}
-	}
-	return true;
-}
-
-bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DeclStmt){
-
-	std::vector<HPCParallelPattern*> isInPatterns;
-	IsStmtInAPatt(DeclStmt, &isInPatterns);
 
 	if(isInPatterns.empty()){
 			return true;
@@ -294,12 +295,18 @@ bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
 	}
 	else{
 		int numTypeQual = HalsteadVisitor::countQual(VrDcl);
-		/*countQual return the number of TypeQualifiers excluding the default qualifier
-		  If numTypeQual = 0 the for loop should be computed once if numTypeQual = n the
-			loop shoulb be enteren n+1 times */
+		/*
+		countQual return the number of TypeQualifiers excluding the default qualifier
+		  If numTypeQual = 0 the for loop should npt be executed */
 		for(HPCParallelPattern* Pat : isInPatterns){
-			for (size_t i = 0; i <= numTypeQual; i++) {
+			for (size_t i = 0; i < numTypeQual; i++) {
 					Pat->incrementNumOfOperators();
+			}
+			/*is the variable mot only declared but also initialized, than we have one operator more
+			  in the patterns  */
+
+			if(VrDcl->hasInit()){
+				Pat->incrementNumOfOperators();
 			}
 		}
 	}
@@ -359,14 +366,29 @@ bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
 		}
 
 	int HalsteadVisitor::countQual(clang::VarDecl* VDecl){
+			llvm::SmallVector<clang::Attr*, 4> Attributes;
+
 			clang::QualType type = VDecl->getType();
-			std::string typeStr = type.getAsString();
-			int numWords = 0;
-			for(int i = 0; i < (int)typeStr.length(); i++){
-				if(isspace(typeStr[i])) numWords ++;
-			}
-			return numWords;
-	}
+			std::string typ = type.getAsString();
+			std::cout << typ;
+			int wc = 0;
+			for(int i =0 ; i < typ.length(); i++){
+				char actchar = typ[i];
+				if(!((actchar <= 'z' && actchar >= 'a') || (actchar <= 'Z' && actchar >= 'A') || (actchar == '_'))){
+					if(actchar == ' '){
+						/*we only count one more if the next character is a letter or _*/
+						if( ((i+1) < typ.length()) && ( (typ[i+1] <= 'z' && typ[i+1] >= 'a') || (typ[i+1] <= 'Z' && typ[i+1] >= 'A') || (typ[i+1] == '_') ) ){
+							wc++;
+						}
+						else{
+							return wc;
+							}
+						}
+					}
+				}
+			return wc;
+
+		}
 /*
  * Frontend action function implementations
  */

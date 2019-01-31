@@ -16,6 +16,7 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 
+
 #define PATTERN_BEGIN_C_FNNAME "PatternInstrumentation_Pattern_Begin"
 #define PATTERN_END_C_FNNAME "PatternInstrumentation_Pattern_End"
 
@@ -70,7 +71,7 @@ public:
 	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
 	bool VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr);
 	bool VisitUnaryOperator(clang::UnaryOperator *UnaryOperator);
-	bool VisitDeclStmt(clang::DeclStmt *DeclStmt);
+	bool VisitDeclStmt(clang::DeclStmt *DclStmt);
 	bool VisitCompoundAssignOperator(clang::CompoundAssignOperator *CompAsOp);
 	bool VisitMemberExpr(clang::MemberExpr *MemExpr);
 	bool VisitStringLiteral(clang::StringLiteral *StrgLit);
