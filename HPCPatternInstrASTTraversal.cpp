@@ -296,8 +296,7 @@ bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
 	else{
 		int numTypeQual = HalsteadVisitor::countQual(VrDcl);
 		/*
-		countQual return the number of TypeQualifiers excluding the default qualifier
-		  If numTypeQual = 0 the for loop should npt be executed */
+		countQual return the number of TypeQualifiers excluding the default qualifier */
 		for(HPCParallelPattern* Pat : isInPatterns){
 			for (size_t i = 0; i < numTypeQual; i++) {
 					Pat->incrementNumOfOperators();
@@ -308,10 +307,30 @@ bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
 			if(VrDcl->hasInit()){
 				Pat->incrementNumOfOperators();
 			}
+			/*count the storage class specifiers*/
+			if(VrDcl->getStorageClass()!= clang::StorageClass::SC_None){
+				Pat->incrementNumOfOperators();
+			}
 		}
 	}
 	return true;
 }
+
+bool HalsteadVisitor::VisitFunctionDecl(clang::FunctionDecl *FctDecl){
+	std::vector<HPCParallelPattern*> isInPatterns;
+	IsDeclInAPatt(FctDecl, &isInPatterns);
+
+	if(isInPatterns.empty()){
+			return true;
+	}
+	else{
+		for(HPCParallelPattern* Pat : isInPatterns){
+			if(FctDecl->getStorageClass() != clang::StorageClass::SC_None ) Pat->incrementNumOfOperators();
+		}
+	}
+	return true;
+}
+
 	void HalsteadVisitor::IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns){
 
 	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;

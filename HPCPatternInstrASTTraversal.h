@@ -77,6 +77,7 @@ public:
 	bool VisitStringLiteral(clang::StringLiteral *StrgLit);
 	bool VisitCharacterLiteral(clang::CharacterLiteral *CharLit);
 	bool VisitVarDecl(clang::VarDecl *VrDcl);
+	bool VisitFunctionDecl(clang::FunctionDecl *FctDecl);
 
 	void IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns);
 	void IsDeclInAPatt(clang::Decl *Dcl, std::vector<HPCParallelPattern*> *isInPatterns);
