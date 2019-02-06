@@ -18,7 +18,7 @@ Test::TestOperatorTypeQualifiers(){
   const volatile int p = 0;
 
   it does nor matter if u imagine counting the "," or the ";"
-  because we count those indirectly while counting VarDecl or DeclStmt etc. 
+  because we count those indirectly while counting VarDecl or DeclStmt etc.
 
 */
 
@@ -30,7 +30,7 @@ Test::TestOperatorTypeQualifiers(){
 // +1 "volatile", +1 "="
   volatile int a = 4;
 }
-//+1 "::"
+//+1 "::",  +1 "()"
 OtherClass::UselessFunc(){
   return 0;
 }

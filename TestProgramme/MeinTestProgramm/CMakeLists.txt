@@ -3,4 +3,4 @@ project (MyExample)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(MyExample main.cpp)
+add_executable(MyExample main.cpp Tests.cpp)

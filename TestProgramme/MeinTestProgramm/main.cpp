@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "PatternInstrumentation.h"
+#include "Tests.h"
 
 
 int main_(int argc, char* argv[])
@@ -14,9 +15,11 @@ int main_(int argc, char* argv[])
 	bool wahr,falsch;
 
 
-	PatternInstrumentation::Pattern_Begin("OPERATOR-Test TypeQualifiers TQ1");
+	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
+	  const int i = 0;
+	Test::TestOperatorTypeQualifiers();
 
 	PatternInstrumentation::Pattern_End("TQ1");
 	const int temp = 0;
@@ -30,8 +33,5 @@ int main_(int argc, char* argv[])
 			break;
 		}
 	}
-
-	PatternInstrumentation::Pattern_End("ForLoop1");
-
 	return 0;
 }

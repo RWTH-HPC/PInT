@@ -1,15 +1,4 @@
-//+1 "{}"
-class Test{
-
-public:
-  //+1 "()",   +1 "virtual"
-  virtual void VirtualFunction();
-  //+1 "()"
-  void TestOperatorTypeQualifiers();
-  // +1 "friend",   +1 "::",   +1 "()"
-  friend void OtherClass::uselessFunc();
-};
-
+class Test;
 //+1 "{}"
 class OtherClass{
 public:
@@ -17,8 +6,19 @@ public:
    void uselessFunc();
 };
 
+//+1 "{}"
+class Test{
+
+public:
+  //+1 "()",   +1 "virtual"
+  virtual void VirtualFunction();
+  //+1 "()"
+  static void TestOperatorTypeQualifiers();
+  // +1 "friend",   +1 "::",   +1 "()"
+  friend void OtherClass::uselessFunc();
+};
 // +1 ":",   +1 "()",   +1 "{}"
-class TestDerived : Test(){
+class TestDerived : public Test {
   //+1 "final",   +1 "()"
-  final VirtualFunction();
-}
+  void VirtualFunction() final;
+};
