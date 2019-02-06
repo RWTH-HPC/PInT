@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/6.0.1/bin/clang++       -o CMakeFiles/MyExample.dir/main.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/main.cpp",
+  "file": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/main.cpp"
+}
+]

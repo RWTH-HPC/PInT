@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/rodinia-bfs/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/6.0.1/bin/clang++      -fopenmp   -o CMakeFiles/RodiniaBFS.dir/bfs.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/rodinia-bfs/bfs.cpp",
+  "file": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/rodinia-bfs/bfs.cpp"
+}
+]
