@@ -3,7 +3,7 @@ class Test;
 class OtherClass{
 public:
   //+1 "()"
-   void uselessFunc();
+   int uselessFunc();
 };
 
 //+1 "{}"
@@ -15,7 +15,7 @@ public:
   //+1 "()"
   static void TestOperatorTypeQualifiers();
   // +1 "friend",   +1 "::",   +1 "()"
-  friend void OtherClass::uselessFunc();
+  friend int OtherClass::uselessFunc();
 };
 // +1 ":",   +1 "()",   +1 "{}"
 class TestDerived : public Test {

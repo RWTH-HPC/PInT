@@ -9,7 +9,7 @@
 #include "Tests.h"
 
 
-int main_(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	// is not consideres because it isn't inside a pattern
 	bool wahr,falsch;
@@ -19,19 +19,9 @@ int main_(int argc, char* argv[])
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
 	  const int i = 0;
+	//+1 "::",  +1 "()"
 	Test::TestOperatorTypeQualifiers();
 
 	PatternInstrumentation::Pattern_End("TQ1");
-	const int temp = 0;
-	// +0 (Operators)
-	int a[100];
-
-	//+1 for "for", +1 for "=", +1 for "<", +1 for "++" (Operators) total 7
-	for (int i = 1; i < 101 ;i++) {
-		if(i > 5 && i <7)
-		{
-			break;
-		}
-	}
 	return 0;
 }

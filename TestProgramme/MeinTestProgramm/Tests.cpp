@@ -1,7 +1,7 @@
 #include "Tests.h"
 
 //+1 "::",  +1 "()"
-Test::TestOperatorTypeQualifiers(){
+void Test::TestOperatorTypeQualifiers(){
 /*
   TypeQualifiers: const, friend, volatile,final
 */
@@ -31,6 +31,6 @@ Test::TestOperatorTypeQualifiers(){
   volatile int a = 4;
 }
 //+1 "::",  +1 "()"
-OtherClass::UselessFunc(){
+int OtherClass::uselessFunc(){
   return 0;
 }
