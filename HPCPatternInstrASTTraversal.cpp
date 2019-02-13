@@ -165,6 +165,11 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 }
 
 
+
+
+
+
+
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(BinarOp, &isInPatterns);
@@ -194,10 +199,10 @@ bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DclStmt){
 	return true;
 }
 
-bool HalsteadVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr){
+bool HalsteadVisitor::VisitCallExpr(clang::CallExpr *CallExpr){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
-	IsStmtInAPatt(CXXOperatorCallExpr, &isInPatterns);
+	IsStmtInAPatt(CallExpr, &isInPatterns);
 
 	if(isInPatterns.empty()){
 			return true;

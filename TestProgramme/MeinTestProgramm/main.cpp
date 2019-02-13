@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include <vector>
 #include <string>
-#include <iostream>
 
 #include "PatternInstrumentation.h"
 #include "Tests.h"
@@ -18,6 +16,7 @@ int main(int argc, char* argv[])
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
+	//+1 "const",   +1 "=",   +1 ";"
 	  const int i = 0;
 	//+1 "::",  +1 "()"
 	Test::TestOperatorTypeQualifiers();

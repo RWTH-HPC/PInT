@@ -69,7 +69,7 @@ public:
 	explicit HalsteadVisitor(clang::ASTContext *Context);
 
 	bool VisitBinaryOperator(clang::BinaryOperator *BinarOp);
-	bool VisitCXXOperatorCallExpr(clang::CXXOperatorCallExpr *CXXOperatorCallExpr);
+	bool VisitCallExpr(clang::CallExpr *CallExpr);
 	bool VisitUnaryOperator(clang::UnaryOperator *UnaryOperator);
 	bool VisitDeclStmt(clang::DeclStmt *DclStmt);
 	bool VisitCompoundAssignOperator(clang::CompoundAssignOperator *CompAsOp);
