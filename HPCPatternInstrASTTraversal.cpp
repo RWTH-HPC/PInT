@@ -203,6 +203,13 @@ bool HalsteadVisitor::VisitCallExpr(clang::CallExpr *CallExpr){
 
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(CallExpr, &isInPatterns);
+	clang::Decl* CalleeDecl = CallExpr->getCalleeDecl();
+	clang::SourceManager& SurMan = Context->getSourceManager();
+	if(SurMan.isInMainFile(CallExpr->getExprLoc())){
+			CalleeDecl->dump();
+	}
+
+
 
 	if(isInPatterns.empty()){
 			return true;
@@ -394,7 +401,7 @@ bool HalsteadVisitor::VisitFunctionDecl(clang::FunctionDecl *FctDecl){
 
 			clang::QualType type = VDecl->getType();
 			std::string typ = type.getAsString();
-			std::cout << typ;
+	
 			int wc = 0;
 			for(int i =0 ; i < typ.length(); i++){
 				char actchar = typ[i];

@@ -69,7 +69,19 @@ int main (int argc, const char** argv)
 {
 
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
-	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), OptsParser.getSourcePathList());
+	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), (OptsParser.getCompilations()).getAllFiles());
+	std::cout << "SOURCEPATH LIST: " << '\n';
+	std::vector<std::string> v = OptsParser.getSourcePathList();
+
+	for(int i = 0; i< v.size(); i++){
+		std::cout << v[i] << '\n';
+	}
+	std::cout << "COMPILATIONS LIST: " << '\n';
+	std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
+
+	for(int i = 0; i< d.size(); i++){
+		std::cout << d[i] << '\n';
+	}
 
 	/* Declare vector of command line arguments */
 	clang::tooling::CommandLineArguments Arguments;
