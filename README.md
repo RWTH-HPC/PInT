@@ -66,3 +66,5 @@ Finally, you can also add the <code>-I/path/to/headers</code> flag to the compil
 <br>
 If you want to see the <b>Patterntree without the function calls </b> you can set the onption -onlyPattern=1. <br>
 <code>./HPC-pattern-tool /path/to/your/code.cpp -onlyPattern=1 --extra-arg=-I/path/to/headers</code>
+If you want <b>no tree </b> you can set the onption -noTree=1. <br>
+<code>./HPC-pattern-tool /path/to/your/code.cpp -noTree=1 --extra-arg=-I/path/to/headers</code>
