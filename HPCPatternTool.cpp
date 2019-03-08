@@ -129,5 +129,5 @@ int main (int argc, const char** argv)
 	Jaccard.Calculate();
 	Jaccard.Print();
 */
-	return retcode && halstead;
+	return retcode; //&& halstead;
 }
