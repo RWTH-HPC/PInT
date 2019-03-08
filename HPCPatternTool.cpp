@@ -56,6 +56,10 @@ static llvm::cl::OptionCategory onlyPattern("Patterntree without function calls"
 static llvm::cl::extrahelp Help("Turn this on (onlyPattern=1) if you want to see the Patterntree without function calls");
 static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern));
 
+static llvm::cl::OptionCategory noTree("Output without the call tree");
+static llvm::cl::extrahelp HelpNoTree("Turn this on (noTree=1) if you don't want to see tree");
+static llvm::cl::opt<bool> NoTree("noTree", llvm::cl::cat(noTree));
+
 
 Halstead* actHalstead = new Halstead();
 
@@ -99,8 +103,9 @@ int main (int argc, const char** argv)
 	   corresponding Action */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
-
+  if(!NoTree.getValue()){
 	CallTreeVisualisation::PrintCallTree(20, OnlyPatterns.getValue());
+  }
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{
