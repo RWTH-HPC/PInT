@@ -82,6 +82,7 @@ public:
 	void IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns);
 	void IsDeclInAPatt(clang::Decl *Dcl, std::vector<HPCParallelPattern*> *isInPatterns);
 	int countQual(clang::VarDecl* VDecl);
+	bool shouldVisitImplicitCode() const { return true; }
 private:
 	clang::ASTContext *Context;
 	Halstead* actHalstead;
