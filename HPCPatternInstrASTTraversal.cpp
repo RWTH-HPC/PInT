@@ -205,9 +205,13 @@ bool HalsteadVisitor::VisitCallExpr(clang::CallExpr *CallExpr){
 	IsStmtInAPatt(CallExpr, &isInPatterns);
 	clang::Decl* CalleeDecl = CallExpr->getCalleeDecl();
 	clang::SourceManager& SurMan = Context->getSourceManager();
-	/*if(SurMan.isInMainFile(CallExpr->getExprLoc())){
-			CalleeDecl->dump();
-	}*/
+	if(SurMan.isInMainFile(CallExpr->getExprLoc())){
+		/*	CalleeDecl->dump();
+			std::cout << "STATEMENT DUMP: " << '\n';
+			clang::Stmt* CalleeStmt = CalleeDecl->getBody();
+			CalleeStmt->dump();*/
+	}
+
 
 
 

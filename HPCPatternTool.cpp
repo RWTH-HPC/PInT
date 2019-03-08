@@ -59,7 +59,7 @@ static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern
 
 Halstead* actHalstead = new Halstead();
 
-static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(10), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
+static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(20), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
 
 /**
  * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
@@ -70,7 +70,7 @@ int main (int argc, const char** argv)
 
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), (OptsParser.getCompilations()).getAllFiles());
-	
+
 	std::cout << "COMPILATIONS LIST: " << '\n';
 	std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
 
@@ -95,10 +95,12 @@ int main (int argc, const char** argv)
 	setActualHalstead(actHalstead);
 
 	/* Run the tool with options and source files provided */
+	/* clang::tooling::newFrontendActionFactory<HalsteadClassAction>() has type std::unique_ptr<OurAction> get() returns
+	   corresponding Action */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
-	int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
+	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 
-	CallTreeVisualisation::PrintCallTree(10, OnlyPatterns.getValue());
+	CallTreeVisualisation::PrintCallTree(20, OnlyPatterns.getValue());
 
 	for (HPCPatternStatistic* Stat : Statistics)
 	{
