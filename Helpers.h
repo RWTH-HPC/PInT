@@ -28,6 +28,7 @@ namespace GraphAlgorithms
 	extern void FindChildPatternCodeRegions(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth);
 
 	extern void FindNeighbourPatternCodeRegions(PatternGraphNode* Current, std::vector<PatternCodeRegion*>& Results, GraphSearchDirection dir, int depth, int maxdepth);
+	extern void FindNeighbourPatternCodeRegionss(PatternGraphNode* Current, std::vector<PatternCodeRegion*>& Results, GraphSearchDirection dir, int * depth, int maxdepth);
 }
 
 namespace SetAlgorithms
