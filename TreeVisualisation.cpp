@@ -11,16 +11,26 @@
  **/
 void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 {
-	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
+		if(onlyPattern){
+			PatternGraph* actlGraph = PatternGraph::GetInstance();
+			for(PatternCodeRegion* RootNode : actlGraph->GetAllPatternCodeRegions()){
+				if(!RootNode->hasPatternParent()){
+					PrintPattern(RootNode, 0, maxdepth, onlyPattern);
+					}
+			}
+		}
 
-	if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
-	{
-		PrintFunction(Func, 0, maxdepth, onlyPattern);
-	}
-	else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
-	{
-		PrintPattern(CodeRegion, 0, maxdepth, onlyPattern);
-	}
+		else{
+			PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
+			if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
+			{
+				PrintFunction(Func, 0, maxdepth, onlyPattern);
+			}
+			else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
+			{
+				PrintPattern(CodeRegion, 0, maxdepth, onlyPattern);
+			}
+		}
 }
 
 /**
@@ -32,28 +42,42 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
  **/
 void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int depth, int maxdepth, bool onlyPattern)
 {
-	if (depth > maxdepth)
-	{
-		return;
+
+		if (depth > maxdepth)
+		{
+			return;
+		}
+
+		PrintIndent(depth);
+
+		HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurrence()->GetPattern();
+		std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
+
+		std::cout << "(" << CodeRegion->GetPatternOccurrence()->GetID() << ")" << std::endl;
+
+	if(!onlyPattern){
+		for (PatternGraphNode* Child : CodeRegion->GetChildren())
+		{ 
+			if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
+			{
+				PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
+			}
+			else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
+			{
+				PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
+			}
+		}
 	}
-
-	PrintIndent(depth);
-
-	HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurrence()->GetPattern();
-	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
-
-	std::cout << "(" << CodeRegion->GetPatternOccurrence()->GetID() << ")" << std::endl;
-
-	for (PatternGraphNode* Child : CodeRegion->GetChildren())
-	{
-		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
+	else{
+		for (PatternGraphNode* Child : CodeRegion->GetChildren())
 		{
-			PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
+		 	if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
+			{
+
+				PrintPattern(CodeRegion, depth + 1 , maxdepth, onlyPattern);
+			}
 		}
-		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
-		{
-			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
-		}
+
 	}
 }
 
@@ -74,6 +98,7 @@ void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int m
 		PrintIndent(depth);
 		std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
 	}
+	std::vector<PatternGraphNode*> pointerToChildren = FnCall->GetChildren();
 	for (PatternGraphNode* Child : FnCall->GetChildren())
 	{
 		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
@@ -82,9 +107,11 @@ void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int m
 		}
 		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
+			++depth;
 			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
 		}
 	}
+	return;
 }
 
 /**

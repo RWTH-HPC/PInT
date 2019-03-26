@@ -13,7 +13,7 @@ FunctionNode::FunctionNode (std::string Name, unsigned Hash) : PatternGraphNode(
 {
 	this->FnName = Name;
 	this->Hash = Hash;
-}	
+}
 
 void FunctionNode::AddChild(PatternGraphNode* Child)
 {
@@ -29,7 +29,6 @@ void FunctionNode::AddParent(PatternGraphNode* Parent)
 
 PatternGraph::PatternGraph() : Functions(), Patterns(), PatternOccurrences()
 {
-
 }
 
 /**
@@ -62,13 +61,13 @@ FunctionNode* PatternGraph::GetFunctionNode(clang::FunctionDecl* Decl)
 {
 	clang::ODRHash Hash;
 	Hash.AddDecl(Decl);
-	unsigned HashVal = Hash.CalculateHash();		
+	unsigned HashVal = Hash.CalculateHash();
 
-	std::string FnName = Decl->getNameInfo().getName().getAsString();	
+	std::string FnName = Decl->getNameInfo().getName().getAsString();
 
 	// Search for an existing entry
 	for (FunctionNode* Func : Functions)
-	{	
+	{
 		if (Func->GetHash() == HashVal)
 		{
 			return Func;
@@ -101,7 +100,7 @@ bool PatternGraph::RegisterFunction(clang::FunctionDecl* Decl)
 	Hash.AddDecl(Decl);
 	unsigned HashVal = Hash.CalculateHash();
 
-	std::string FnName = Decl->getNameInfo().getName().getAsString();	
+	std::string FnName = Decl->getNameInfo().getName().getAsString();
 
 
 	/* Allocate a new entry */
@@ -145,7 +144,7 @@ HPCParallelPattern* PatternGraph::GetPattern(DesignSpace DesignSp, std::string P
  * @brief Adds a parallel pattern to the database.
  *
  * @param Pattern The parallel pattern that is added.
- * 
+ *
  * @return False if the pattern is already registered. Else, true.
  **/
 bool PatternGraph::RegisterPattern(HPCParallelPattern* Pattern)
@@ -194,7 +193,7 @@ bool PatternGraph::RegisterPatternOccurrence(PatternOccurrence* PatternOcc)
 	{
 		return false;
 	}
-	
+
 	PatternOccurrences.push_back(PatternOcc);
 
 	return true;

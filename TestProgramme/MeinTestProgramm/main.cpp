@@ -3,7 +3,6 @@
 #include <omp.h>
 #include <string>
 
-#include "PatternInstrumentation.h"
 #include "Tests.h"
 
 
@@ -21,6 +20,6 @@ int main(int argc, char* argv[])
 	//+1 "::",  +1 "()"
 	Test::TestOperatorTypeQualifiers();
 
-	PatternInstrumentation::Pattern_End("TQ1");
+
 	return 0;
 }
