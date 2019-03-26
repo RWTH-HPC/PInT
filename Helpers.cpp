@@ -61,7 +61,7 @@ void GraphAlgorithms::MarkConnectedComponents(PatternGraphNode* Node, int Compon
 	if (Node->GetConnectedComponent() == -1)
 	{
 		Node->SetConnectedComponent(ComponentID);
-		
+
 		for (PatternGraphNode* Child : Node->GetChildren())
 		{
 			MarkConnectedComponents(Child, ComponentID);
@@ -84,7 +84,9 @@ void GraphAlgorithms::MarkConnectedComponents(PatternGraphNode* Node, int Compon
  **/
 void GraphAlgorithms::FindParentPatternCodeRegions(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Parents, int maxdepth)
 {
-	FindNeighbourPatternCodeRegions(Start, Parents, DIR_Parents, 0, maxdepth);
+	int a = 0;
+	int* p = &a;
+	FindNeighbourPatternCodeRegionss(Start, Parents, DIR_Parents, p, maxdepth);
 }
 
 /**
@@ -92,7 +94,9 @@ void GraphAlgorithms::FindParentPatternCodeRegions(PatternCodeRegion* Start, std
  **/
 void GraphAlgorithms::FindChildPatternCodeRegions(PatternCodeRegion* Start, std::vector<PatternCodeRegion*>& Children, int maxdepth)
 {
-	FindNeighbourPatternCodeRegions(Start, Children, DIR_Children, 0, maxdepth);
+	int a = 0;
+	int* p = &a;
+	FindNeighbourPatternCodeRegionss(Start, Children, DIR_Children, p, maxdepth);
 }
 
 /**
@@ -133,12 +137,59 @@ void GraphAlgorithms::FindNeighbourPatternCodeRegions(PatternGraphNode* Current,
 			Neighbours = Current->GetChildren();
 		}
 
+
+
 		/* Visit all the neighbouring nodes according to the given direction */
-		for (PatternGraphNode* Neighbour : Neighbours)
-		{
-			FindNeighbourPatternCodeRegions(Neighbour, Results, dir, depth + 1, maxdepth);
+		if (Neighbours.size() > 0 && Neighbours[0] != NULL && Neighbours[0] != 0){
+			for (PatternGraphNode* Neighbour : Neighbours)
+			{
+				FindNeighbourPatternCodeRegions(Neighbour, Results, dir, depth + 1, maxdepth);
+			}
 		}
 	}
+		return;
+}
+
+void GraphAlgorithms::FindNeighbourPatternCodeRegionss(PatternGraphNode* Current, std::vector<PatternCodeRegion*>& Results, GraphSearchDirection dir, int* depth, int maxdepth)
+{
+	/* Check, if we reached the maximum depth */
+	if (*depth >= maxdepth)
+	{
+		return;
+	}
+
+	PatternCodeRegion* PatternReg = clang::dyn_cast<PatternCodeRegion>(Current);
+
+	if (*depth > 0 && PatternReg != NULL)
+	{
+		Results.push_back(PatternReg);
+	}
+	else
+	{
+		/* Get the neighbouring nodes depending on the defined search direction */
+		std::vector<PatternGraphNode*> Neighbours;
+
+		if (dir == DIR_Parents)
+		{
+			Neighbours = Current->GetParents();
+		}
+		else if (dir == DIR_Children)
+		{
+			Neighbours = Current->GetChildren();
+		}
+
+
+
+		/* Visit all the neighbouring nodes according to the given direction */
+		if (Neighbours.size() > 0 && Neighbours[0] != NULL && Neighbours[0] != 0){
+			for (PatternGraphNode* Neighbour : Neighbours)
+			{
+				*depth = *depth + 1;
+				FindNeighbourPatternCodeRegionss(Neighbour, Results, dir, depth , maxdepth);
+			}
+		}
+	}
+		return;
 }
 
 /**
@@ -164,7 +215,7 @@ std::vector<PatternOccurrence*> SetAlgorithms::GetUniquePatternOccList(std::vect
 			{
 				duplicate = true;
 				break;
-			} 
+			}
 		}
 
 		if (!duplicate)
@@ -210,4 +261,3 @@ std::vector<HPCParallelPattern*> SetAlgorithms::GetUniquePatternList(std::vector
 
 	return Res;
 }
-

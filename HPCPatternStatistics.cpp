@@ -486,7 +486,9 @@ void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vec
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindParentPatternCodeRegions(Start, CodeRegions, maxdepth);
 
-	Parents = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
+	std::vector<PatternOccurrence*> TempParents = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
+
+	Parents.insert(Parents.end(),TempParents.begin(), TempParents.end());
 }
 
 /**
@@ -498,7 +500,9 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindChildPatternCodeRegions(Start, CodeRegions, maxdepth);
 
-	Children = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
+	std::vector<PatternOccurrence*> TempChildren = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
+
+	Children.insert(Children.end(),TempChildren.begin(), TempChildren.end());
 }
 
 /* eigentlich HALSTEADMETRIK*/

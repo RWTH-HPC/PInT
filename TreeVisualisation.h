@@ -17,4 +17,5 @@ private:
 	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth, bool onlyPattern);
 
 	static void PrintIndent(int depth);
+
 };

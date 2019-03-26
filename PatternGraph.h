@@ -24,13 +24,14 @@ class PatternCodeRegion;
  */
 class PatternGraphNode {
 public:
-	/** 
+	/**
  	* This enum is needed for LLVM type checking. New classes inheriting from this class should add their own enum values here.
  	*/
-	enum GraphNodeKind 
+	enum GraphNodeKind
 	{
-		GNK_FnCall, 
-		GNK_Pattern
+		GNK_FnCall,
+		GNK_Pattern,
+		GNK_NOTSET
 	};
 
 	GraphNodeKind GetKind() const
@@ -59,6 +60,9 @@ private:
 	int ComponentID;
 
 	const GraphNodeKind Kind;
+
+	std::vector<PatternGraphNode*> Children;
+	std::vector<PatternGraphNode*> Parents;
 };
 
 
@@ -75,20 +79,20 @@ public:
 	FunctionNode (std::string Name, unsigned Hash);
 
 	void AddChild(PatternGraphNode* Child);
-	
+
 	void AddParent(PatternGraphNode* Parent);
 
 	std::vector<PatternGraphNode*> GetChildren()
 	{
 		return Children;
-	}	
+	}
 
 	std::vector<PatternGraphNode*> GetParents()
 	{
 		return Parents;
 	}
 
-	unsigned GetHash() 
+	unsigned GetHash()
 	{
 		return Hash;
 	}
@@ -102,7 +106,7 @@ public:
 	{
 		return Node->GetKind() == PatternGraphNode::GNK_FnCall;
 	}
-	
+
 private:
 	std::string FnName;
 	unsigned Hash;
@@ -118,15 +122,17 @@ class PatternGraph
 public:
 	PatternGraphNode* GetRootNode();
 
+	std::vector<PatternGraphNode*>  GetRootNodes();
+
 	/* Access to patterns */
 	bool RegisterPattern(HPCParallelPattern* Pattern);
 
 	HPCParallelPattern* GetPattern(DesignSpace DesignSp, std::string Name);
 
 	/**
-	 * @brief 
+	 * @brief
 	 *
-	 * @return All patterns registered in the graph. 
+	 * @return All patterns registered in the graph.
 	 **/
 	std::vector<HPCParallelPattern*> GetAllPatterns() { return Patterns; }
 
@@ -137,14 +143,16 @@ public:
 	PatternOccurrence* GetPatternOccurrence(std::string ID);
 
 	/**
-	 * @brief 
+	 * @brief
 	 *
 	 * @return All pattern occurrences registered in the graph.
 	 **/
 	std::vector<PatternOccurrence*> GetAllPatternOccurrence() { return PatternOccurrences; }
 
+	void SetCodeRegs();
 	std::vector<PatternCodeRegion*> GetAllPatternCodeRegions();
-	
+
+
 	/* Access to functions */
 	bool RegisterFunction(clang::FunctionDecl* Decl);
 
@@ -154,7 +162,7 @@ public:
 
 
 	/**
-	 * @brief 
+	 * @brief
 	 *
 	 * @return All functions registered in the graph.
 	 **/
@@ -170,6 +178,8 @@ public:
 		static PatternGraph Graph;
 		return &Graph;
 	}
+
+	bool CodeRegsAreSet = false;
 
 private:
 	/* Save patterns, patternoccurrences and functions for later requests and linear access. */

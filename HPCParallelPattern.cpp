@@ -100,6 +100,7 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 	return CodeRegions;
 }
 
+
 void HPCParallelPattern::incrementNumOfOperators(){
 	this->numOfOperators++;
 }
@@ -221,6 +222,13 @@ clang::SourceLocation PatternCodeRegion::GetStartLoc(){
 clang::SourceLocation PatternCodeRegion::GetEndLoc(){
 	return this->EndSLocation;
 }
+
+	bool PatternCodeRegion::hasPatternParent() {
+		for(PatternGraphNode* graphnode : this->Parents){
+			if(graphnode->GetKind() == GNK_Pattern) return true;
+		}
+		return false;
+	}
 
 
 /*
