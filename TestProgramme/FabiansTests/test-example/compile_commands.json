@@ -1,12 +1,12 @@
 [
 {
   "directory": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/build",
-  "command": "/rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++   -DGTEST_HAS_RTTI=0 -I/rwthfs/rz/SW/UTIL/clang/6.0.1/include    -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -fno-rtti -o CMakeFiles/test-example.dir/test-example.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/test-example.cpp",
+  "command": "/rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++  -DGTEST_HAS_RTTI=0 -I/rwthfs/rz/SW/UTIL/clang/7.0.0/include    -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -fno-rtti -o CMakeFiles/test-example.dir/test-example.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/test-example.cpp",
   "file": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/test-example.cpp"
 },
 {
   "directory": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/build",
-  "command": "/rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++   -DGTEST_HAS_RTTI=0 -I/rwthfs/rz/SW/UTIL/clang/6.0.1/include    -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -fno-rtti -o CMakeFiles/test-example.dir/external-function.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/external-function.cpp",
+  "command": "/rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++  -DGTEST_HAS_RTTI=0 -I/rwthfs/rz/SW/UTIL/clang/7.0.0/include    -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -fno-rtti -o CMakeFiles/test-example.dir/external-function.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/external-function.cpp",
   "file": "/home/eh671079/patternInstrumentation/TestProgramme/FabiansTests/test-example/external-function.cpp"
 }
 ]

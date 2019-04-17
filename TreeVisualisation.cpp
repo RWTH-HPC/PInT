@@ -12,14 +12,18 @@
 void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 {
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
+	if(onlyPattern){
 
-	if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
-	{
-		PrintFunction(Func, 0, maxdepth, onlyPattern);
 	}
-	else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
-	{
-		PrintPattern(CodeRegion, 0, maxdepth, onlyPattern);
+	else{
+		if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
+		{
+			PrintFunction(Func, 0, maxdepth);
+		}
+		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(RootNode))
+		{
+			PrintPattern(CodeRegion, 0, maxdepth);
+		}
 	}
 }
 
@@ -30,7 +34,7 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
  * @param depth The current depth of recursion.
  * @param maxdepth The maximum depth of recursion.
  **/
-void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int depth, int maxdepth, bool onlyPattern)
+void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{
@@ -48,11 +52,11 @@ void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int dept
 	{
 		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
-			PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
+			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
 		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
-			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
+			PrintPattern(CodeRegion, depth + 1, maxdepth);
 		}
 	}
 }
@@ -64,25 +68,23 @@ void CallTreeVisualisation::PrintPattern(PatternCodeRegion* CodeRegion, int dept
  * @param depth Current recursion depth.
  * @param maxdepth Maximum recursion depth.
  **/
-void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int maxdepth,  bool onlyPattern)
+void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int maxdepth)
 {
 	if (depth > maxdepth)
 	{
 		return;
 	}
-	if (!onlyPattern){
 		PrintIndent(depth);
 		std::cout << "\033[31m" << FnCall->GetFnName() << "\033[0m" << " (Hash: " << FnCall->GetHash() << ")" << std::endl;
-	}
 	for (PatternGraphNode* Child : FnCall->GetChildren())
 	{
 		if (FunctionNode* FnCall = clang::dyn_cast<FunctionNode>(Child))
 		{
-			PrintFunction(FnCall, depth + 1, maxdepth, onlyPattern);
+			PrintFunction(FnCall, depth + 1, maxdepth);
 		}
 		else if (PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child))
 		{
-			PrintPattern(CodeRegion, depth + 1, maxdepth, onlyPattern);
+			PrintPattern(CodeRegion, depth + 1, maxdepth);
 		}
 	}
 }
