@@ -180,6 +180,17 @@ void PatternCodeRegion::AddParent(PatternGraphNode* Parent)
 	Parents.push_back(Parent);
 }
 
+void PatternCodeRegion::AddPatternChild(PatternGraphNode* PatChild)
+{
+	PatternChildren.push_back(PatChild);
+}
+
+void PatternCodeRegion::AddPatternParent(PatternGraphNode* PatParent)
+{
+	PatternParents.push_back(PatParent);
+}
+
+
 /**
  * @brief Save the first line of the code region to keep track of the lines of code.
  **/

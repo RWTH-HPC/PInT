@@ -121,6 +121,10 @@ public:
 
 	void AddParent(PatternGraphNode* Parent);
 
+	void AddPatternChild(PatternGraphNode* PatChild);
+
+	void AddPatternParent(PatternGraphNode* PatParent);
+
 	std::vector<PatternGraphNode*> GetChildren() { return this->Children; }
 
 	std::vector<PatternGraphNode*> GetParents() { return this->Parents; }
@@ -151,7 +155,8 @@ private:
 	clang::SourceLocation EndSLocation;
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;
-
+	std::vector<PatternGraphNode*> PatternParents;
+	std::vector<PatternGraphNode*> PatternChildren;
 	int LinesOfCode = 0;
 };
 
