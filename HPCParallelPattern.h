@@ -121,9 +121,9 @@ public:
 
 	void AddParent(PatternGraphNode* Parent);
 
-	void AddPatternChild(PatternGraphNode* PatChild);
+	void AddOnlyPatternChild(PatternGraphNode* PatChild);
 
-	void AddPatternParent(PatternGraphNode* PatParent);
+	void AddOnlyPatternParent(PatternGraphNode* PatParent);
 
 	std::vector<PatternGraphNode*> GetChildren() { return this->Children; }
 
@@ -163,14 +163,24 @@ private:
 
 
 /**
- * The pattern stack is used to keep track of the nesting of patterns.
+ * The pattern stack is used to keep track of the nesting of patterns and functions.
  */
 extern std::stack<PatternCodeRegion*> PatternContext;
+/**
+	*The OnlyPatternContext only keeps track of the nesting of patterns.
+	*/
+extern std::stack<PatternCodeRegion*> OnlyPatternContext;
 
 extern std::vector<PatternOccurrence*> OccStackForHalstead;
 
 void AddToPatternStack(PatternCodeRegion* PatternOcc);
 
+void AddToOnlyPatternStack(PatternCodeRegion* PatternCodeReg);
+
 PatternCodeRegion* GetTopPatternStack();
 
+PatternCodeRegion* GetTopOnlyPatternStack();
+
 void RemoveFromPatternStack(std::string ID);
+
+void RemoveFromOnlyPatternStack(std::string ID);

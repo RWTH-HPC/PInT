@@ -180,12 +180,12 @@ void PatternCodeRegion::AddParent(PatternGraphNode* Parent)
 	Parents.push_back(Parent);
 }
 
-void PatternCodeRegion::AddPatternChild(PatternGraphNode* PatChild)
+void PatternCodeRegion::AddOnlyPatternChild(PatternGraphNode* PatChild)
 {
 	PatternChildren.push_back(PatChild);
 }
 
-void PatternCodeRegion::AddPatternParent(PatternGraphNode* PatParent)
+void PatternCodeRegion::AddOnlyPatternParent(PatternGraphNode* PatParent)
 {
 	PatternParents.push_back(PatParent);
 }
@@ -238,6 +238,7 @@ clang::SourceLocation PatternCodeRegion::GetEndLoc(){
  * Pattern Stack Management
  */
 std::stack<PatternCodeRegion*> PatternContext;
+std::stack<PatternCodeRegion*> OnlyPatternContext;
 
 /**
  * @brief Add a PatternCodeRegion to the top of the pattern context stack.
@@ -247,6 +248,11 @@ std::stack<PatternCodeRegion*> PatternContext;
 void AddToPatternStack(PatternCodeRegion* PatternReg)
 {
 	PatternContext.push(PatternReg);
+}
+
+void AddToOnlyPatternStack(PatternCodeRegion* PatternReg)
+{
+	OnlyPatternContext.push(PatternReg);
 }
 
 /**
@@ -259,6 +265,17 @@ PatternCodeRegion* GetTopPatternStack()
 	if (!PatternContext.empty())
 	{
 		return PatternContext.top();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+PatternCodeRegion* GetTopOnlyPatternStack(){
+	if (!OnlyPatternContext.empty())
+	{
+		return OnlyPatternContext.top();
 	}
 	else
 	{
@@ -286,5 +303,19 @@ void RemoveFromPatternStack(std::string ID)
 	}
 }
 
+void RemoveFromOnlyPatternStack(std::string ID){
+	if(!OnlyPatternContext.empty())
+	{
+		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.top();
+		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack.
+
+		if (ID.compare(OnlyPatternTop->GetID()))
+		{
+			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
+		}
+
+		OnlyPatternContext.pop();
+	}
+}
 /*Stack for Halstead */
 std::vector<PatternOccurrence*> OccStackForHalstead;

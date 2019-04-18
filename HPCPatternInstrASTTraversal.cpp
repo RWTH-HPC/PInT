@@ -48,8 +48,8 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
  * @brief When we encounter a call expression, we look up the declaration of the function called.
  * If it is one of our instrumentation functions, we extract the information from the string argument with ASTMatchers.
  * A PatternCodeRegion object is created if this is the start of a region or the current region is closed.
- * For a non-instrumentation function, the function is added to top-most pattern as a child.
- * If the pattern stack is empty, the function is a direct child of the calling function.
+ * For a non-instrumentation function, the function is added to the pattern which surraunds it as a child.
+ * If there is no pattern, the function is a direct child of the calling function.
  *
  * @param CallExpr The clang object containing information about the call expression.
  *
@@ -67,7 +67,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 		std::string FnName = Callee->getNameInfo().getName().getAsString();
 
-		// Is this a call to our pattern functions?
+		// If the CallExpr is a pattern-begin expression
 		if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
 		{
 			/*Delivers the children of the current node*/
@@ -75,8 +75,13 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 #ifdef PRINT_DEBUG
 			Args[0]->dump();
 #endif
-			/*calls all registered callbacks on all matches on the given node */
+			/*calls all registered callbacks on all matches on the given node.
+			  this call is pretty stong. It creates the patternCodeRegion and if there is no mathing PatternOccurrence it
+				is creating one. Also are the Child parent relations set with this call*/
+			//PatternBeginFinder is a  clang::ast_matchers::MatchFinder which uses a HPCPatternBeginInstrHandler to set everything up and the Pattern is also registered in the patternStack.
 			PatternBeginFinder.match(*Args[0], *Context);
+
+
 			PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
 
 			/* Get the location of the fn call which denotes the beginning of this pattern */
