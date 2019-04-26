@@ -233,6 +233,10 @@ clang::SourceLocation PatternCodeRegion::GetEndLoc(){
 	return this->EndSLocation;
 }
 
+void PatternCodeRegion::SetHasNoPatternParents(bool bo)
+{
+	this->HasNoPatternParents = bo;
+}
 
 /*
  * Pattern Stack Management

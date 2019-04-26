@@ -13,7 +13,7 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 {
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
 	if(onlyPattern){
-
+			PrintOnlyPatternTree(maxdepth);
 	}
 	else{
 		if (FunctionNode* Func = clang::dyn_cast<FunctionNode>(RootNode))
@@ -24,6 +24,14 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 		{
 			PrintPattern(CodeRegion, 0, maxdepth);
 		}
+	}
+}
+
+void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth){
+	PatternGraph::GetInstance()->SetOnlyPatternRootNodes();
+	for(PatternGraphNode* OnlyPatRootNode : PatternGraph::GetInstance()->GetOnlyPatternRootNodes()){
+		PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(OnlyPatRootNode);
+		PrintPattern(CodeRegion,0,maxdepth);
 	}
 }
 

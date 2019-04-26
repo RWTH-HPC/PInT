@@ -142,11 +142,18 @@ public:
 
 	clang::SourceLocation GetEndLoc();
 
+	void SetHasNoPatternParents(bool bo);
+
 	int GetLinesOfCode() { return this->LinesOfCode; }
 
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
+	bool hasNoPatternParents(){return this->HasNoPatternParents;}
+
+
+
 private:
+	bool HasNoPatternParents = true;
 	PatternOccurrence* PatternOcc;
 
 	clang::SourceLocation SurLoc;

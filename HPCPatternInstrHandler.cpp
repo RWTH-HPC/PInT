@@ -111,8 +111,12 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	if(OnlyPatternTop != NULL){
 		OnlyPatternTop->AddOnlyPatternChild(CodeRegion);
 		CodeRegion->AddOnlyPatternParent(OnlyPatternTop);
+		OnlyPatternTop->SetHasNoPatternParents(false);
 	}
-	
+	else{
+		CodeRegion->SetHasNoPatternParents(true);
+	}
+
 	AddToOnlyPatternStack(CodeRegion);
 
 #if PRINT_DEBUG
