@@ -100,6 +100,7 @@ std::vector<PatternCodeRegion*> HPCParallelPattern::GetCodeRegions()
 	return CodeRegions;
 }
 
+
 void HPCParallelPattern::incrementNumOfOperators(){
 	this->numOfOperators++;
 }
