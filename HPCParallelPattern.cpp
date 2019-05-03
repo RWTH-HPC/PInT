@@ -3,7 +3,7 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
-
+#define PRINT_ONLYPATTERNDENUG
 
 /*
  * HPC Parallel Pattern Class Functions
@@ -236,6 +236,9 @@ clang::SourceLocation PatternCodeRegion::GetEndLoc(){
 void PatternCodeRegion::SetHasNoPatternParents(bool bo)
 {
 	this->HasNoPatternParents = bo;
+	#ifdef PRINT_ONLYPATTERNDENUG
+		std::cout <<this->GetID()<< " Seted hasNoPatternPartents to "<< bo <<" reality "<<this->HasNoPatternParents << '\n';
+	#endif
 }
 
 /*

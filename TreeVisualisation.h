@@ -18,5 +18,8 @@ private:
 
 	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth);
 
+	static void PrintRecursiveOnlyPattern(PatternCodeRegion* CodeRegion,int depth,int maxdepth);
+
 	static void PrintIndent(int depth);
+
 };

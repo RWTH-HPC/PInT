@@ -127,7 +127,11 @@ public:
 
 	std::vector<PatternGraphNode*> GetChildren() { return this->Children; }
 
+	std::vector<PatternGraphNode*> GetOnlyPatternChildren() { return this->PatternChildren; }
+
 	std::vector<PatternGraphNode*> GetParents() { return this->Parents; }
+
+	std::vector<PatternGraphNode*> GetOnlyPatternParents() { return this->PatternParents; }
 
 	void SetFirstLine (int FirstLine);
 

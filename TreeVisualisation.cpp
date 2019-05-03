@@ -1,7 +1,7 @@
 #include "TreeVisualisation.h"
 
 #include <iostream>
-
+//#define PRINT_ONLYPATTERNDENUG
 
 
 /**
@@ -27,11 +27,18 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 	}
 }
 
-void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth){
-	PatternGraph::GetInstance()->SetOnlyPatternRootNodes();
-	for(PatternGraphNode* OnlyPatRootNode : PatternGraph::GetInstance()->GetOnlyPatternRootNodes()){
+void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth)
+{
+	//PatternGraph::GetInstance()->SetOnlyPatternRootNodes();
+
+	for(PatternGraphNode* OnlyPatRootNode : PatternGraph::GetInstance()->GetOnlyPatternRootNodes())
+	{
 		PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(OnlyPatRootNode);
-		PrintPattern(CodeRegion,0,maxdepth);
+		#ifdef PRINT_ONLYPATTERNDENUG
+			std::cout << "Wir haben es in die for Schleife von PrintOnlyPatternTree geschaft" << '\n';
+			std::cout << CodeRegion->GetID() << ": hasNoPatternParents = "<< CodeRegion->hasNoPatternParents() << '\n';
+		#endif
+		PrintRecursiveOnlyPattern(CodeRegion,0,maxdepth);
 	}
 }
 
@@ -94,6 +101,24 @@ void CallTreeVisualisation::PrintFunction(FunctionNode* FnCall, int depth, int m
 		{
 			PrintPattern(CodeRegion, depth + 1, maxdepth);
 		}
+	}
+}
+
+void CallTreeVisualisation::PrintRecursiveOnlyPattern(PatternCodeRegion* CodeRegion,int depth,int maxdepth)
+{
+	if (depth > maxdepth)
+	{
+		return;
+	}
+	PrintIndent(depth);
+	HPCParallelPattern* Pattern = CodeRegion->GetPatternOccurrence()->GetPattern();
+	std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
+		std::cout << "(" << CodeRegion->GetPatternOccurrence()->GetID() << ")" << std::endl;
+
+	for (PatternGraphNode* Child : CodeRegion->GetOnlyPatternChildren())
+	{
+		PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(Child);
+		PrintRecursiveOnlyPattern(CodeRegion, depth + 1, maxdepth);
 	}
 }
 

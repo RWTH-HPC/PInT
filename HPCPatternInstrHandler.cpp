@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <regex>
+#define PRINT_ONLYPATTERNDENUG
 
 
 /*
@@ -112,9 +113,16 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 		OnlyPatternTop->AddOnlyPatternChild(CodeRegion);
 		CodeRegion->AddOnlyPatternParent(OnlyPatternTop);
 		OnlyPatternTop->SetHasNoPatternParents(false);
+		#ifdef PRINT_ONLYPATTERNDENUG
+			std::cout <<CodeRegion->GetID()<< ": hat Eltern " << '\n';
+		#endif
 	}
 	else{
 		CodeRegion->SetHasNoPatternParents(true);
+		#ifdef PRINT_ONLYPATTERNDENUG
+			std::cout <<CodeRegion->GetID()<< ": hat keine Eltern " << '\n';
+		#endif
+		PatternGraph::GetInstance()->RegisterOnlyPatternRootNode(CodeRegion);
 	}
 
 	AddToOnlyPatternStack(CodeRegion);

@@ -153,6 +153,7 @@ public:
 	FunctionNode* GetFunctionNode(std::string Name);
 
 	void SetOnlyPatternRootNodes();
+	void RegisterOnlyPatternRootNode(PatternCodeRegion* CodeReg);
 
 	/**
 	 * @brief
