@@ -31,6 +31,7 @@ void FunctionNode::AddParent(PatternGraphNode* Parent)
 
 PatternGraph::PatternGraph() : Functions(), Patterns(), PatternOccurrences()
 {
+
 }
 
 /**

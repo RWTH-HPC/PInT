@@ -1,7 +1,3 @@
-#include "PatternInstrumentation.h"
-
-
-
 class Test;
 //+1 "{}"
 class OtherClass{

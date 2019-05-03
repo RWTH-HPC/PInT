@@ -30,8 +30,7 @@ public:
 	enum GraphNodeKind
 	{
 		GNK_FnCall,
-		GNK_Pattern,
-		GNK_NOTSET
+		GNK_Pattern
 	};
 
 	GraphNodeKind GetKind() const
@@ -60,9 +59,6 @@ private:
 	int ComponentID;
 
 	const GraphNodeKind Kind;
-
-	std::vector<PatternGraphNode*> Children;
-	std::vector<PatternGraphNode*> Parents;
 };
 
 
@@ -121,11 +117,7 @@ class PatternGraph
 {
 public:
 	PatternGraphNode* GetRootNode();
-
 	std::vector<PatternGraphNode*> GetOnlyPatternRootNodes();
-
-
-	std::vector<PatternGraphNode*>  GetRootNodes();
 	/* Access to patterns */
 	bool RegisterPattern(HPCParallelPattern* Pattern);
 
@@ -151,9 +143,7 @@ public:
 	 **/
 	std::vector<PatternOccurrence*> GetAllPatternOccurrence() { return PatternOccurrences; }
 
-	void SetCodeRegs();
 	std::vector<PatternCodeRegion*> GetAllPatternCodeRegions();
-
 
 	/* Access to functions */
 	bool RegisterFunction(clang::FunctionDecl* Decl);
@@ -182,8 +172,6 @@ public:
 		static PatternGraph Graph;
 		return &Graph;
 	}
-
-	bool CodeRegsAreSet = false;
 
 private:
 	/* Save patterns, patternoccurrences and functions for later requests and linear access. */

@@ -28,9 +28,6 @@ class HPCParallelPattern
 public:
 	HPCParallelPattern(DesignSpace DesignSp, std::string PatternName);
 
-	/*operator PatternGraphNode() const { return new PatternGraphNode::PatternGraphNode(GNK_Pattern);
-	}*/
-
 	void Print();
 
 	void PrintShort();
@@ -40,8 +37,6 @@ public:
 	std::vector<PatternOccurrence*> GetOccurrences();
 
 	std::vector<PatternCodeRegion*> GetCodeRegions();
-
-
 
 	std::string GetPatternName() { return this->PatternName; }
 

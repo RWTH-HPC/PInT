@@ -1,6 +1,5 @@
 #include "Tests.h"
 
-
 //+1 "::",  +1 "()"
 void Test::TestOperatorTypeQualifiers(){
 /*
@@ -8,8 +7,7 @@ void Test::TestOperatorTypeQualifiers(){
 */
 // +1 "const", +1 "="
   const int i = 0;
-PatternInstrumentation::Pattern_Begin("AlgorithmStructure TypeQualifiers TQ2");
-PatternInstrumentation::Pattern_End("TQ2");
+
 /*
   Here we have a special case: we defines the number of operants when declares in one
   statement differently.
@@ -23,13 +21,14 @@ PatternInstrumentation::Pattern_End("TQ2");
   because we count those indirectly while counting VarDecl or DeclStmt etc.
 
 */
+
 // +3 "const" +3 "="
   const int s = 0 , t = 0, d = 0;
+
   // +3 "const",   +3 "volatile",   +3 "="
   const volatile int q = 0 , r = 0, p = 0;
 // +1 "volatile", +1 "="
   volatile int a = 4;
-  	PatternInstrumentation::Pattern_End("TQ1");
 }
 //+1 "::",  +1 "()"
 int OtherClass::uselessFunc(){
