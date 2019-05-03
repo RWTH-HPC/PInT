@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <regex>
+#define PRINT_ONLYPATTERNDENUG
 
 
 /*
@@ -31,6 +32,8 @@ void HPCPatternBeginInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry)
  *
  * @param Result Match results from the pattern begin matcher.
  **/
+
+ // describes what has to happen if we encounter the beginning of a pattern
 void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::MatchResult &Result)
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
@@ -102,6 +105,27 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 
 	AddToPatternStack(CodeRegion);
 	LastPattern = CodeRegion;
+  /* Set the parent-child-relation for the onlyPattern function. For that we use a stack which keeps track in which Pattens we are currently
+	*/
+	PatternCodeRegion* OnlyPatternTop = GetTopOnlyPatternStack();
+
+	if(OnlyPatternTop != NULL){
+		OnlyPatternTop->AddOnlyPatternChild(CodeRegion);
+		CodeRegion->AddOnlyPatternParent(OnlyPatternTop);
+		OnlyPatternTop->SetHasNoPatternParents(false);
+		#ifdef PRINT_ONLYPATTERNDENUG
+			std::cout <<CodeRegion->GetID()<< ": hat Eltern " << '\n';
+		#endif
+	}
+	else{
+		CodeRegion->SetHasNoPatternParents(true);
+		#ifdef PRINT_ONLYPATTERNDENUG
+			std::cout <<CodeRegion->GetID()<< ": hat keine Eltern " << '\n';
+		#endif
+		PatternGraph::GetInstance()->RegisterOnlyPatternRootNode(CodeRegion);
+	}
+
+	AddToOnlyPatternStack(CodeRegion);
 
 #if PRINT_DEBUG
 	Pattern->Print();
@@ -117,6 +141,8 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
  *
  * @param Result Match results from the pattern end matcher.
  **/
+
+ //defines what has to happen if we encounter the end of an Pattern
 void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::MatchResult &Result)
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
@@ -125,6 +151,13 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 
 	LastPattern = GetTopPatternStack();
 	RemoveFromPatternStack(PatternID);
+
+	// for the onlyPattern function we also want to remove the Pattern which is the first Element from the Pattern Stack
+	// so the element which was pushed inside the stack at first. If they dont have the same ID somethig with the nesting of the PatternName
+	// went wrong.
+
+	LastOnlyPattern = GetTopOnlyPatternStack();
+	RemoveFromOnlyPatternStack(PatternID);
 }
 
 /**

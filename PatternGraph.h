@@ -122,8 +122,10 @@ class PatternGraph
 public:
 	PatternGraphNode* GetRootNode();
 
-	std::vector<PatternGraphNode*>  GetRootNodes();
+	std::vector<PatternGraphNode*> GetOnlyPatternRootNodes();
 
+
+	std::vector<PatternGraphNode*>  GetRootNodes();
 	/* Access to patterns */
 	bool RegisterPattern(HPCParallelPattern* Pattern);
 
@@ -160,6 +162,8 @@ public:
 
 	FunctionNode* GetFunctionNode(std::string Name);
 
+	void SetOnlyPatternRootNodes();
+	void RegisterOnlyPatternRootNode(PatternCodeRegion* CodeReg);
 
 	/**
 	 * @brief
@@ -190,6 +194,8 @@ private:
 
 	/* Designated root node for output in "Treeifyed" display */
 	PatternGraphNode* RootNode;
+	/* When using the OnlyPattern flag we can have multiple rootPatterns*/
+	std::vector<PatternGraphNode*> OnlyPatternRootNodes;
 
 	/* Prevent object creation */
 	PatternGraph();

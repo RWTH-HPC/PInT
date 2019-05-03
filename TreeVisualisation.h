@@ -12,9 +12,13 @@ public:
 	static void PrintCallTree(int maxdepth, bool onlyPattern);
 
 private:
-	static void PrintPattern(PatternCodeRegion* PatternCodeRegion, int depth, int maxdepth, bool onlyPattern);
+	static void PrintOnlyPatternTree(int maxdepth);
 
-	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth, bool onlyPattern);
+	static void PrintPattern(PatternCodeRegion* PatternCodeRegion, int depth, int maxdepth);
+
+	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth);
+
+	static void PrintRecursiveOnlyPattern(PatternCodeRegion* CodeRegion,int depth,int maxdepth);
 
 	static void PrintIndent(int depth);
 

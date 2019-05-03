@@ -5,6 +5,8 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
+#define PRINT_ONLYPATTERNDENUGG 1
+
 
 /*
  * Function Declaration Database Entry functions
@@ -47,6 +49,9 @@ PatternGraphNode* PatternGraph::GetRootNode()
 	return (PatternGraphNode*)Patterns.front();
 }
 
+std::vector<PatternGraphNode*> PatternGraph::GetOnlyPatternRootNodes(){
+		return this->OnlyPatternRootNodes;
+}
 /**
  * @brief Lookup function for the database entry that corresponds to the given function declaration.
  *
@@ -76,7 +81,31 @@ FunctionNode* PatternGraph::GetFunctionNode(clang::FunctionDecl* Decl)
 
 	return NULL;
 }
+	void PatternGraph::SetOnlyPatternRootNodes(){
+		for(HPCParallelPattern* Pattern : this->Patterns)
+		{
+			for(PatternCodeRegion* CodeRegion : Pattern->GetCodeRegions()){
+				if(CodeRegion->hasNoPatternParents()){
+					this->OnlyPatternRootNodes.push_back(CodeRegion);
+					#ifdef PRINT_ONLYPATTERNDENUG
+						std::cout <<CodeRegion->GetID()<< ": ist im OnlyPatternRoot Stack. Wert von hasNoPatternParents = "<<CodeRegion->hasNoPatternParents() << '\n';
+					#endif
+				}
+				else{
+					#ifdef PRINT_ONLYPATTERNDENUG
+						std::cout <<CodeRegion->GetID()<< ": ist nicht im OnlyPatternRoot Stack Wert von hasNoPatternParents = "<<CodeRegion->hasNoPatternParents()<< '\n';
+					#endif
+				}
+			}
 
+		}
+
+	}
+
+	void PatternGraph::RegisterOnlyPatternRootNode(PatternCodeRegion* CodeReg)
+	{
+		this->OnlyPatternRootNodes.push_back(CodeReg);
+	}
 /**
  * @brief Registers a function with the database in the PatternGraph.
  *
@@ -155,7 +184,14 @@ bool PatternGraph::RegisterPattern(HPCParallelPattern* Pattern)
 	}
 
 	Patterns.push_back(Pattern);
-
+	/*for(PatternCodeRegion* PatCodeReg : Pattern->GetCodeRegions()){
+		if(PatCodeReg->hasNoPatternParents()){
+			OnlyPatternRootNodes.push_back(PatCodeReg);
+			#ifdef PRINT_ONLYPATTERNDENUGG
+				std::cout <<PatCodeReg->GetID()<< ": hat keine Eltern (PatternRegistrierung). Wert von hasNoPatterParents = "<< PatCodeReg->hasNoPatternParents()<< '\n';
+			#endif
+		}
+	}*/
 	return true;
 }
 

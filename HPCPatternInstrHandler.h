@@ -10,7 +10,7 @@
  * This class handles the callback that is issued when a pattern begin instrumentation call is encountered and the string argument is matched.
  * It extracts all information about the pattern and patternoccurrence from the string argument and initiates creation of all involved objects.
  */
-class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::MatchCallback 
+class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::MatchCallback
 {
 public:
 	void SetCurrentFnEntry(FunctionNode* FnEntry);
@@ -42,4 +42,6 @@ private:
 	FunctionNode* CurrentFnEntry;
 
 	PatternCodeRegion* LastPattern;
+
+	PatternCodeRegion* LastOnlyPattern;
 };
