@@ -114,28 +114,37 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 		// If no: search the called function for patterns
 		else
 		{
-			/* Look up the database entry for this function */
+			/* Look up the database entry for the function in which the current callExpr is within*/
 			FunctionNode* Func;
 
 			if ((Func = PatternGraph::GetInstance()->GetFunctionNode(Callee)) == NULL)
 			{
 				PatternGraph::GetInstance()->RegisterFunction(Callee);
-				Func = PatternGraph::GetInstance()->GetFunctionNode(Callee);
 			}
-
+			Func = PatternGraph::GetInstance()->GetFunctionNode(Callee);
 #ifdef PRINT_DEBUG
 			std::cout << Func->GetFnName() << " (" << Func->GetHash() << ")" << std::endl;
 #endif
 			PatternCodeRegion* Top;
+			/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
 			if ((Top = GetTopPatternStack()) != NULL)
 			{
 				Top->AddChild(Func);
 				Func->AddParent(Top);
+				Func->SetHasNoPatternParent(false);
+				Func->SetPatternParent(Top);
 			}
 			else
-			{
+			{/*if not register this function as a child for the function in which we currenty AddCodeRegion
+				 (because we are always inside a function this is possible)
+				 */
 				CurrentFnEntry->AddChild(Func);
 				Func->AddParent(CurrentFnEntry);
+
+				/*if the parent of this function has a PatternParent, the function inherits it to its child (Func) */
+				if(!CurrentFnEntry->hasNoPatternParents()){
+					Func->SetPatternParent(CurrentFnEntry->GetPatternParent());
+				}
 			}
 		}
 	}

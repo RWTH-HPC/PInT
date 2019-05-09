@@ -78,6 +78,14 @@ public:
 
 	void AddParent(PatternGraphNode* Parent);
 
+	void SetPatternParent(PatternGraphNode* PatParent);
+
+	PatternGraphNode* GetPatternParent();
+
+	void SetHasNoPatternParent(bool bo);
+
+	bool hasNoPatternParents(){return this->HasNoPatternParent;}
+
 	std::vector<PatternGraphNode*> GetChildren()
 	{
 		return Children;
@@ -106,6 +114,10 @@ public:
 private:
 	std::string FnName;
 	unsigned Hash;
+	/*for the onlyPattern functionality*/
+	bool HasNoPatternParent = true;
+	// we need only one Parents to trace down the reletion chip of the patterns through different Functions
+	PatternGraphNode* PatternParent;
 
 	std::vector<PatternGraphNode*> Children;
 	std::vector<PatternGraphNode*> Parents;
@@ -152,7 +164,6 @@ public:
 
 	FunctionNode* GetFunctionNode(std::string Name);
 
-	void SetOnlyPatternRootNodes();
 	void RegisterOnlyPatternRootNode(PatternCodeRegion* CodeReg);
 
 	/**

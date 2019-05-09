@@ -5,7 +5,7 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
-#define PRINT_ONLYPATTERNDENUGG 1
+//#define PRINT_ONLYPATTERNDENUGG 1
 
 
 /*
@@ -27,7 +27,20 @@ void FunctionNode::AddParent(PatternGraphNode* Parent)
 	Parents.push_back(Parent);
 }
 
+void FunctionNode::SetPatternParent(PatternGraphNode* PatParent)
+{
+	this->PatternParent = PatParent;
+}
 
+PatternGraphNode* FunctionNode::GetPatternParent()
+{
+	return this->PatternParent;
+}
+
+void FunctionNode::SetHasNoPatternParent(bool bo)
+{
+	this->HasNoPatternParent = bo;
+}
 
 PatternGraph::PatternGraph() : Functions(), Patterns(), PatternOccurrences()
 {
@@ -82,26 +95,7 @@ FunctionNode* PatternGraph::GetFunctionNode(clang::FunctionDecl* Decl)
 
 	return NULL;
 }
-	void PatternGraph::SetOnlyPatternRootNodes(){
-		for(HPCParallelPattern* Pattern : this->Patterns)
-		{
-			for(PatternCodeRegion* CodeRegion : Pattern->GetCodeRegions()){
-				if(CodeRegion->hasNoPatternParents()){
-					this->OnlyPatternRootNodes.push_back(CodeRegion);
-					#ifdef PRINT_ONLYPATTERNDENUG
-						std::cout <<CodeRegion->GetID()<< ": ist im OnlyPatternRoot Stack. Wert von hasNoPatternParents = "<<CodeRegion->hasNoPatternParents() << '\n';
-					#endif
-				}
-				else{
-					#ifdef PRINT_ONLYPATTERNDENUG
-						std::cout <<CodeRegion->GetID()<< ": ist nicht im OnlyPatternRoot Stack Wert von hasNoPatternParents = "<<CodeRegion->hasNoPatternParents()<< '\n';
-					#endif
-				}
-			}
 
-		}
-
-	}
 
 	void PatternGraph::RegisterOnlyPatternRootNode(PatternCodeRegion* CodeReg)
 	{
@@ -185,14 +179,6 @@ bool PatternGraph::RegisterPattern(HPCParallelPattern* Pattern)
 	}
 
 	Patterns.push_back(Pattern);
-	/*for(PatternCodeRegion* PatCodeReg : Pattern->GetCodeRegions()){
-		if(PatCodeReg->hasNoPatternParents()){
-			OnlyPatternRootNodes.push_back(PatCodeReg);
-			#ifdef PRINT_ONLYPATTERNDENUGG
-				std::cout <<PatCodeReg->GetID()<< ": hat keine Eltern (PatternRegistrierung). Wert von hasNoPatterParents = "<< PatCodeReg->hasNoPatternParents()<< '\n';
-			#endif
-		}
-	}*/
 	return true;
 }
 
