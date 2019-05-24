@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <regex>
-#define PRINT_ONLYPATTERNDENUG
+//#define PRINT_ONLYPATTERNDENUG
 
 
 /*
@@ -101,27 +101,28 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	{
 		CurrentFnEntry->AddChild(CodeRegion);
 		CodeRegion->AddParent(CurrentFnEntry);
+		/*Register the PatternChildren of the Functions too*/
+		CurrentFnEntry->AddPatternChild(CodeRegion);
+
+		/*Again if the function has PatternParents and Pattern Children we
+		  will register the PatternChildren as Children of the PatternParents*/
+		CurrentFnEntry->registerPatChildrenToPatParents();
 	}
 
 	AddToPatternStack(CodeRegion);
 	LastPattern = CodeRegion;
-  /* Set the parent-child-relation for the onlyPattern function. For that we use a stack which keeps track in which Pattens we are currently
+  /* Set the parent-child-relation for the onlyPattern function. For that we use a stack which keeps track
+	   in which Pattens we are currently. In this part we take care about the direct PatternPatten relations
 	*/
 	PatternCodeRegion* OnlyPatternTop = GetTopOnlyPatternStack();
 
-	if(OnlyPatternTop != NULL){
+	if(OnlyPatternTop != NULL)
+	{
 		OnlyPatternTop->AddOnlyPatternChild(CodeRegion);
 		CodeRegion->AddOnlyPatternParent(OnlyPatternTop);
-		OnlyPatternTop->SetHasNoPatternParents(false);
-		#ifdef PRINT_ONLYPATTERNDENUG
-			std::cout <<CodeRegion->GetID()<< ": hat Eltern " << '\n';
-		#endif
 	}
-	else{
-		CodeRegion->SetHasNoPatternParents(true);
-		#ifdef PRINT_ONLYPATTERNDENUG
-			std::cout <<CodeRegion->GetID()<< ": hat keine Eltern " << '\n';
-		#endif
+	else
+	{
 		PatternGraph::GetInstance()->RegisterOnlyPatternRootNode(CodeRegion);
 	}
 

@@ -31,15 +31,32 @@ void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth)
 {
 	//PatternGraph::GetInstance()->SetOnlyPatternRootNodes();
 
-	for(PatternGraphNode* OnlyPatRootNode : PatternGraph::GetInstance()->GetOnlyPatternRootNodes())
+	for(PatternCodeRegion* OnlyPatRootNode : PatternGraph::GetInstance()->GetAllPatternCodeRegions())
+	//hier selbst raussortieren welche Pattern als RootNode gelten(Pattern die in der Main sind und keine Eltern haben)
 	{
+#ifdef DEBUG
+		std::cout << "(" << OnlyPatRootNode->GetPatternOccurrence()->GetID() << ")" << std::endl;
+		std::cout << "HasNoPatternParents: " << OnlyPatRootNode->HasNoPatternParents() << std::endl;
+		std::cout << "HasNoPatternChildren: " << OnlyPatRootNode->HasNoPatternChildren() << std::endl;
+#endif
+
 		PatternCodeRegion* CodeRegion = clang::dyn_cast<PatternCodeRegion>(OnlyPatRootNode);
-		#ifdef PRINT_ONLYPATTERNDENUG
-			std::cout << "Wir haben es in die for Schleife von PrintOnlyPatternTree geschaft" << '\n';
-			std::cout << CodeRegion->GetID() << ": hasNoPatternParents = "<< CodeRegion->hasNoPatternParents() << '\n';
-		#endif
-		PrintRecursiveOnlyPattern(CodeRegion,0,maxdepth);
+		if(CodeRegion->isInMain && CodeRegion->HasNoPatternParents()){
+			PrintRecursiveOnlyPattern(CodeRegion,0,maxdepth);
+		}
 	}
+
+#ifdef DEBUG
+	for(FunctionNode* FuncNode : PatternGraph::GetInstance()->GetAllFunctions())
+	{
+		if(!FuncNode->HasNoPatternParents()||!FuncNode->HasNoPatternChildren())
+		std::cout << "NEUE FUNKTION" << '\n';
+		std::cout << "(" << FuncNode->GetFnName() << ")" << std::endl;
+		std::cout << "HasNoPatternParents: " << FuncNode->HasNoPatternParents() << std::endl;
+		std::cout << "HasNoPatternChildren: " << FuncNode->HasNoPatternChildren() << std::endl;
+		FuncNode->PrintVecOfPattern(FuncNode->GetPatternChildren());
+	}
+	#endif
 }
 
 /**

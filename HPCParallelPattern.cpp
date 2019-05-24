@@ -3,7 +3,7 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
-#define PRINT_ONLYPATTERNDENUG
+//#define PRINT_ONLYPATTERNDENUG
 
 /*
  * HPC Parallel Pattern Class Functions
@@ -181,13 +181,24 @@ void PatternCodeRegion::AddParent(PatternGraphNode* Parent)
 }
 
 void PatternCodeRegion::AddOnlyPatternChild(PatternGraphNode* PatChild)
-{
-	PatternChildren.push_back(PatChild);
+{/*Before we add a child we look if this child has not been registered already
+		*/
+		PatternCodeRegion* PatternChild = clang::dyn_cast<PatternCodeRegion>(PatChild);
+		for(PatternCodeRegion* PatRegFor : this->PatternChildren){
+			if(PatRegFor->GetID() == PatternChild->GetID()) return;
+		}
+		this->PatternChildren.push_back(PatternChild);
+
 }
 
 void PatternCodeRegion::AddOnlyPatternParent(PatternGraphNode* PatParent)
-{
-	PatternParents.push_back(PatParent);
+{/*Before we add a parent we look if this parent has not been registered already
+	*/
+	PatternCodeRegion* PatternParent = clang::dyn_cast<PatternCodeRegion>(PatParent);
+	for(PatternCodeRegion* PatRegFor : this->PatternParents){
+		if(PatRegFor->GetID() == PatternParent->GetID()) return;
+	}
+	this->PatternParents.push_back(PatternParent);
 }
 
 
@@ -233,12 +244,28 @@ clang::SourceLocation PatternCodeRegion::GetEndLoc(){
 	return this->EndSLocation;
 }
 
-void PatternCodeRegion::SetHasNoPatternParents(bool bo)
-{
-	this->HasNoPatternParents = bo;
-	#ifdef PRINT_ONLYPATTERNDENUG
-		std::cout <<this->GetID()<< " Seted hasNoPatternPartents to "<< bo <<" reality "<<this->HasNoPatternParents << '\n';
-	#endif
+bool PatternCodeRegion::HasNoPatternParents(){
+	if(this->PatternParents.size()){
+		return false;
+	}
+	return true;
+}
+
+bool PatternCodeRegion::HasNoPatternChildren(){
+	if(this->PatternChildren.size()){
+		return false;
+	}
+	return true;
+}
+
+void PatternCodeRegion::PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec){
+	for(PatternCodeRegion* CodeReg : RegionVec){
+		HPCParallelPattern* Pattern = CodeReg->GetPatternOccurrence()->GetPattern();
+		std::cout << "\033[36m" << Pattern->GetDesignSpaceStr() << ":\33[33m " << Pattern->GetPatternName() << "\33[0m";
+
+		std::cout << "(" << CodeReg->GetPatternOccurrence()->GetID() << ")" << std::endl;
+
+	}
 }
 
 /*
@@ -259,6 +286,7 @@ void AddToPatternStack(PatternCodeRegion* PatternReg)
 
 void AddToOnlyPatternStack(PatternCodeRegion* PatternReg)
 {
+
 	OnlyPatternContext.push(PatternReg);
 }
 

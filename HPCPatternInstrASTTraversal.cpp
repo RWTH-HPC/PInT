@@ -12,7 +12,7 @@
 #include <string>
 #include "llvm/ADT/SmallVector.h"
 
-
+//#define PRINT_DEBUG
 
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.
@@ -26,20 +26,23 @@
 
 bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 {
-	CurrentFn = Decl;
-
-	if ((CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl)) == NULL)
+	clang::SourceManager& SourceMan = Context->getSourceManager();
+	if(SourceMan.isInMainFile(Decl->getBeginLoc()))
 	{
-		PatternGraph::GetInstance()->RegisterFunction(Decl);
-		CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
+		CurrentFn = Decl;
+
+		if ((CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl)) == NULL)
+		{
+			PatternGraph::GetInstance()->RegisterFunction(Decl);
+			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
+		}
+
+	#ifdef PRINT_DEBUG
+		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
+	#endif
+		PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
+		PatternEndHandler.SetCurrentFnEntry(CurrentFnEntry);
 	}
-
-#ifdef PRINT_DEBUG
-	std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
-#endif
-	PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
-	PatternEndHandler.SetCurrentFnEntry(CurrentFnEntry);
-
 	return true;
 }
 
@@ -57,98 +60,118 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
  **/
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
-	if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace())
+	clang::SourceManager& SourceMan = Context->getSourceManager();
+	if(SourceMan.isInMainFile(CallExpr->getLocStart()))
 	{
-		clang::FunctionDecl* Callee = CallExpr->getDirectCallee();
-
-#ifdef PRINT_DEBUG
-		std::cout << Callee->getNameInfo().getName().getAsString() << std::endl;
-#endif
-
-		std::string FnName = Callee->getNameInfo().getName().getAsString();
-
-		// If the CallExpr is a pattern-begin expression
-		if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
+		if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace())
 		{
-			/*Delivers the children of the current node*/
-			clang::Expr** Args = CallExpr->getArgs();
-#ifdef PRINT_DEBUG
-			Args[0]->dump();
-#endif
-			/*calls all registered callbacks on all matches on the given node.
-			  this call is pretty stong. It creates the patternCodeRegion and if there is no mathing PatternOccurrence it
-				is creating one. Also are the Child parent relations set with this call*/
-			//PatternBeginFinder is a  clang::ast_matchers::MatchFinder which uses a HPCPatternBeginInstrHandler to set everything up and the Pattern is also registered in the patternStack.
-			PatternBeginFinder.match(*Args[0], *Context);
+			clang::FunctionDecl* Callee = CallExpr->getDirectCallee();
 
+	#ifdef PRINT_DEBUG
+			std::cout << Callee->getNameInfo().getName().getAsString() << std::endl;
+	#endif
 
-			PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
+			std::string FnName = Callee->getNameInfo().getName().getAsString();
 
-			/* Get the location of the fn call which denotes the beginning of this pattern */
-			clang::SourceManager& SourceMan = Context->getSourceManager();
-			clang::SourceLocation LocStart = CallExpr->getLocStart();
-			//std::cout << "Sourcelocation vom begindes Patterns"<<LocStart.printToString(SourceMan);
-
-			clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
-			PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
-			PatternCodeReg->SetStartSourceLoc(LocStart);
-
-		}
-		else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
-		{
-			clang::Expr** Args = CallExpr->getArgs();
-#ifdef PRINT_DEBUG
-			Args[0]->dump();
-#endif
-			PatternEndFinder.match(*Args[0], *Context);
-			PatternCodeRegion* PatternCodeReg = PatternEndHandler.GetLastPattern();
-
-
-			/* Get the location of the fn call which denotes the end of this pattern */
-			clang::SourceManager& SourceMan = Context->getSourceManager();
-			clang::SourceLocation LocEnd = CallExpr->getLocEnd();
-			clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-			PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
-			PatternCodeReg->SetEndSourceLoc(LocEnd);
-		}
-		// If no: search the called function for patterns
-		else
-		{
-			/* Look up the database entry for the function in which the current callExpr is within*/
-			FunctionNode* Func;
-
-			if ((Func = PatternGraph::GetInstance()->GetFunctionNode(Callee)) == NULL)
+			// If the CallExpr is a pattern-begin expression
+			if (!FnName.compare(PATTERN_BEGIN_CXX_FNNAME) || !FnName.compare(PATTERN_BEGIN_C_FNNAME))
 			{
-				PatternGraph::GetInstance()->RegisterFunction(Callee);
+				/*Delivers the children of the current node*/
+				clang::Expr** Args = CallExpr->getArgs();
+	#ifdef PRINT_DEBUG
+				Args[0]->dump();
+	#endif
+				/*calls all registered callbacks on all matches on the given node.
+				  this call is pretty stong. It creates the patternCodeRegion and if there is no mathing PatternOccurrence it
+					is creating one. Also are the Child parent relations set with this call*/
+				//PatternBeginFinder is a  clang::ast_matchers::MatchFinder which uses a HPCPatternBeginInstrHandler to set everything up and the Pattern is also registered in the patternStack.
+				PatternBeginFinder.match(*Args[0], *Context);
+
+
+				PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
+
+				/* Get the location of the fn call which denotes the beginning of this pattern */
+
+				clang::SourceLocation LocStart = CallExpr->getLocStart();
+				//std::cout << "Sourcelocation vom begindes Patterns"<<LocStart.printToString(SourceMan);
+
+				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
+				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
+				PatternCodeReg->SetStartSourceLoc(LocStart);
+
+				PatternCodeReg->isInMain = SourceMan.isInMainFile(LocStart);
 			}
-			Func = PatternGraph::GetInstance()->GetFunctionNode(Callee);
-#ifdef PRINT_DEBUG
-			std::cout << Func->GetFnName() << " (" << Func->GetHash() << ")" << std::endl;
-#endif
-			PatternCodeRegion* Top;
-			/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
-			if ((Top = GetTopPatternStack()) != NULL)
+			else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 			{
-				Top->AddChild(Func);
-				Func->AddParent(Top);
-				Func->SetHasNoPatternParent(false);
-				Func->SetPatternParent(Top);
+				clang::Expr** Args = CallExpr->getArgs();
+	#ifdef PRINT_DEBUG
+				Args[0]->dump();
+	#endif
+				PatternEndFinder.match(*Args[0], *Context);
+				PatternCodeRegion* PatternCodeReg = PatternEndHandler.GetLastPattern();
+
+
+				/* Get the location of the fn call which denotes the end of this pattern */
+				clang::SourceManager& SourceMan = Context->getSourceManager();
+				clang::SourceLocation LocEnd = CallExpr->getLocEnd();
+				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
+				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
+				PatternCodeReg->SetEndSourceLoc(LocEnd);
 			}
+			// If no: search the called function for patterns
 			else
-			{/*if not register this function as a child for the function in which we currenty AddCodeRegion
-				 (because we are always inside a function this is possible)
-				 */
-				CurrentFnEntry->AddChild(Func);
-				Func->AddParent(CurrentFnEntry);
+			{
+				/* Look up the database entry for the function in which the current callExpr is within*/
+				FunctionNode* Func;
 
-				/*if the parent of this function has a PatternParent, the function inherits it to its child (Func) */
-				if(!CurrentFnEntry->hasNoPatternParents()){
-					Func->SetPatternParent(CurrentFnEntry->GetPatternParent());
+				/*if the function is not registered register*/
+				if ((Func = PatternGraph::GetInstance()->GetFunctionNode(Callee)) == NULL)
+				{
+					PatternGraph::GetInstance()->RegisterFunction(Callee);
+				}
+				Func = PatternGraph::GetInstance()->GetFunctionNode(Callee);
+
+	#ifdef PRINT_DEBUG
+				std::cout << Func->GetFnName() << " (" << Func->GetHash() << ")" << std::endl;
+	#endif
+
+				PatternCodeRegion* Top;
+				/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
+				if ((Top = GetTopPatternStack()) != NULL)
+				{
+					Top->AddChild(Func);
+					Func->AddParent(Top);
+					/*register the PatternParents and the PatternChildren
+					  if a fuktion  has PatternParents and PatternChildren register every
+						Child as Child of the Parents vice versa*/
+
+					Func->AddPatternParent(Top);
+					#ifdef DEBUG_J
+					std::cout << Func->GetFnName()<< "hat als PatternParent: " << Top->GetID()<< '\n';
+					#endif
+				}
+				else
+				{/*if not register this function as a child for the function in which we currenty are
+					 (because we are always inside a function this is possible)
+					 */
+					CurrentFnEntry->AddChild(Func);
+					Func->AddParent(CurrentFnEntry);
+
+					/*if the parent of this function has a PatternParent, the function inherits it to its child (Func) */
+					if(!CurrentFnEntry->HasNoPatternParents()){
+						//function has PatternParents too
+						Func->AddPatternParents(CurrentFnEntry->GetPatternParents());
+						/*now we need to know wheather the function has now
+						  PatternParents AND PatternChildren if yes we register the the GetPatternChildren
+							as Children of the PatternParents vice versa*/
+						if(!Func->HasNoPatternChildren()){
+							Func->registerPatChildrenToPatParents();
+						}
+					}
 				}
 			}
 		}
 	}
-
 	return true;
 }
 

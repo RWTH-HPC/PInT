@@ -127,11 +127,11 @@ public:
 
 	std::vector<PatternGraphNode*> GetChildren() { return this->Children; }
 
-	std::vector<PatternGraphNode*> GetOnlyPatternChildren() { return this->PatternChildren; }
+	std::vector<PatternCodeRegion*> GetOnlyPatternChildren() { return this->PatternChildren; }
 
 	std::vector<PatternGraphNode*> GetParents() { return this->Parents; }
 
-	std::vector<PatternGraphNode*> GetOnlyPatternParents() { return this->PatternParents; }
+	std::vector<PatternCodeRegion*> GetOnlyPatternParents() { return this->PatternParents; }
 
 	void SetFirstLine (int FirstLine);
 
@@ -146,28 +146,31 @@ public:
 
 	clang::SourceLocation GetEndLoc();
 
-	void SetHasNoPatternParents(bool bo);
-
 	int GetLinesOfCode() { return this->LinesOfCode; }
 
 	std::string GetID() { return this->PatternOcc->GetID(); }
 
-	bool hasNoPatternParents(){return this->HasNoPatternParents;}
+	bool HasNoPatternParents();
 
+	bool HasNoPatternChildren();
 
+	bool isInMain = false;
+
+	void PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec);
 
 private:
-	bool HasNoPatternParents = true;
 	PatternOccurrence* PatternOcc;
 
 	clang::SourceLocation SurLoc;
 
 	clang::SourceLocation StartSLocation;
 	clang::SourceLocation EndSLocation;
+
+
 	std::vector<PatternGraphNode*> Parents;
 	std::vector<PatternGraphNode*> Children;
-	std::vector<PatternGraphNode*> PatternParents;
-	std::vector<PatternGraphNode*> PatternChildren;
+	std::vector<PatternCodeRegion*> PatternParents;
+	std::vector<PatternCodeRegion*> PatternChildren;
 	int LinesOfCode = 0;
 };
 

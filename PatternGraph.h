@@ -78,13 +78,23 @@ public:
 
 	void AddParent(PatternGraphNode* Parent);
 
-	void SetPatternParent(PatternGraphNode* PatParent);
+	void AddPatternParent(PatternGraphNode* PatParent);
 
-	PatternGraphNode* GetPatternParent();
+	void AddPatternParents(std::vector<PatternCodeRegion*> PatternParents);
 
-	void SetHasNoPatternParent(bool bo);
+	void AddPatternChild(PatternGraphNode* PatChild);
 
-	bool hasNoPatternParents(){return this->HasNoPatternParent;}
+	std::vector<PatternCodeRegion*> GetPatternParents();
+
+	std::vector<PatternCodeRegion*> GetPatternChildren();
+
+	bool HasNoPatternParents();
+
+	bool HasNoPatternChildren();
+
+	void registerPatChildrenToPatParents();
+	
+	void PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec);
 
 	std::vector<PatternGraphNode*> GetChildren()
 	{
@@ -114,10 +124,10 @@ public:
 private:
 	std::string FnName;
 	unsigned Hash;
-	/*for the onlyPattern functionality*/
-	bool HasNoPatternParent = true;
 	// we need only one Parents to trace down the reletion chip of the patterns through different Functions
-	PatternGraphNode* PatternParent;
+
+	std::vector<PatternCodeRegion*> PatternParents;
+	std::vector<PatternCodeRegion*> PatternChildren;
 
 	std::vector<PatternGraphNode*> Children;
 	std::vector<PatternGraphNode*> Parents;
