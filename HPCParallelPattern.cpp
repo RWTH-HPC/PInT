@@ -172,11 +172,54 @@ PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGra
 
 void PatternCodeRegion::AddChild(PatternGraphNode* Child)
 {
+	/*Before we add a child we look if this child has not been registered already
+			*/
+	if(PatternCodeRegion* ChildCodeReg = clang::dyn_cast<PatternCodeRegion>(Child))
+	{
+		for(PatternGraphNode* PatFor : this->Children){
+			if(PatternCodeRegion* PatRegFor = clang::dyn_cast<PatternCodeRegion>(PatFor))
+			{
+					if(PatRegFor->GetID()== ChildCodeReg->GetID()) return;
+			}
+		}
+	}
+	else
+	{
+		FunctionNode* ChildFunc = clang::dyn_cast<FunctionNode>(Child);
+		for(PatternGraphNode* PatFor : this->Children){
+			if(FunctionNode* PatFuncFor = clang::dyn_cast<FunctionNode>(PatFor))
+			{
+				if(PatFuncFor->GetHash() == ChildFunc->GetHash()) return;
+			}
+		}
+	}
 	Children.push_back(Child);
 }
 
+
 void PatternCodeRegion::AddParent(PatternGraphNode* Parent)
 {
+	/*Before we add a child we look if this child has not been registered already
+			*/
+	if(PatternCodeRegion* ParentCodeReg = clang::dyn_cast<PatternCodeRegion>(Parent))
+	{
+		for(PatternGraphNode* PatFor : this->Parents){
+			if(PatternCodeRegion* PatRegFor = clang::dyn_cast<PatternCodeRegion>(PatFor))
+			{
+					if(PatRegFor->GetID()== ParentCodeReg->GetID()) return;
+			}
+		}
+	}
+	else
+	{
+		FunctionNode* ParentFunc = clang::dyn_cast<FunctionNode>(Parent);
+		for(PatternGraphNode* PatFor : this->Parents){
+			if(FunctionNode* PatFuncFor = clang::dyn_cast<FunctionNode>(PatFor))
+			{
+				if(PatFuncFor->GetHash() == ParentFunc->GetHash()) return;
+			}
+		}
+	}
 	Parents.push_back(Parent);
 }
 
