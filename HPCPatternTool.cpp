@@ -105,7 +105,7 @@ int main (int argc, const char** argv)
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
   if(!NoTree.getValue()){
-	CallTreeVisualisation::PrintCallTree(20, OnlyPatterns.getValue());
+	CallTreeVisualisation::PrintCallTree(7, OnlyPatterns.getValue());
   }
 
 	for (HPCPatternStatistic* Stat : Statistics)
