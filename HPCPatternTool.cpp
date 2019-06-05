@@ -100,8 +100,6 @@ int main (int argc, const char** argv)
 	setActualHalstead(actHalstead);
 
 	/* Run the tool with options and source files provided */
-	/* clang::tooling::newFrontendActionFactory<HalsteadClassAction>() has type std::unique_ptr<OurAction> get() returns
-	   corresponding Action */
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
   if(!NoTree.getValue()){

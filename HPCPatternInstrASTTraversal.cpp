@@ -93,7 +93,6 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				/* Get the location of the fn call which denotes the beginning of this pattern */
 
 				clang::SourceLocation LocStart = CallExpr->getLocStart();
-				//std::cout << "Sourcelocation vom begindes Patterns"<<LocStart.printToString(SourceMan);
 
 				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
 				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
@@ -141,9 +140,6 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				{
 					Top->AddChild(Func);
 					Func->AddParent(Top);
-					/*register the PatternParents and the PatternChildren
-					  if a fuktion  has PatternParents and PatternChildren register every
-						Child as Child of the Parents vice versa*/
 
 					Func->AddPatternParent(Top);
 					#ifdef DEBUG_J
@@ -161,8 +157,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 					if(!CurrentFnEntry->HasNoPatternParents()){
 						//function has PatternParents too
 						Func->AddPatternParents(CurrentFnEntry->GetPatternParents());
-						/*now we need to know wheather the function has now
-						  PatternParents AND PatternChildren if yes we register the the GetPatternChildren
+						/*If the function has PatternParents AND PatternChildre, we register the the GetPatternChildren
 							as Children of the PatternParents vice versa*/
 						if(!Func->HasNoPatternChildren()){
 							Func->registerPatChildrenToPatParents();
@@ -198,7 +193,6 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
 	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-	//	EsthersVisitor.TraverseDecl(Context.getTranslationUnitDecl());
 }
 
 
@@ -210,7 +204,7 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(BinarOp, &isInPatterns);
- 	//std::cout << "groesse isInPatterns: "<<isInPatterns.size() << '\n';
+
 	if(isInPatterns.empty()){
 			return true;
 	}
@@ -221,6 +215,7 @@ bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	}
 	return true;
 }
+
 bool HalsteadVisitor::VisitDeclStmt(clang::DeclStmt *DclStmt){
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(DclStmt, &isInPatterns);
