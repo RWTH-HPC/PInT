@@ -42,8 +42,7 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	/* Match Regex and save info*/
 	std::smatch MatchRes;
 	std::string PatternInfoStr = patternstr->getString().str();
-	/* Stores the tree parts of the string from the function paramaters of the Pattern_begin function call in MatchRes
-	with help from the regular expresion BeginParallelPatternRegex (defined above).*/
+
 	std::regex_search(PatternInfoStr, MatchRes, BeginParallelPatternRegex);
 
 	DesignSpace DesignSp = StrToDesignSpace(MatchRes[1].str());
@@ -101,19 +100,15 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	{
 		CurrentFnEntry->AddChild(CodeRegion);
 		CodeRegion->AddParent(CurrentFnEntry);
+
 		/*Register the PatternChildren of the Functions too*/
 		CurrentFnEntry->AddPatternChild(CodeRegion);
-
-		/*Again if the function has PatternParents and Pattern Children we
-		  will register the PatternChildren as Children of the PatternParents*/
 		CurrentFnEntry->registerPatChildrenToPatParents();
 	}
 
 	AddToPatternStack(CodeRegion);
 	LastPattern = CodeRegion;
-  /* Set the parent-child-relation for the onlyPattern function. For that we use a stack which keeps track
-	   in which Pattens we are currently. In this part we take care about the direct PatternPatten relations
-	*/
+
 	PatternCodeRegion* OnlyPatternTop = GetTopOnlyPatternStack();
 
 	if(OnlyPatternTop != NULL)
@@ -152,10 +147,6 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 
 	LastPattern = GetTopPatternStack();
 	RemoveFromPatternStack(PatternID);
-
-	// for the onlyPattern function we also want to remove the Pattern which is the first Element from the Pattern Stack
-	// so the element which was pushed inside the stack at first. If they dont have the same ID somethig with the nesting of the PatternName
-	// went wrong.
 
 	LastOnlyPattern = GetTopOnlyPatternStack();
 	RemoveFromOnlyPatternStack(PatternID);

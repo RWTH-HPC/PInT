@@ -505,7 +505,6 @@ void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vect
 	Children.insert(Children.end(),TempChildren.begin(), TempChildren.end());
 }
 
-/* eigentlich HALSTEADMETRIK*/
 
 Halstead::Halstead () {
 	int numOfOperators = 0;
