@@ -374,7 +374,8 @@ void RemoveFromPatternStack(std::string ID)
 
 		if (ID.compare(Top->GetID()))
 		{
-			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
+			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
+			"You probably tried to end "<<	ID << " before ending "<< Top->GetID() << "\033[0m" << std::endl;
 		}
 
 		PatternContext.pop();
@@ -389,7 +390,8 @@ void RemoveFromOnlyPatternStack(std::string ID){
 
 		if (ID.compare(OnlyPatternTop->GetID()))
 		{
-			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!" << "\033[0m" << std::endl;
+			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
+			 "You probably tried to end "<<	ID << " before ending "<< OnlyPatternTop->GetID() << "\033[0m" << std::endl;
 		}
 
 		OnlyPatternContext.pop();
