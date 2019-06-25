@@ -73,10 +73,46 @@ If you want to see the <b>patterntree without the function calls </b> you can us
 <h4> -noTree </h4>
 If you want to see <b>no tree </b> you use the Flag -noTree <br>
 <code>./HPC-pattern-tool /path/to/compile_commands/file/ -noTree --extra-arg=-I/path/to/headers</code>
-<h4> -useSpecFiles </h4><br>
+<h4> -useSpecFiles </h4>
 If you want to analyze specific files and not every file in your Compilation Database (in the compile_commands.json file). You can use the flag -useSpecFiles. Then you can specify
 every file that you want to analyze.
 <code> ./HPC-pattern-tool /path/to/compile_commands/file/file1.cpp /path/to/compile_commands/file/file2.cpp /path/to/compile_commands/file/file3.cpp -useSpecFiles --extra-arg=-I/path/to/headers</code>
 Every file specified have to be in the compilation database (in the compile_commands.json file), if not the tool will crash.
 You should be careful using this flag. The function bodies of the functions in files which where not specified are not analyzed. When a pattern is called from one of those functions
 this pattern is not displayed in the tree.
+
+<h3>4. Limitations</h3>
+Since our tool is a static analysis tool there are some limitations.
+<h4>If-else commands</h4>
+It is not allowed to spread pattern parts through if-else commands.
+<code>if(root){
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
+}
+else{
+  Pattern_Begin(""FindingConcurrency TypeQualifiers elseB");
+}
+
+if(root){
+  PatternInstrumentation::Pattern_End("ifA");
+}
+else{
+  PatternInstrumentation::Pattern_End("elseB");
+}
+</code>
+This code will give you a stack inconsistency warning. We can not deal properly with patterns parts spread over if statements or if-else statements. If you started your pattern part within an if or an else statement, you should end it in the same statement otherwise you can get wrong results (even without warning).
+This code for example throws no warning.
+<code>if(root){
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
+}
+else{
+  Pattern_Begin(""FindingConcurrency TypeQualifiers elseB");
+}
+
+if(root){
+  PatternInstrumentation::Pattern_End("elseB");
+}
+else{
+    PatternInstrumentation::Pattern_End("ifA");
+}
+</code>
+The pattern part of TypeQualifiers, ifA will appear as a parent of elseB. 
