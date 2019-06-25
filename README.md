@@ -84,7 +84,7 @@ this pattern is not displayed in the tree.
 Since our tool is a static analysis tool there are some limitations.
 <h4>If-else commands</h4>
 It is not allowed to spread pattern parts through if-else commands.
-<code>if(root){
+<pre><code>
   #include "PatternInstrumentation.h"
 
   int main(int argc, const char** argv){
@@ -103,11 +103,11 @@ It is not allowed to spread pattern parts through if-else commands.
     }
     return 0;
   }
-</code>
+</code></pre>
 This code will give you a stack inconsistency warning. We can not deal properly with patterns parts spread over if statements or if-else statements. If you started your pattern part within an if or an else statement, you should end it in the same statement otherwise you can get wrong results (even without warning).
 This code for example throws no warning.
-<code>
-  #include "PatternInstrumentation.h"
+<pre><code>
+  \#include "PatternInstrumentation.h"
 
   int main(int argc, const char** argv){
     if(true){
@@ -125,11 +125,11 @@ This code for example throws no warning.
     }
   	return 0;
   }
-</code>
+</code></pre>
 The pattern part of TypeQualifiers, ifA will appear as a parent of elseB.
 <h4>Pattern parts which are spread over different functions</h4>
 It is not allowed to spread pattern parts over different functions. We consider supporting that but for now we don't. Wrong results can appear with or without warning of the tool when doing this.
-<code>
+<pre><code>
   #include "PatternInstrumentation.h"
 
   void function1(){
@@ -144,5 +144,5 @@ It is not allowed to spread pattern parts over different functions. We consider 
   	return 0;
   }
 
-</code>
+</code></pre>
 This is not allowed and could throw an error or could not. By coincidence the result could be as intended, don't let that fool you.
