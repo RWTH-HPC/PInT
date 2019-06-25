@@ -20,10 +20,10 @@ int main(int argc, char* argv[])
 	}
 
 	if(wahr==falsch){
-		PatternInstrumentation::Pattern_End("else");
+	 PatternInstrumentation::Pattern_End("if");
 	}
 	else{
-	 PatternInstrumentation::Pattern_End("if");
+		PatternInstrumentation::Pattern_End("else")
 	}
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
@@ -31,5 +31,6 @@ int main(int argc, char* argv[])
 	  const int i = 0;
 	//+1 "::",  +1 "()"
 	Test::TestOperatorTypeQualifiers();
+
 	return 0;
 }

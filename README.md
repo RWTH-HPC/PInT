@@ -64,7 +64,6 @@ You can copy the instrumentation header files to the source directory.
 Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/compile_commands/file/ --extra-arg=-I/path/to/headers</code> to your tool call.
 <b>If you use cmake</b>, you can instead add the flag to the list of include directories with <code>include_directories(/path/to/headers)</code>.
 Finally, you can also add the <code>-I/path/to/headers</code> flag to the compilation database for the files where the instrumentation header is used.
-<br>
 
 <h3>3.4 Tool options </h3>
 <h4> -onlyPattern </h4>
@@ -86,33 +85,64 @@ Since our tool is a static analysis tool there are some limitations.
 <h4>If-else commands</h4>
 It is not allowed to spread pattern parts through if-else commands.
 <code>if(root){
-  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
-}
-else{
-  Pattern_Begin(""FindingConcurrency TypeQualifiers elseB");
-}
+  #include "PatternInstrumentation.h"
 
-if(root){
-  PatternInstrumentation::Pattern_End("ifA");
-}
-else{
-  PatternInstrumentation::Pattern_End("elseB");
-}
+  int main(int argc, const char** argv){
+    if(true){
+      PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
+    }
+    else{
+      PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers elseB");
+    }
+
+    if(true){
+      PatternInstrumentation::Pattern_End("ifA");
+    }
+    else{
+      PatternInstrumentation::Pattern_End("elseB");
+    }
+    return 0;
+  }
 </code>
 This code will give you a stack inconsistency warning. We can not deal properly with patterns parts spread over if statements or if-else statements. If you started your pattern part within an if or an else statement, you should end it in the same statement otherwise you can get wrong results (even without warning).
 This code for example throws no warning.
-<code>if(root){
-  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
-}
-else{
-  Pattern_Begin(""FindingConcurrency TypeQualifiers elseB");
-}
+<code>
+  #include "PatternInstrumentation.h"
 
-if(root){
-  PatternInstrumentation::Pattern_End("elseB");
-}
-else{
-    PatternInstrumentation::Pattern_End("ifA");
-}
+  int main(int argc, const char** argv){
+    if(true){
+      PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers ifA");
+    }
+    else{
+      PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers elseB");
+    }
+
+    if(true){
+      PatternInstrumentation::Pattern_End("elseB");
+    }
+    else{
+        PatternInstrumentation::Pattern_End("ifA");
+    }
+  	return 0;
+  }
 </code>
-The pattern part of TypeQualifiers, ifA will appear as a parent of elseB. 
+The pattern part of TypeQualifiers, ifA will appear as a parent of elseB.
+<h4>Pattern parts which are spread over different functions</h4>
+It is not allowed to spread pattern parts over different functions. We consider supporting that but for now we don't. Wrong results can appear with or without warning of the tool when doing this.
+<code>
+  #include "PatternInstrumentation.h"
+
+  void function1(){
+  	PatternInstrumentation::Pattern_Begin("SupportingStructure func1 One");
+  };
+  void function2(){
+  	PatternInstrumentation::Pattern_End("One");
+  };
+  int main(int argc, const char** argv){
+  	function1();
+  	function2();
+  	return 0;
+  }
+
+</code>
+This is not allowed and could throw an error or could not. By coincidence the result could be as intended, don't let that fool you.
