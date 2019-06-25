@@ -81,7 +81,7 @@ int main (int argc, const char** argv)
 	std::vector<std::string> analyseList;
 	if(UseSpecFiles.getValue()){
 		analyseList = OptsParser.getSourcePathList();
-		std::cout << "ANALYSE LIST: " << '\n';
+		std::cout << "ANALYZE LIST: " << '\n';
 
 		for(int i = 0; i  < analyseList.size(); i++){
 			std::cout << analyseList[i] << std::endl;

@@ -76,7 +76,8 @@ If you want to see <b>no tree </b> you use the Flag -noTree <br>
 If you want to analyze specific files and not every file in your Compilation Database (in the compile_commands.json file). You can use the flag -useSpecFiles. Then you can specify
 every file that you want to analyze.
 <code> ./HPC-pattern-tool /path/to/compile_commands/file/file1.cpp /path/to/compile_commands/file/file2.cpp /path/to/compile_commands/file/file3.cpp -useSpecFiles --extra-arg=-I/path/to/headers</code>
-Every file specified have to be in the compilation database (in the compile_commands.json file), if not the tool will crash.
+Every file specified has to be in the compilation database (in the compile_commands.json file), if not the tool will crash. When using this flag there will be an additional output
+"ANALYZE LIST:" which shows you which files are analyzed, a file which is not in the compilation database is not analyzed.
 You should be careful using this flag. The function bodies of the functions in files which where not specified are not analyzed. When a pattern is called from one of those functions
 this pattern is not displayed in the tree.
 
@@ -107,7 +108,7 @@ It is not allowed to spread pattern parts through if-else commands.
 This code will give you a stack inconsistency warning. We can not deal properly with patterns parts spread over if statements or if-else statements. If you started your pattern part within an if or an else statement, you should end it in the same statement otherwise you can get wrong results (even without warning).
 This code for example throws no warning.
 <pre><code>
-  \#include "PatternInstrumentation.h"
+  #include "PatternInstrumentation.h"
 
   int main(int argc, const char** argv){
     if(true){
