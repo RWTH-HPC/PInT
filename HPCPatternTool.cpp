@@ -54,12 +54,16 @@ static llvm::cl::OptionCategory HPCPatternToolCategory("HPC pattern tool options
 static llvm::cl::extrahelp CommonHelp(clang::tooling::CommonOptionsParser::HelpMessage);
 
 static llvm::cl::OptionCategory onlyPattern("Patterntree without function calls");
-static llvm::cl::extrahelp Help("Turn this on (onlyPattern=1) if you want to see the Patterntree without function calls");
+static llvm::cl::extrahelp Help("-onlyPattern Use this flag, if you want to see the Patterntree without function calls\n \n");
 static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern));
 
 static llvm::cl::OptionCategory noTree("Output without the call tree");
-static llvm::cl::extrahelp HelpNoTree("Turn this on (noTree=1) if you don't want to see tree");
+static llvm::cl::extrahelp HelpNoTree("-noTree Use this flag, if you don't want to see tree\n \n");
 static llvm::cl::opt<bool> NoTree("noTree", llvm::cl::cat(noTree));
+
+static llvm::cl::OptionCategory useSpecFiles("Only traverse certain Files");
+static llvm::cl::extrahelp HelpUseSpecFiles("-useSpecFiles Use this Flag, if you want to traverse certain files instead of a all Files within the compilation data base.");
+static llvm::cl::opt<bool> UseSpecFiles("useSpecFiles", llvm::cl::cat(useSpecFiles));
 
 
 Halstead* actHalstead = new Halstead();
@@ -74,13 +78,26 @@ int main (int argc, const char** argv)
 {
 
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
-	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(), (OptsParser.getCompilations()).getAllFiles());
+	std::vector<std::string> analyseList;
+	if(UseSpecFiles.getValue()){
+		analyseList = OptsParser.getSourcePathList();
+		std::cout << "ANALYSE LIST: " << '\n';
 
-	std::cout << "COMPILATIONS LIST: " << '\n';
+		for(int i = 0; i  < analyseList.size(); i++){
+			std::cout << analyseList[i] << std::endl;
+		}
+	}
+	else{
+		analyseList = (OptsParser.getCompilations()).getAllFiles();
+	}
+
+	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(),analyseList);
+
+	std::cout << "COMPILATIONS LIST: "<<std::endl;
 	std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
 
 	for(int i = 0; i< d.size(); i++){
-		std::cout << d[i] << '\n';
+		std::cout << d[i] << std::endl;
 	}
 
 	/* Declare vector of command line arguments */
@@ -103,7 +120,7 @@ int main (int argc, const char** argv)
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
   if(!NoTree.getValue()){
-	CallTreeVisualisation::PrintCallTree(7, OnlyPatterns.getValue());
+	CallTreeVisualisation::PrintCallTree(6, OnlyPatterns.getValue());
   }
 
 	for (HPCPatternStatistic* Stat : Statistics)
