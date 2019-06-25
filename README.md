@@ -56,15 +56,27 @@ The syntax of the compilation database is covered in the <a href="https://clang.
 <b>If you want to write the compilation database from scratch by yourself</b> consider the following tutorials: <a href="https://eli.thegreenplace.net/2014/05/21/compilation-databases-for-clang-based-tools/">Compilation databases for Clang-based tools</a> and <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>
 
 <h3>3.3 Running the tool</h3>
-You can call the tool from its build directory like this: <code>./HPC-pattern-tool /path/to/your/code.cpp</code>.
+You can call the tool from its build directory like this: <code>./HPC-pattern-tool /path/to/compile_commands/file/</code>.
+In our example now the compile_commands.json file is in the folder "file". Now every file specified in the compile_commands.json is analysed.
 Arbitrary additional arguments can be passed after <code>--extra-arg=</code>.<br><br>
 You'll have to tell PInT where the instrumentation header files are located.
 You can copy the instrumentation header files to the source directory.
-Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/your/code.cpp --extra-arg=-I/path/to/headers</code> to your tool call.
+Alternatively, you can add an include flag using <code>--extra-arg=</code>, e.g. <code>./HPC-pattern-tool /path/to/compile_commands/file/ --extra-arg=-I/path/to/headers</code> to your tool call.
 <b>If you use cmake</b>, you can instead add the flag to the list of include directories with <code>include_directories(/path/to/headers)</code>.
 Finally, you can also add the <code>-I/path/to/headers</code> flag to the compilation database for the files where the instrumentation header is used.
 <br>
-If you want to see the <b>Patterntree without the function calls </b> you can set the onption -onlyPattern=1. <br>
-<code>./HPC-pattern-tool /path/to/your/code.cpp -onlyPattern=1 --extra-arg=-I/path/to/headers</code><br>
-If you want <b>no tree </b> you can set the onption -noTree=1. <br>
-<code>./HPC-pattern-tool /path/to/your/code.cpp -noTree=1 --extra-arg=-I/path/to/headers</code>
+
+<h3>3.4 Tool options </h3>
+<h4> -onlyPattern </h4>
+If you want to see the <b>patterntree without the function calls </b> you can use the flag -onlyPattern <br>
+<code>./HPC-pattern-tool /path/to/compile_commands/file/ -onlyPattern --extra-arg=-I/path/to/headers</code><br>
+<h4> -noTree </h4>
+If you want to see <b>no tree </b> you use the Flag -noTree <br>
+<code>./HPC-pattern-tool /path/to/compile_commands/file/ -noTree --extra-arg=-I/path/to/headers</code>
+<h4> -useSpecFiles </h4><br>
+If you want to analyze specific files and not every file in your Compilation Database (in the compile_commands.json file). You can use the flag -useSpecFiles. Then you can specify
+every file that you want to analyze.
+<code> ./HPC-pattern-tool /path/to/compile_commands/file/file1.cpp /path/to/compile_commands/file/file2.cpp /path/to/compile_commands/file/file3.cpp -useSpecFiles --extra-arg=-I/path/to/headers</code>
+Every file specified have to be in the compilation database (in the compile_commands.json file), if not the tool will crash.
+You should be careful using this flag. The function bodies of the functions in files which where not specified are not analyzed. When a pattern is called from one of those functions
+this pattern is not displayed in the tree.
