@@ -65,6 +65,13 @@ static llvm::cl::OptionCategory useSpecFiles("Only traverse certain Files");
 static llvm::cl::extrahelp HelpUseSpecFiles("-useSpecFiles Use this Flag, if you want to traverse certain files instead of a all Files within the compilation data base.");
 static llvm::cl::opt<bool> UseSpecFiles("useSpecFiles", llvm::cl::cat(useSpecFiles));
 
+static llvm::cl::OptionCategory maxTreeDisplayDepth("Sets maximal depth to display the tree");
+static llvm::cl::extrahelp HelpMaxTreeDisplayDepth("This only changes the depth with which the tree is displayed. The other statistics are still using the whole tree.");
+static llvm::cl::opt<unsigned int> MaxTreeDisplayDepth("maxTreeDisplayDepth", llvm::cl::cat(maxTreeDisplayDepth));
+
+static llvm::cl::OptionCategory displayCompilationsList("Displays every File in the compilation database");
+static llvm::cl::extrahelp HelpDisplayCompilationsList("Use this option to be shure that every file which you want to analyze is in the compilation database. If not ur file is not analyzed by the tool and you should add this file in your compile_commands.json file");
+static llvm::cl::opt<bool> DisplayCompilationsList("displayCompilationsList", llvm::cl::cat(displayCompilationsList));
 
 Halstead* actHalstead = new Halstead();
 
@@ -76,6 +83,7 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  */
 int main (int argc, const char** argv)
 {
+	MaxTreeDisplayDepth.setInitialValue(10);
 
 	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
 	std::vector<std::string> analyseList;
@@ -92,12 +100,14 @@ int main (int argc, const char** argv)
 	}
 
 	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(),analyseList);
+	if(DisplayCompilationsList.getValue()){
+		std::cout << "COMPILATIONS LIST: "<<std::endl;
+		std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
 
-	std::cout << "COMPILATIONS LIST: "<<std::endl;
-	std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
+		for(int i = 0; i< d.size(); i++){
+			std::cout << d[i] << std::endl;
+		}
 
-	for(int i = 0; i< d.size(); i++){
-		std::cout << d[i] << std::endl;
 	}
 
 	/* Declare vector of command line arguments */
@@ -120,7 +130,8 @@ int main (int argc, const char** argv)
 	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
   if(!NoTree.getValue()){
-	CallTreeVisualisation::PrintCallTree(6, OnlyPatterns.getValue());
+		int mxdspldpth = MaxTreeDisplayDepth.getValue();
+	CallTreeVisualisation::PrintCallTree(mxdspldpth - 1, OnlyPatterns.getValue());
   }
 
 	for (HPCPatternStatistic* Stat : Statistics)
