@@ -80,6 +80,11 @@ Every file specified has to be in the compilation database (in the compile_comma
 "ANALYZE LIST:" which shows you which files are analyzed, a file which is not in the compilation database is not analyzed.
 You should be careful using this flag. The function bodies of the functions in files which where not specified are not analyzed. When a pattern is called from one of those functions
 this pattern is not displayed in the tree.
+<h4>-maxTreeDisplayDepth</h4>
+You can use this flag if you want to cut off the deepest parts of the tree. This is really usefull for large files, to avoid printing the tree for hours. The other statistics are working with a uncut version of the tree.
+Per default this is set to 10.
+<h4>-displayCompilationsList</h4>
+This flag is usefull for checking if all files you need to analyze are in the compilation database, which means considered by the tool.
 
 <h3>4. Limitations</h3>
 Since our tool is a static analysis tool there are some limitations.
