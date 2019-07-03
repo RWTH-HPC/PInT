@@ -44,7 +44,7 @@ Therefore, it requires compilation databases in order to obtain the compiler fla
 <b>If you have a CMake project for your source code</b><br>
 1) In your CMakeLists.txt, set the variable "EXPORT_COMPILE_COMMANDS" to 1 or ON: <code>SET(EXPORT_COMPILE_COMMANDS 1)</code><br>
 2) Create/update your build system: <code>mkdir build && cd build && cmake ..</code><br>
-3) Copy compile_commands.json to the directory containing the sources: <code>cp compilation_commands.json path/to/src<br>
+3) Copy compile_commands.json to the directory containing the sources: <code>cp compilation_commands.json path/to/src</code><br>
 
 <b>If you use make (or another build tool) to build your source code</b><br>
 Install the <a href="https://github.com/rizsotto/Bear">Bear Tool</a>.
