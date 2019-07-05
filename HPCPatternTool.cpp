@@ -93,7 +93,7 @@ int main (int argc, const char** argv)
 		clang::tooling::CommonOptionsParser OptsParserVersion(argc, argv, pintVersion);
 
 	if(PintVersion.getValue()){
-			std::cout << "You currently using Version: " << PInTVersion <<'\n';
+			std::cout << "You currently using Version " << PInTVersion <<" of the PInT"<<'\n';
 	}
 	else{
 		clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
