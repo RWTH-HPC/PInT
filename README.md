@@ -87,6 +87,12 @@ For large codes you can set it to a smaller number for example 5.
 <code> ./HPC-pattern-tool /path/to/compile_commands/file/ -maxTreeDisplyDepth=5 --extra-arg=-I/path/to/headers</code>
 <h4>-displayCompilationsList</h4>
 This flag is usefull for checking if all files you need to analyze are in the compilation database, which means considered by the tool.
+<h4>-pintVersion</h4>
+This flag shows you which version of the tool (PInT) you are using by displaying the commit hash.
+You can use this flag with the following command.
+/path/to/your/build/directory/of/the/Tool/./HPC-pattern-tool /path/to/your/build/directory/of/the/Tool -pintVersion
+If you are alredy in the build directory of the tool you can use:
+./HPC-pattern-tool . -pintVersion
 
 <h3>4. Limitations</h3>
 Since our tool is a static analysis tool there are some limitations.
