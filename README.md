@@ -90,9 +90,9 @@ This flag is usefull for checking if all files you need to analyze are in the co
 <h4>-pintVersion</h4>
 This flag shows you which version of the tool (PInT) you are using by displaying the commit hash.
 You can use this flag with the following command.
-/path/to/your/build/directory/of/the/Tool/./HPC-pattern-tool /path/to/your/build/directory/of/the/Tool -pintVersion
+<code> /path/to/your/build/directory/of/the/Tool/./HPC-pattern-tool /path/to/your/build/directory/of/the/Tool -pintVersion</code>
 If you are alredy in the build directory of the tool you can use:
-./HPC-pattern-tool . -pintVersion
+<code>./HPC-pattern-tool . -pintVersion</code>
 
 <h3>4. Limitations</h3>
 Since our tool is a static analysis tool there are some limitations.
