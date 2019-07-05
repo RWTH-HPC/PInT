@@ -38,5 +38,5 @@ add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
 
 
 
-add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp Helpers.cpp SimilarityMetrics.cpp PatternGraph.cpp DesignSpaces.cpp HPCRunningStats.cpp)
-target_link_libraries (HPC-pattern-tool ${llvm_libs} clangBasic clangTooling)
+add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp Helpers.cpp SimilarityMetrics.cpp PatternGraph.cpp DesignSpaces.cpp HPCRunningStats.cpp ToolInformation.cpp)
+target_link_libraries (HPC-pattern-tool PRIVATE ${llvm_libs} clangBasic clangTooling)
