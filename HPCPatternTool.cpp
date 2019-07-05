@@ -5,6 +5,7 @@
 #include "Helpers.h"
 #include "SimilarityMetrics.h"
 
+#include "ToolInformation.h"
 #include "HPCRunningStats.h"
 
 #include <iostream>
@@ -73,6 +74,10 @@ static llvm::cl::OptionCategory displayCompilationsList("Displays every File in 
 static llvm::cl::extrahelp HelpDisplayCompilationsList("Use this option to be shure that every file which you want to analyze is in the compilation database. If not ur file is not analyzed by the tool and you should add this file in your compile_commands.json file");
 static llvm::cl::opt<bool> DisplayCompilationsList("displayCompilationsList", llvm::cl::cat(displayCompilationsList));
 
+static llvm::cl::OptionCategory pintVersion("Shows the currently used version of the tool");
+static llvm::cl::extrahelp HelpPintVersion("Use this option if you want to know which version you builded");
+static llvm::cl::opt<bool> PintVersion("pintVersion", llvm::cl::cat(pintVersion));
+
 Halstead* actHalstead = new Halstead();
 
 static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(20), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
@@ -85,81 +90,90 @@ int main (int argc, const char** argv)
 {
 	MaxTreeDisplayDepth.setInitialValue(10);
 
-	clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
-	std::vector<std::string> analyseList;
-	if(UseSpecFiles.getValue()){
-		analyseList = OptsParser.getSourcePathList();
-		std::cout << "ANALYZE LIST: " << '\n';
+		clang::tooling::CommonOptionsParser OptsParserVersion(argc, argv, pintVersion);
 
-		for(int i = 0; i  < analyseList.size(); i++){
-			std::cout << analyseList[i] << std::endl;
-		}
+	if(PintVersion.getValue()){
+			std::cout << "You currently using Version: " << PInTVersion <<'\n';
 	}
 	else{
-		analyseList = (OptsParser.getCompilations()).getAllFiles();
-	}
+		clang::tooling::CommonOptionsParser OptsParser(argc, argv, HPCPatternToolCategory);
+		std::vector<std::string> analyseList;
+		if(UseSpecFiles.getValue()){
+			analyseList = OptsParser.getSourcePathList();
+			std::cout << "ANALYZE LIST: " << '\n';
 
-	clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(),analyseList);
-	if(DisplayCompilationsList.getValue()){
-		std::cout << "COMPILATIONS LIST: "<<std::endl;
-		std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
+			for(int i = 0; i  < analyseList.size(); i++){
+				std::cout << analyseList[i] << std::endl;
+			}
 
-		for(int i = 0; i< d.size(); i++){
-			std::cout << d[i] << std::endl;
+		}
+		else{
+			analyseList = (OptsParser.getCompilations()).getAllFiles();
 		}
 
+		clang::tooling::ClangTool HPCPatternTool(OptsParser.getCompilations(),analyseList);
+		if(DisplayCompilationsList.getValue()){
+			std::cout << "COMPILATIONS LIST: "<<std::endl;
+			std::vector<std::string> d = (OptsParser.getCompilations()).getAllFiles();
+
+			for(int i = 0; i< d.size(); i++){
+				std::cout << d[i] << std::endl;
+			}
+
+		}
+
+		/* Declare vector of command line arguments */
+		clang::tooling::CommandLineArguments Arguments;
+
+		/* Add Arguments to prevent inlining */
+		Arguments.push_back("-fno-inline");
+
+		/* Add arguments to include system headers */
+		Arguments.push_back("-resource-dir");
+		Arguments.push_back(CLANG_INCLUDE_DIR);
+
+
+		clang::tooling::ArgumentsAdjuster ArgsAdjuster = clang::tooling::getInsertArgumentAdjuster(Arguments, clang::tooling::ArgumentInsertPosition::END);
+		HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);
+
+		setActualHalstead(actHalstead);
+
+		/* Run the tool with options and source files provided */
+		int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
+	  if(!NoTree.getValue()){
+			int mxdspldpth = MaxTreeDisplayDepth.getValue();
+		CallTreeVisualisation::PrintCallTree(mxdspldpth - 1, OnlyPatterns.getValue());
+	  }
+
+		for (HPCPatternStatistic* Stat : Statistics)
+		{
+			std::cout << std::endl << std::endl;
+			Stat->Calculate();
+			Stat->Print();
+		}
+
+		Statistics[0]->CSVExport("Counts.csv");
+		Statistics[1]->CSVExport("FIFO.csv");
+		Statistics[2]->CSVExport("LOC.csv");
+
+		/* Similarity Measures
+		std::vector<HPCParallelPattern*> SimPatterns;
+
+		HPCParallelPattern* IMVI = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
+		HPCParallelPattern* FCGT = PatternGraph::GetInstance()->GetPattern(DesignSpace::FindingConcurrency, "GroupTask");
+		HPCParallelPattern* IMCO = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Communication");
+		HPCParallelPattern* IMSY = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Synchronization");
+
+		SimPatterns.push_back(IMCO);
+		SimPatterns.push_back(IMSY);
+
+		JaccardSimilarityStatistic Jaccard(SimPatterns, 2, 4, GraphSearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 1000);
+
+		Jaccard.Calculate();
+		Jaccard.Print();
+	*/
+		return retcode; //&& halstead;
 	}
-
-	/* Declare vector of command line arguments */
-	clang::tooling::CommandLineArguments Arguments;
-
-	/* Add Arguments to prevent inlining */
-	Arguments.push_back("-fno-inline");
-
-	/* Add arguments to include system headers */
-	Arguments.push_back("-resource-dir");
-	Arguments.push_back(CLANG_INCLUDE_DIR);
-
-
-	clang::tooling::ArgumentsAdjuster ArgsAdjuster = clang::tooling::getInsertArgumentAdjuster(Arguments, clang::tooling::ArgumentInsertPosition::END);
-	HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);
-
-	setActualHalstead(actHalstead);
-
-	/* Run the tool with options and source files provided */
-	int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
-	//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
-  if(!NoTree.getValue()){
-		int mxdspldpth = MaxTreeDisplayDepth.getValue();
-	CallTreeVisualisation::PrintCallTree(mxdspldpth - 1, OnlyPatterns.getValue());
-  }
-
-	for (HPCPatternStatistic* Stat : Statistics)
-	{
-		std::cout << std::endl << std::endl;
-		Stat->Calculate();
-		Stat->Print();
-	}
-
-	Statistics[0]->CSVExport("Counts.csv");
-	Statistics[1]->CSVExport("FIFO.csv");
-	Statistics[2]->CSVExport("LOC.csv");
-
-	/* Similarity Measures
-	std::vector<HPCParallelPattern*> SimPatterns;
-
-	HPCParallelPattern* IMVI = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "VariableIncrement");
-	HPCParallelPattern* FCGT = PatternGraph::GetInstance()->GetPattern(DesignSpace::FindingConcurrency, "GroupTask");
-	HPCParallelPattern* IMCO = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Communication");
-	HPCParallelPattern* IMSY = PatternGraph::GetInstance()->GetPattern(DesignSpace::ImplementationMechanism, "Synchronization");
-
-	SimPatterns.push_back(IMCO);
-	SimPatterns.push_back(IMSY);
-
-	JaccardSimilarityStatistic Jaccard(SimPatterns, 2, 4, GraphSearchDirection::DIR_Parents, SimilarityCriterion::Pattern, 1000);
-
-	Jaccard.Calculate();
-	Jaccard.Print();
-*/
-	return retcode; //&& halstead;
+	return 1;
 }
