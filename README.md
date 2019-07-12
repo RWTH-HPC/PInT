@@ -6,8 +6,7 @@
 
 <h2>2. Installing the tool</h2>
 1) Change path of clang include directory which is stored in the Variable CLANG_INCLUDE_DIR to the path to your clang include directory.
-   I.e. the code  <code>set (CLANG_INCLUDE_DIR "/rwthfs/rz/SW/UTIL/clang/7.0.0/lib64/clang/7.0.0" CACHE STRING
-	"Directory where the clang system library header files are located")</code> has to be changed to <code>set (CLANG_INCLUDE_DIR "/path/to/your/clang/installation/clang/7.0.0/lib64/clang/7.0.0" CACHE STRING "Directory where the clang system library header files are located")</code>
+   I.e. the code  <code>set (CLANG_INCLUDE_DIR "/rwthfs/rz/SW/UTIL/clang/7.0.0/lib64/clang/7.0.0" CACHE STRING "Directory where the clang system library header files are located")</code> has to be changed to <code>set (CLANG_INCLUDE_DIR "/path/to/your/clang/installation/clang/7.0.0/lib64/clang/7.0.0" CACHE STRING "Directory where the clang system library header files are located")</code><br>
 2) Change into the source directory<br>
 3) Create a new directory: <code>mkdir build</code><br>
 4) Change into the new directory: <code>cd build</code><br>
@@ -52,8 +51,8 @@ Therefore, it requires compilation databases in order to obtain the compiler fla
 <b>If you use make (or another build tool) to build your source code</b><br>
 Install the <a href="https://github.com/rizsotto/Bear">Bear Tool</a>.
 The tool intercepts the exec calls made by your build tool and creates a compilation database from this.
-Make sure to copy this compilation database to the directory of the source code.
-ATTENTION: Sometimes the Bear Tool genearates multiple entries for the same file within the compilation database (compile_commands.json). If so delete those entries with non-absolute paths otherwise every Pattern is analyzed twice. Occurences, lines of codes and Fan-In Fan-Out will double.  
+Make sure to copy this compilation database to the directory of the source code.<br>
+ATTENTION: Sometimes the Bear Tool genearates multiple entries for the same file within the compilation database (compile_commands.json). If so delete those entries with non-absolute paths otherwise every Pattern is analyzed twice. Occurences, lines of codes and Fan-In Fan-Out will double.
 If you don't want to install the Bear Tool, you can copy the compilation commands from the make file.
 The syntax of the compilation database is covered in the <a href="https://clang.llvm.org/docs/JSONCompilationDatabase.html">JSON Compilation Database Format Specification</a>.
 
