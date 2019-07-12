@@ -1,8 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (HPC-pattern-tool)
 
-set (CMAKE_C_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang)
-set (CMAKE_CXX_COMPILER /rwthfs/rz/SW/UTIL/clang/5.0.1/bin/clang++)
+
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
@@ -10,8 +9,8 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra")
 
-set (CLANG_INCLUDE_DIR "/rwthfs/rz/SW/UTIL/clang/5.0.1/lib64/clang/5.0.1" CACHE STRING
-	"Dirrectory where the clang system library header files are located")
+set (CLANG_INCLUDE_DIR "/rwthfs/rz/SW/UTIL/clang/7.0.0/lib64/clang/7.0.0" CACHE STRING
+	"Directory where the clang system library header files are located")
 add_definitions (-DCLANG_INCLUDE_DIR="${CLANG_INCLUDE_DIR}")
 
 set (PRINT_DEBUG_INFORMATION OFF CACHE BOOL
