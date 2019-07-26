@@ -139,7 +139,14 @@ int main (int argc, const char** argv)
 		setActualHalstead(actHalstead);
 
 		/* Run the tool with options and source files provided */
-		int retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+		int retcode = 0;
+		try{
+			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+		}
+		catch(std::string patID){
+			std::cout << "\033[1;31mThe pattern occurence \033[33;1m" << patID<<"\033[1;31m has more than one pattern end."<< '\n';
+			return retcode;
+		}
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();

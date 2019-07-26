@@ -15,14 +15,12 @@ class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::Mat
 public:
 	void SetCurrentFnEntry(FunctionNode* FnEntry);
 
-	PatternCodeRegion* GetLastPattern() { return LastPattern; }
+	PatternCodeRegion* GetLastPattern() { return GetTopPatternStack(); }
 
 	virtual void run (const clang::ast_matchers::MatchFinder::MatchResult &Result);
 
 private:
 	FunctionNode* CurrentFnEntry;
-
-	PatternCodeRegion* LastPattern;
 };
 
 

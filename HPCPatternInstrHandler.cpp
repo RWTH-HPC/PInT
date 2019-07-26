@@ -107,7 +107,6 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	}
 
 	AddToPatternStack(CodeRegion);
-	LastPattern = CodeRegion;
 
 	PatternCodeRegion* OnlyPatternTop = GetTopOnlyPatternStack();
 
@@ -144,8 +143,12 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
 
 	std::string PatternID = patternstr->getString().str();
-
+	
 	LastPattern = GetTopPatternStack();
+	if(LastPattern==NULL){
+		throw PatternID;
+	}
+
 	RemoveFromPatternStack(PatternID);
 
 	LastOnlyPattern = GetTopOnlyPatternStack();

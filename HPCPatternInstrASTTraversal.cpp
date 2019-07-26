@@ -3,6 +3,7 @@
 #include "HPCParallelPattern.h"
 #include <string>
 
+#include <exception>
 
 #include <iostream>
 #include "clang/AST/RawCommentList.h"
@@ -114,7 +115,14 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceManager& SourceMan = Context->getSourceManager();
 				clang::SourceLocation LocEnd = CallExpr->getLocEnd();
 				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
+				try{
+					PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
+				}
+				catch(std::exception& e){
+					std::cout << "You probably have an extraeinuous end of the pattern : " <<"hier Name einfuegen"<< '\n';
+					return false;
+				}
+
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
 			}
 			// If no: search the called function for patterns
