@@ -1,6 +1,6 @@
 #include "HPCPatternInstrHandler.h"
 #include "HPCParallelPattern.h"
-
+#include "HPCError.h"
 #include <iostream>
 #include <regex>
 //#define PRINT_ONLYPATTERNDENUG
@@ -143,10 +143,10 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
 
 	std::string PatternID = patternstr->getString().str();
-	
+
 	LastPattern = GetTopPatternStack();
 	if(LastPattern==NULL){
-		throw PatternID;
+		throw TooManyEndsError();
 	}
 
 	RemoveFromPatternStack(PatternID);

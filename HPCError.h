@@ -8,18 +8,18 @@ public:
 
 class TooManyEndsError: public PInTRuntimeError{
 public:
-  virtual const char* what() const throw();
+  const char* what() const throw();
   void resolveError();
 };
 
-class TooManyBegins: public PInTRuntimeError{
+class TooManyBeginsError: public PInTRuntimeError{
 public:
-  virtual const char* what() const throw();
+  const char* what() const throw();
   void resolveError();
 };
 
 class PatternSpreadOverSatements{
 public:
-  virtual const char* what() const throw();
-  void resolveError();
+  const char* what() const throw();
+  virtual void resolveError();
 };
