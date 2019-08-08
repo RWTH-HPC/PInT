@@ -344,10 +344,7 @@ PatternCodeRegion* GetTopPatternStack()
 	{
 		return PatternContext.top();
 	}
-	else
-	{
 		return NULL;
-	}
 }
 
 PatternCodeRegion* GetTopOnlyPatternStack(){
@@ -355,10 +352,7 @@ PatternCodeRegion* GetTopOnlyPatternStack(){
 	{
 		return OnlyPatternContext.top();
 	}
-	else
-	{
 		return NULL;
-	}
 }
 
 /**
@@ -377,8 +371,13 @@ void RemoveFromPatternStack(std::string ID)
 			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
 			"You probably tried to end "<<	ID << " before ending "<< Top->GetID() << "\033[0m" << std::endl;
 		}
+		else{
+			PatternContext.pop();
+		}
+	}
+	else{
+			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
 
-		PatternContext.pop();
 	}
 }
 
@@ -386,15 +385,18 @@ void RemoveFromOnlyPatternStack(std::string ID){
 	if(!OnlyPatternContext.empty())
 	{
 		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.top();
-		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack.
-
+		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack
 		if (ID.compare(OnlyPatternTop->GetID()))
 		{
 			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
 			 "You probably tried to end "<<	ID << " before ending "<< OnlyPatternTop->GetID() << "\033[0m" << std::endl;
 		}
-
-		OnlyPatternContext.pop();
+		else{
+		  OnlyPatternContext.pop();
+		}
+	}
+	else{
+			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
 	}
 }
 /*Stack for Halstead */
