@@ -62,7 +62,7 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
 	clang::SourceManager& SourceMan = Context->getSourceManager();
-	if(SourceMan.isInMainFile(CallExpr->getLocStart()))
+	if(SourceMan.isInMainFile(CallExpr->getBeginLoc()))
 	{
 		if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace())
 		{
@@ -93,7 +93,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				/* Get the location of the fn call which denotes the beginning of this pattern */
 
-				clang::SourceLocation LocStart = CallExpr->getLocStart();
+				clang::SourceLocation LocStart = CallExpr->getBeginLoc();
 
 				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
 				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
@@ -113,7 +113,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				/* Get the location of the fn call which denotes the end of this pattern */
 				clang::SourceManager& SourceMan = Context->getSourceManager();
-				clang::SourceLocation LocEnd = CallExpr->getLocEnd();
+				clang::SourceLocation LocEnd = CallExpr->getEndLoc();
 				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 				try{
 					PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
@@ -402,7 +402,7 @@ bool HalsteadVisitor::VisitFunctionDecl(clang::FunctionDecl *FctDecl){
 		for(int i = 0; i < CodeRegions.size(); i++){
 
 			PatternCodeRegion* CodeReg = CodeRegions[i];
-			bool ExprAfterBegStmt = SourceMan.isPointWithin (Stm->getLocEnd(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
+			bool ExprAfterBegStmt = SourceMan.isPointWithin (Stm->getEndLoc(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
 			//std::cout << "wer von ExprAfterBegStmt: " <<ExprAfterBegStmt<< '\n';
 			//bool ExprBeforEndStmt = SourceMan.isBeforeInTranslationUnit(DeclStmt->getEndLoc(), CodeReg->GetEndLoc());
 
