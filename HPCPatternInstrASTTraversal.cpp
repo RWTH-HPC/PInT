@@ -13,6 +13,10 @@
 #include <string>
 #include "llvm/ADT/SmallVector.h"
 
+#ifndef HPCERROR_H
+#include "HPCError.h"
+#endif
+
 //#define PRINT_DEBUG
 
 /**
@@ -107,9 +111,15 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 	#ifdef PRINT_DEBUG
 				Args[0]->dump();
 	#endif
-				PatternEndFinder.match(*Args[0], *Context);
-				PatternCodeRegion* PatternCodeReg = PatternEndHandler.GetLastPattern();
-
+				PatternCodeRegion* PatternCodeReg;
+				try{
+					PatternEndFinder.match(*Args[0], *Context);
+					PatternCodeReg = PatternEndHandler.GetLastPattern();
+				}
+				catch(TooManyEndsException& e){
+					e.what();
+					throw TerminateEarlyException();
+				}
 
 				/* Get the location of the fn call which denotes the end of this pattern */
 				clang::SourceManager& SourceMan = Context->getSourceManager();

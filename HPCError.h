@@ -1,25 +1,63 @@
 #include <exception>
 #include <iostream>
+#include <string>
 
-class PInTRuntimeError: public std::exception{
+#ifndef HPCPARALLELPATTERN_H
+  #include "HPCParallelPattern.h"
+#endif
+
+class PInTRuntimeException: public std::exception{
 public:
   virtual const char* what() const throw();
 };
 
-class TooManyEndsError: public PInTRuntimeError{
+class TooManyEndsException: public PInTRuntimeException{
+public:
+  TooManyEndsException(){};
+  TooManyEndsException(std::string ID);
+  const char* what() const throw();
+  void resolveError();
+private:
+  std::string ID = "ID";
+};
+
+class TooManyBeginsException: public PInTRuntimeException{
+public:
+  TooManyBeginsException(){};
+  TooManyBeginsException(std::string ID);
+  const char* what() const throw();
+  void resolveError();
+private:
+  std::string ID = "";
+};
+
+class PatternSpreadOverSatementsException: public PInTRuntimeException{
 public:
   const char* what() const throw();
   void resolveError();
 };
 
-class TooManyBeginsError: public PInTRuntimeError{
+/*
+ * This exception should only be caught in main function
+ */
+class TerminateEarlyException: public PInTRuntimeException{
 public:
   const char* what() const throw();
-  void resolveError();
 };
 
-class PatternSpreadOverSatements{
+class WrongNestingException: public PInTRuntimeException{
 public:
+  WrongNestingException(std::string ID, std::string TopID);
   const char* what() const throw();
-  virtual void resolveError();
+private:
+  std::string ID;
+  std::string TopID;
+};
+
+class WrongSyntaxException: public PInTRuntimeException{
+public:
+  WrongSyntaxException(PatternOccurrence* PatOc);
+  const char* what() const throw();
+private:
+  std::string ID;
 };

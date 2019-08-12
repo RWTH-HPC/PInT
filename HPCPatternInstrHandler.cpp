@@ -49,9 +49,16 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	std::string PatternName = MatchRes[2].str();
 	std::string PatternID = MatchRes[3].str();
 
-	//const clang::SourceLocation SurLoc = range.getBegin();
-
-
+	/*We look if this patternCodeRegion ID is already used*/
+	try{
+		if(PatternIDisUsed(PatternID)){
+			throw TooManyBeginsException(PatternID);
+		}
+	}
+	catch(TooManyBeginsException& e){
+		e.what();
+		throw TerminateEarlyException();
+	}
 	/* Look if a pattern with this Design Space and Name already exists */
 	HPCParallelPattern* Pattern = PatternGraph::GetInstance()->GetPattern(DesignSp, PatternName);
 
@@ -74,9 +81,15 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 	}
 	else
 	{
-		if (!PatternOcc->GetPattern()->Equals(Pattern))
-		{
-			std::cout << "\033[31m" << "Pattern Occurrences with same identifier have different underlying pattern:\033[0m" << PatternID << std::endl;
+		try{
+			if (!PatternOcc->GetPattern()->Equals(Pattern))
+			{
+				throw WrongSyntaxException(PatternOcc);
+			}
+		}
+		catch(WrongSyntaxException& wrongSyn){
+			std::cout << wrongSyn.what() <<" ende "<< std::endl;
+			throw TerminateEarlyException();
 		}
 	}
 
@@ -146,7 +159,7 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 
 	LastPattern = GetTopPatternStack();
 	if(LastPattern==NULL){
-		throw TooManyEndsError();
+		throw TooManyEndsException();
 	}
 
 	RemoveFromPatternStack(PatternID);

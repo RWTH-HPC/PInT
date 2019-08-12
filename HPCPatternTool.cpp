@@ -145,9 +145,9 @@ int main (int argc, const char** argv)
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 		}
-		catch(TooManyEndsError& e){
-			std::cout << e.what() << '\n';
-			return retcode;
+		catch(TerminateEarlyException& terminate){
+			std::cout << terminate.what() << '\n';
+			return 0;
 		}
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
