@@ -198,3 +198,5 @@ PatternCodeRegion* GetTopOnlyPatternStack();
 void RemoveFromPatternStack(std::string ID);
 
 void RemoveFromOnlyPatternStack(std::string ID);
+
+bool PatternIDisUsed(std::string ID);

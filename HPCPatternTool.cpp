@@ -14,7 +14,9 @@
 #include "llvm/Support/CommandLine.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 
-
+#ifndef HPCERROR_H
+#include "HPCError.h"
+#endif
 
 
 /**
@@ -143,9 +145,9 @@ int main (int argc, const char** argv)
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 		}
-		catch(std::string patID){
-			std::cout << "\033[1;31mThe pattern occurence \033[33;1m" << patID<<"\033[1;31m has more than one pattern end."<< '\n';
-			return retcode;
+		catch(TerminateEarlyException& terminate){
+			std::cout << terminate.what() << '\n';
+			return 0;
 		}
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){

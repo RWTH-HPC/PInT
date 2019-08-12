@@ -3,6 +3,9 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
+#ifndef HPCERROR_H
+	#include "HPCError.h"
+#endif
 //#define PRINT_ONLYPATTERNDENUG
 
 /*
@@ -362,23 +365,34 @@ PatternCodeRegion* GetTopOnlyPatternStack(){
  **/
 void RemoveFromPatternStack(std::string ID)
 {
-	if (!PatternContext.empty())
-	{
-		PatternCodeRegion* Top = PatternContext.top();
-
-		if (ID.compare(Top->GetID()))
+	try{
+		if (!PatternContext.empty())
 		{
-			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
-			"You probably tried to end "<<	ID << " before ending "<< Top->GetID() << "\033[0m" << std::endl;
+			PatternCodeRegion* Top = PatternContext.top();
+			try{
+				if (ID.compare(Top->GetID()))
+				{
+					throw WrongNestingException(ID, Top->GetID());
+				}
+				else{
+					PatternContext.pop();
+				}
+			}
+			catch(WrongNestingException& wrongNest){
+
+				wrongNest.what();
+				throw TerminateEarlyException();
+			}
 		}
 		else{
-			PatternContext.pop();
+				throw TooManyEndsException(ID);
 		}
 	}
-	else{
-			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
-
+	catch(TooManyEndsException& e){
+		e.what();
+		throw TerminateEarlyException();
 	}
+
 }
 
 void RemoveFromOnlyPatternStack(std::string ID){
@@ -386,18 +400,34 @@ void RemoveFromOnlyPatternStack(std::string ID){
 	{
 		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.top();
 		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack
-		if (ID.compare(OnlyPatternTop->GetID()))
-		{
-			std::cout << "\033[31m" << "Inconsistency in the pattern stack detected. Results may not be correct. Check the structure of the instrumentation in the application code!\n" <<
-			 "You probably tried to end "<<	ID << " before ending "<< OnlyPatternTop->GetID() << "\033[0m" << std::endl;
+		/*usually the WrongNestingException is encountered before this function*/
+		try{
+			if (ID.compare(OnlyPatternTop->GetID()))
+			{
+				throw WrongNestingException(ID, OnlyPatternTop->GetID());
+			}
+			else{
+			  OnlyPatternContext.pop();
+			}
 		}
-		else{
-		  OnlyPatternContext.pop();
+		catch(WrongNestingException& wrongNest){
+			std::cout << wrongNest.what() << std::endl;
+			throw TerminateEarlyException();
 		}
 	}
 	else{
 			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
 	}
+}
+
+bool PatternIDisUsed(std::string ID){
+	std::vector<PatternCodeRegion*> PatternCodeRegions = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
+	for(PatternCodeRegion* PatCodeReg : PatternCodeRegions){
+		if(!(ID.compare(PatCodeReg->GetID()))){
+			return true;
+		}
+	}
+	return false;
 }
 /*Stack for Halstead */
 std::vector<PatternOccurrence*> OccStackForHalstead;
