@@ -6,7 +6,7 @@ TooManyEndsException::TooManyEndsException(std::string ID){
 }
 const char* TooManyEndsException::what() const throw(){
 
-  std::string s = "You probably added one end of a patten to much.\n " + this->ID+ " ends outside of any Pattern.";
+  std::string s = "\033[31mYou probably added one end of a patten to much.\n " + this->ID+ " ends outside of any Pattern.\033[0m";
   std::cout << s << '\n';
 
   return s.c_str();
