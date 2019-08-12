@@ -95,8 +95,8 @@ public:
 	explicit HPCPatternInstrConsumer(clang::ASTContext *Context) : Visitor(Context)
 	{
 	}
-
 	void HandleTranslationUnit(clang::ASTContext &Context);
+
 
 private:
 	HPCPatternInstrVisitor Visitor;

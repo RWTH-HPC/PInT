@@ -6,7 +6,7 @@ TooManyEndsException::TooManyEndsException(std::string ID){
 }
 const char* TooManyEndsException::what() const throw(){
 
-  std::string s = "You probably added one end of a patten to much.\n " + this->ID+ " ends outside of any Pattern.";
+  std::string s = "\033[31mYou probably added one end of a patten to much.\n " + this->ID+ " ends outside of any Pattern.\033[0m";
   std::cout << s << '\n';
 
   return s.c_str();
@@ -48,4 +48,27 @@ const char* WrongSyntaxException::what() const throw(){
   std::cout << str << std::endl;
   //std::cout << this->ID << std::endl;
   return str.c_str();
+};
+
+missingPatternEnd::missingPatternEnd(std::stack<PatternCodeRegion*> PatContext){
+  this->PatternStack = PatContext;
+};
+
+const char* missingPatternEnd::what() const throw(){
+  std::cout << "\033[31mYou forgott to end the following Pattern Code Regions: "<< "\n";
+  this->printPatternWithNoEnd();
+  std::cout << "\033[0m" << '\n';
+  return "";
+};
+
+void missingPatternEnd::printPatternWithNoEnd() const{
+  std::stack<PatternCodeRegion*> tempStack = this->PatternStack;
+  if(!((this->PatternStack).empty())){
+    PatternCodeRegion* PatCodeReg;
+    for(int i=0; i< this->PatternStack.size(); i++){
+      PatCodeReg = this->PatternStack.top();
+      PatCodeReg->Print();
+      std::cout <<'\n';
+    }
+  }
 };

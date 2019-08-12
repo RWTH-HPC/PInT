@@ -88,6 +88,24 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  * @brief Tool entry point. The tool's entry point which calls the FrontEndAction on the code.
  * Register statistics and similarity measures here.
  */
+
+ void lookIfEveryPatternEnds(){
+		try{
+ 			if(!PatternContext.empty()){
+ 				throw missingPatternEnd(PatternContext);
+ 				}
+
+ 			if(!OnlyPatternContext.empty()){
+ 				throw missingPatternEnd(OnlyPatternContext);
+ 			}
+ 		}
+ 		catch(missingPatternEnd& me){
+ 			me.what();
+			throw TerminateEarlyException();
+ 		}
+ }
+
+
 int main (int argc, const char** argv)
 {
 	MaxTreeDisplayDepth.setInitialValue(10);
@@ -144,11 +162,15 @@ int main (int argc, const char** argv)
 		int retcode = 0;
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+			lookIfEveryPatternEnds();
 		}
 		catch(TerminateEarlyException& terminate){
 			std::cout << terminate.what() << '\n';
 			return 0;
 		}
+
+
+
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
