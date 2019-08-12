@@ -44,7 +44,7 @@ WrongSyntaxException::WrongSyntaxException(PatternOccurrence* PatOc){
 };
 
 const char* WrongSyntaxException::what() const throw(){
-  std::string str ="Pattern Occurrences with same identifier have different underlying pattern:" + this->ID;
+  std::string str ="\033[31mPattern Occurrences with same identifier have different underlying pattern:" + this->ID+"\033[0m";
   std::cout << str << std::endl;
   //std::cout << this->ID << std::endl;
   return str.c_str();
