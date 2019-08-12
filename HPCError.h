@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <string>
+#include <stack>
 
 #ifndef HPCPARALLELPATTERN_H
   #include "HPCParallelPattern.h"
@@ -8,7 +9,7 @@
 
 class PInTRuntimeException: public std::exception{
 public:
-  virtual const char* what() const throw();
+  virtual const char* what() const throw()=0;
 };
 
 class TooManyEndsException: public PInTRuntimeException{
@@ -60,4 +61,15 @@ public:
   const char* what() const throw();
 private:
   std::string ID;
+};
+
+class missingPatternEnd: public PInTRuntimeException{
+public:
+  missingPatternEnd(std::stack<PatternCodeRegion*> PatContext);
+  missingPatternEnd(){};
+  const char* what() const throw();
+  void printPatternWithNoEnd() const;
+private:
+  std::stack<PatternCodeRegion*> PatternStack;
+
 };

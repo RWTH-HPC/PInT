@@ -125,13 +125,8 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceManager& SourceMan = Context->getSourceManager();
 				clang::SourceLocation LocEnd = CallExpr->getEndLoc();
 				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
-				try{
-					PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
-				}
-				catch(std::exception& e){
-					std::cout << "You probably have an extraeinuous end of the pattern : " <<"hier Name einfuegen"<< '\n';
-					return false;
-				}
+
+				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
 			}
@@ -211,13 +206,8 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
 	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
+
 }
-
-
-
-
-
-
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
 	std::vector<HPCParallelPattern*> isInPatterns;
