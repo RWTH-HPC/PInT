@@ -29,8 +29,11 @@ void Test::TestOperatorTypeQualifiers(){
   const volatile int q = 0 , r = 0, p = 0;
 // +1 "volatile", +1 "="
   volatile int a = 4;
+
+  uselessFunc();
 }
+
 //+1 "::",  +1 "()"
-int OtherClass::uselessFunc(){
+int uselessFunc(){
   return 0;
 }

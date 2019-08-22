@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <queue>
 #include "clang/AST/Decl.h"
 #include "llvm/Support/Casting.h"
 
@@ -14,7 +15,7 @@
 class HPCParallelPattern;
 class PatternOccurrence;
 class PatternCodeRegion;
-
+class CallTreeNode;
 
 
 /**
@@ -93,7 +94,7 @@ public:
 	bool HasNoPatternChildren();
 
 	void registerPatChildrenToPatParents();
-	
+
 	void PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec);
 
 	std::vector<PatternGraphNode*> GetChildren()
@@ -211,3 +212,67 @@ private:
 	PatternGraph(const PatternGraph&);
 	PatternGraph& operator = (const PatternGraph&);
 };
+
+/**
+	* Those classes are necessary to proove that every Pattern ends.
+  **/
+
+
+enum CallTreeNodeType{
+	Function, Pattern_Begin, Pattern_End
+};
+
+class Identification
+{
+public:
+	Identification(CallTreeNodeType type, std::string identification);
+	Identification(CallTreeNodeType type, unsigned identification);
+	bool compare(Identification* ident);
+private:
+	std::string IdentificationString = "";
+	unsigned IdentificationUsigned = 0;
+};
+
+class CallTree
+{
+public:
+	bool everyPatternHasEnd();
+	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
+	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
+	void registerPatternEnd(PatternCodeRegion* PatCodeReg);
+	void registerDeclaration(CallTreeNodeType LastVisited, FunctionNode* FuncNode);
+	void setRootNode(CallTreeNodeType NodeType, std::string identification);
+	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
+private:
+	std::vector<CallTreeNode*> PatternNodesOfCallTree;
+	std::vector<CallTreeNode*> everyCallTreeNode;
+};
+
+class CallTreeNode
+{
+public:
+	CallTreeNode(CallTreeNodeType type, std::string indentification);
+	CallTreeNode(CallTreeNodeType type ,unsigned indentification);
+	bool hasEnd();
+	void setID();
+	Identification GetID();
+	std::queue<CallTreeNode*> GetCallees();
+	CallTreeNode* GetCaller();
+	void insertCallee(CallTreeNode* Node);
+	void SetCaller(CallTreeNode* Node);
+		//returns 1 if the node has the same underlying function/pattern otherwise 0
+	bool compare(CallTreeNode* otherNode);
+private:
+	/*The identification does not identify the CallTreeNode but it identifies the
+	  belonging Pattern or Function.
+		There is no need to declare this class this is only to save memory.*/
+
+	Identification ident;
+	CallTreeNode* Caller;
+	/*the order denotes which call was first*/
+	std::queue<CallTreeNode*> Callees;
+	const CallTreeNodeType NodeType;
+};
+
+//
+extern CallTree ClTre;

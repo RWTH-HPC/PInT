@@ -25,7 +25,7 @@ const char* PatternSpreadOverSatementsException::what() const throw(){
 };
 
 const char* TerminateEarlyException:: what() const throw(){
-  return "An error occured. We could not resolve so we termate early. The statistics are not usable.";
+  return "An error occured. We could not resolve.We termate early. The statistics are not usable.";
 };
 
 WrongNestingException::WrongNestingException(std::string ID, std::string TopID){
@@ -55,7 +55,7 @@ missingPatternEnd::missingPatternEnd(std::stack<PatternCodeRegion*> PatContext){
 };
 
 const char* missingPatternEnd::what() const throw(){
-  std::cout << "\033[31mYou forgott to end the following Pattern Code Regions: "<< "\n";
+  std::cout << "\n\033[31mYou forgott to end the following PatternCodeRegions: "<< "\n\n";
   this->printPatternWithNoEnd();
   std::cout << "\033[0m" << '\n';
   return "";
@@ -63,12 +63,13 @@ const char* missingPatternEnd::what() const throw(){
 
 void missingPatternEnd::printPatternWithNoEnd() const{
   std::stack<PatternCodeRegion*> tempStack = this->PatternStack;
-  if(!((this->PatternStack).empty())){
+  if(!(tempStack.empty())){
     PatternCodeRegion* PatCodeReg;
-    for(int i=0; i< this->PatternStack.size(); i++){
-      PatCodeReg = this->PatternStack.top();
+    for(int i=0; i< tempStack.size(); i++){
+      PatCodeReg = tempStack.top();
       PatCodeReg->Print();
       std::cout <<'\n';
+      tempStack.pop();
     }
   }
 };

@@ -60,6 +60,9 @@ private:
 
 	clang::FunctionDecl* CurrentFn;
 	FunctionNode* CurrentFnEntry;
+
+	// denotes which type of nodes we analyzed lastVisit
+	CallTreeNodeType LastNodeType;
 };
 
 

@@ -42,12 +42,15 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
 
+		ClTre.registerDeclaration(Function, CurrentFnEntry);
+
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 	#endif
 		PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
 		PatternEndHandler.SetCurrentFnEntry(CurrentFnEntry);
 	}
+	LastNodeType = Function;
 	return true;
 }
 
@@ -66,6 +69,9 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 {
 	clang::SourceManager& SourceMan = Context->getSourceManager();
+
+	/*If Clause is used to make shure that only the code in compile_commands.json is traversed
+	  and no used libraries*/
 	if(SourceMan.isInMainFile(CallExpr->getBeginLoc()))
 	{
 		if (!CallExpr->getBuiltinCallee() && CallExpr->getDirectCallee() && !CallExpr->getDirectCallee()->isInStdNamespace())
@@ -90,10 +96,16 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				  this call is pretty stong. It creates the patternCodeRegion and if there is no mathing PatternOccurrence it
 					is creating one. Also are the Child parent relations set with this call*/
 				//PatternBeginFinder is a  clang::ast_matchers::MatchFinder which uses a HPCPatternBeginInstrHandler to set everything up and the Pattern is also registered in the patternStack.
+				PatternCodeRegion* PatBeforethisPat = PatternBeginHandler.GetLastPattern();
+
 				PatternBeginFinder.match(*Args[0], *Context);
 
-
 				PatternCodeRegion* PatternCodeReg = PatternBeginHandler.GetLastPattern();
+
+				/* Store this PatternCodeRegion Begin in the CallTree (ClTre)*/
+
+				ClTre.registerNode(Pattern_Begin, PatternCodeReg, LastNodeType, PatBeforethisPat, CurrentFnEntry);
+
 
 				/* Get the location of the fn call which denotes the beginning of this pattern */
 
@@ -104,6 +116,8 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				PatternCodeReg->SetStartSourceLoc(LocStart);
 
 				PatternCodeReg->isInMain = SourceMan.isInMainFile(LocStart);
+
+				LastNodeType = Pattern_Begin;
 			}
 			else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 			{
@@ -129,6 +143,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
+				ClTre.registerPatternEnd(PatternCodeReg);
 			}
 			// If no: search the called function for patterns
 			else
@@ -147,6 +162,9 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				std::cout << Func->GetFnName() << " (" << Func->GetHash() << ")" << std::endl;
 	#endif
 
+				/* Store this function call in the CallTree (ClTre)*/
+				ClTre.registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+
 				PatternCodeRegion* Top;
 				/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
 				if ((Top = GetTopPatternStack()) != NULL)
@@ -156,7 +174,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 					Func->AddPatternParent(Top);
 					#ifdef DEBUG_J
-					std::cout << Func->GetFnName()<< "hat als PatternParent: " << Top->GetID()<< '\n';
+					std::cout << Func->GetFnName()<< " hat als PatternParent: " << Top->GetID()<< '\n';
 					#endif
 				}
 				else
@@ -180,6 +198,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -327,6 +346,7 @@ bool HalsteadVisitor::VisitStringLiteral(clang::StringLiteral *StrgLit){
 	}
 	return true;
 }
+
 bool HalsteadVisitor::VisitCharacterLiteral(clang::CharacterLiteral *CharLit){
 	std::vector<HPCParallelPattern*> isInPatterns;
 	IsStmtInAPatt(CharLit, &isInPatterns);
@@ -341,6 +361,7 @@ bool HalsteadVisitor::VisitCharacterLiteral(clang::CharacterLiteral *CharLit){
 	}
 	return true;
 }
+
 /*bisher werden nur die TypeQualifiers gezählt. will man noch einmal die Decl selbst mit zählen muss man plus 1 rechnen*/
 bool HalsteadVisitor::VisitVarDecl(clang::VarDecl *VrDcl){
 	std::vector<HPCParallelPattern*> isInPatterns;
@@ -387,7 +408,8 @@ bool HalsteadVisitor::VisitFunctionDecl(clang::FunctionDecl *FctDecl){
 	return true;
 }
 
-	void HalsteadVisitor::IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns){
+
+void HalsteadVisitor::IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPattern*> *isInPatterns){
 
 	std::vector<PatternOccurrence*> WorkOccStackForHalstead(OccStackForHalstead.begin(), OccStackForHalstead.end()) ;
 	// WorkOccStackForHalstead is correctly initialized

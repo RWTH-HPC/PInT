@@ -13,13 +13,14 @@ int main(int argc, char* argv[])
 	bool wahr,falsch;
 
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
+	Test::TestOperatorTypeQualifiers();
 	PatternInstrumentation::Pattern_End("TQ1");
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
 	//+1 "const",   +1 "=",   +1 ";"
 	  const int i = 0;
 	//+1 "::",  +1 "()"
-	Test::TestOperatorTypeQualifiers();
+
 
 
 	return 0;
