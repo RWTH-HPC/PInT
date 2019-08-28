@@ -18,6 +18,7 @@
 #include "HPCError.h"
 #endif
 
+int  MAX_DEPTH = 6;
 
 /**
  * @mainpage Clang Pattern Instrumentation Tool

@@ -18,7 +18,7 @@
 #endif
 
 //#define PRINT_DEBUG
-
+int MAX_DEPTH_ = 7;
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.
  * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations.
@@ -42,15 +42,16 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
 
-		ClTre.registerDeclaration(Function, CurrentFnEntry);
+		ClTre.registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 	#endif
+
 		PatternBeginHandler.SetCurrentFnEntry(CurrentFnEntry);
 		PatternEndHandler.SetCurrentFnEntry(CurrentFnEntry);
 	}
-	LastNodeType = Function;
+	LastNodeType = Function_Decl;
 	return true;
 }
 
@@ -143,7 +144,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
-				ClTre.registerPatternEnd(PatternCodeReg);
+				ClTre.registerNode(Pattern_End, PatternCodeReg, LastNodeType, PatternCodeReg, CurrentFnEntry);
 			}
 			// If no: search the called function for patterns
 			else
@@ -225,7 +226,8 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
 	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-
+	std::cout << "Hallo ich bin kurz davor die Deklarationen einzusetzen" << '\n';
+	ClTre.appendAllDeclToCallTree(ClTre.getRoot(), MAX_DEPTH_);
 }
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
@@ -270,8 +272,6 @@ bool HalsteadVisitor::VisitCallExpr(clang::CallExpr *CallExpr){
 			clang::Stmt* CalleeStmt = CalleeDecl->getBody();
 			CalleeStmt->dump();*/
 	}
-
-
 
 
 	if(isInPatterns.empty()){

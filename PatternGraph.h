@@ -219,7 +219,7 @@ private:
 
 
 enum CallTreeNodeType{
-	Function, Pattern_Begin, Pattern_End
+	Function, Pattern_Begin, Pattern_End, Function_Decl, Root
 };
 
 class Identification
@@ -228,6 +228,8 @@ public:
 	Identification(CallTreeNodeType type, std::string identification);
 	Identification(CallTreeNodeType type, unsigned identification);
 	bool compare(Identification* ident);
+	bool compare(unsigned Hash);
+	bool compare(std::string Id);
 private:
 	std::string IdentificationString = "";
 	unsigned IdentificationUsigned = 0;
@@ -239,13 +241,19 @@ public:
 	bool everyPatternHasEnd();
 	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void registerPatternEnd(PatternCodeRegion* PatCodeReg);
-	void registerDeclaration(CallTreeNodeType LastVisited, FunctionNode* FuncNode);
 	void setRootNode(CallTreeNodeType NodeType, std::string identification);
+	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
+	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);
+	void insertNodeIntoPatternVector(CallTreeNode* Node);
+	void insertNodeIntoDeclVector(CallTreeNode* Node);
+	void appendAllDeclToCallTree(CallTreeNode* Root, int maxdepth);
+	CallTreeNode* getRoot(){return RootNode;};
 private:
 	std::vector<CallTreeNode*> PatternNodesOfCallTree;
-	std::vector<CallTreeNode*> everyCallTreeNode;
+	//everyCallTreeNodeFromRoot inherits the root, with its calls.
+	CallTreeNode* RootNode;
+	std::vector<CallTreeNode*> DeclarationVector;
 };
 
 class CallTreeNode
@@ -256,21 +264,22 @@ public:
 	bool hasEnd();
 	void setID();
 	Identification GetID();
-	std::queue<CallTreeNode*> GetCallees();
+	std::vector<CallTreeNode*> GetCallees();
 	CallTreeNode* GetCaller();
 	void insertCallee(CallTreeNode* Node);
 	void SetCaller(CallTreeNode* Node);
 		//returns 1 if the node has the same underlying function/pattern otherwise 0
 	bool compare(CallTreeNode* otherNode);
+	bool compare(unsigned Hash);
+	bool compare(std::string Id);
 private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
 		There is no need to declare this class this is only to save memory.*/
-
 	Identification ident;
 	CallTreeNode* Caller;
-	/*the order denotes which call was first*/
-	std::queue<CallTreeNode*> Callees;
+
+	std::vector<CallTreeNode*> Callees;
 	const CallTreeNodeType NodeType;
 };
 
