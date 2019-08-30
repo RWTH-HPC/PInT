@@ -106,6 +106,7 @@ private:
 class PatternCodeRegion : public PatternGraphNode
 {
 public:
+	~PatternCodeRegion();
 	PatternCodeRegion(PatternOccurrence* PatternOcc);
 
 	PatternOccurrence* GetPatternOccurrence() { return this->PatternOcc; }

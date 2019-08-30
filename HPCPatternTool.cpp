@@ -156,13 +156,13 @@ int main (int argc, const char** argv)
 
 		clang::tooling::ArgumentsAdjuster ArgsAdjuster = clang::tooling::getInsertArgumentAdjuster(Arguments, clang::tooling::ArgumentInsertPosition::END);
 		HPCPatternTool.appendArgumentsAdjuster(ArgsAdjuster);
-
 		setActualHalstead(actHalstead);
 
 		/* Run the tool with options and source files provided */
 		int retcode = 0;
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+      ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
 			lookIfEveryPatternEnds();
 		}
 		catch(TerminateEarlyException& terminate){

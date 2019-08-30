@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	bool wahr,falsch;
 
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
-	Test::TestOperatorTypeQualifiers();
+	//Test::TestOperatorTypeQualifiers();
 	PatternInstrumentation::Pattern_End("TQ1");
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/

@@ -3,10 +3,5 @@
   "directory": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/build",
   "command": "/rwthfs/rz/SW/UTIL/clang/7.0.0/bin/clang++      -o CMakeFiles/MyExample.dir/main.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/main.cpp",
   "file": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/main.cpp"
-},
-{
-  "directory": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/build",
-  "command": "/rwthfs/rz/SW/UTIL/clang/7.0.0/bin/clang++      -o CMakeFiles/MyExample.dir/Tests.cpp.o -c /home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/Tests.cpp",
-  "file": "/home/eh671079/patternInstrumentation/TestProgramme/MeinTestProgramm/Tests.cpp"
 }
 ]

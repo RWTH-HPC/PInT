@@ -168,6 +168,8 @@ void PatternOccurrence::Print()
 /*
  * Pattern Code Region Class Functions
  */
+PatternCodeRegion::~PatternCodeRegion(){std::cout << "Deleted CodeRegion" << '\n';}
+
 PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;

@@ -225,6 +225,7 @@ enum CallTreeNodeType{
 class Identification
 {
 public:
+	Identification();
 	Identification(CallTreeNodeType type, std::string identification);
 	Identification(CallTreeNodeType type, unsigned identification);
 	bool compare(Identification* ident);
@@ -238,10 +239,13 @@ private:
 class CallTree
 {
 public:
+	~CallTree();
+	CallTree();
 	bool everyPatternHasEnd();
 	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void setRootNode(CallTreeNodeType NodeType, std::string identification);
+	void setRootNode(std::string identification);
+
 	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);
@@ -259,8 +263,9 @@ private:
 class CallTreeNode
 {
 public:
+	~CallTreeNode();
 	CallTreeNode(CallTreeNodeType type, std::string indentification);
-	CallTreeNode(CallTreeNodeType type ,unsigned indentification);
+	CallTreeNode(CallTreeNodeType type, unsigned indentification);
 	bool hasEnd();
 	void setID();
 	Identification GetID();
@@ -284,4 +289,4 @@ private:
 };
 
 //
-extern CallTree ClTre;
+extern CallTree* ClTre;

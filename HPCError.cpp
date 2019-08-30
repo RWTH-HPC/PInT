@@ -65,7 +65,7 @@ void missingPatternEnd::printPatternWithNoEnd() const{
   std::stack<PatternCodeRegion*> tempStack = this->PatternStack;
   if(!(tempStack.empty())){
     PatternCodeRegion* PatCodeReg;
-    for(int i=0; i< tempStack.size(); i++){
+    for(unsigned long i=0; i< tempStack.size(); i++){
       PatCodeReg = tempStack.top();
       PatCodeReg->Print();
       std::cout <<'\n';

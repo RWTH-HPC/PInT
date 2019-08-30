@@ -16,9 +16,7 @@
 #ifndef HPCERROR_H
 #include "HPCError.h"
 #endif
-
 //#define PRINT_DEBUG
-int MAX_DEPTH_ = 7;
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.
  * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations.
@@ -42,7 +40,7 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
 
-		ClTre.registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+		ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
@@ -105,7 +103,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				/* Store this PatternCodeRegion Begin in the CallTree (ClTre)*/
 
-				ClTre.registerNode(Pattern_Begin, PatternCodeReg, LastNodeType, PatBeforethisPat, CurrentFnEntry);
+				ClTre->registerNode(Pattern_Begin, PatternCodeReg, LastNodeType, PatBeforethisPat, CurrentFnEntry);
 
 
 				/* Get the location of the fn call which denotes the beginning of this pattern */
@@ -144,7 +142,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
-				ClTre.registerNode(Pattern_End, PatternCodeReg, LastNodeType, PatternCodeReg, CurrentFnEntry);
+				ClTre->registerNode(Pattern_End, PatternCodeReg, LastNodeType, PatternCodeReg, CurrentFnEntry);
 			}
 			// If no: search the called function for patterns
 			else
@@ -164,7 +162,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 	#endif
 
 				/* Store this function call in the CallTree (ClTre)*/
-				ClTre.registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+				ClTre->registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
 				PatternCodeRegion* Top;
 				/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
@@ -226,8 +224,6 @@ void HPCPatternInstrConsumer::HandleTranslationUnit(clang::ASTContext &Context)
 	/* Traverse the AST for comments and parse them */
 	DEBUG_MESSAGE("Using Visitor to traverse from top translation declaration unit");
 	Visitor.TraverseDecl(Context.getTranslationUnitDecl());
-	std::cout << "Hallo ich bin kurz davor die Deklarationen einzusetzen" << '\n';
-	ClTre.appendAllDeclToCallTree(ClTre.getRoot(), MAX_DEPTH_);
 }
 
 bool HalsteadVisitor::VisitBinaryOperator(clang::BinaryOperator *BinarOp){
@@ -425,10 +421,6 @@ void HalsteadVisitor::IsStmtInAPatt(clang::Stmt *Stm, std::vector<HPCParallelPat
 
 			PatternCodeRegion* CodeReg = CodeRegions[i];
 			bool ExprAfterBegStmt = SourceMan.isPointWithin (Stm->getEndLoc(),CodeReg->GetStartLoc(), CodeReg->GetEndLoc());
-			//std::cout << "wer von ExprAfterBegStmt: " <<ExprAfterBegStmt<< '\n';
-			//bool ExprBeforEndStmt = SourceMan.isBeforeInTranslationUnit(DeclStmt->getEndLoc(), CodeReg->GetEndLoc());
-
-			//if(ExprAfterBegStmt && ExprBeforEndStmt){
 			if(ExprAfterBegStmt){
 
 				isInPatterns->push_back(PatOcc->GetPattern());
