@@ -9,7 +9,7 @@
  *
  * @param maxdepth The maximum recursion (i.e., output depth)
  **/
-void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
+void CallTreeVisualisation::PrintRelationTree(int maxdepth, bool onlyPattern)
 {
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
 	if(onlyPattern){
@@ -25,6 +25,10 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 			PrintPattern(CodeRegion, 0, maxdepth);
 		}
 	}
+}
+
+void CallTreeVisualisation::PrintCallTree(int maxdepth, CallTree* CalTre){
+	
 }
 
 void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth)

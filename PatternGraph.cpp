@@ -483,6 +483,7 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 	}
 }
 
+
 CallTreeNode::~CallTreeNode(){
 	std::cout << "loesche gerade Knoten" << '\n';
 

@@ -245,7 +245,6 @@ public:
 	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void setRootNode(std::string identification);
-
 	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);

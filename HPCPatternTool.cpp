@@ -165,7 +165,7 @@ int main (int argc, const char** argv)
       ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
 			lookIfEveryPatternEnds();
 		}
-		catch(TerminateEarlyException& terminate){
+		catch(std::exception& terminate){
 			std::cout << terminate.what() << '\n';
 			return 0;
 		}
@@ -175,7 +175,7 @@ int main (int argc, const char** argv)
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
-		CallTreeVisualisation::PrintCallTree(mxdspldpth - 1, OnlyPatterns.getValue());
+		CallTreeVisualisation::PrintRelationTree(mxdspldpth - 1, OnlyPatterns.getValue());
 	  }
 
 		for (HPCPatternStatistic* Stat : Statistics)
