@@ -1,5 +1,5 @@
 #include "Tests.h"
-
+#include "PatternInstrumentation.h"
 //+1 "::",  +1 "()"
 void Test::TestOperatorTypeQualifiers(){
 /*
@@ -31,10 +31,4 @@ void Test::TestOperatorTypeQualifiers(){
 // +1 "volatile", +1 "="
   volatile int a = 4;
 
-  uselessFunc();
-}
-
-//+1 "::",  +1 "()"
-int uselessFunc(){
-  return 0;
 }
