@@ -7,7 +7,8 @@ void Test::TestOperatorTypeQualifiers(){
 */
 // +1 "const", +1 "="
   const int i = 0;
-
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ2");
+	PatternInstrumentation::Pattern_End("TQ2");
 /*
   Here we have a special case: we defines the number of operants when declares in one
   statement differently.
