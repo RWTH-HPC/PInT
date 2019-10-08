@@ -2,7 +2,7 @@
 
 #include <iostream>
 //#define PRINT_ONLYPATTERNDENUG
-
+//#define DEBUG
 
 /**
  * @brief Prints the call tree recursively, beginning with the main function.
@@ -28,7 +28,13 @@ void CallTreeVisualisation::PrintRelationTree(int maxdepth, bool onlyPattern)
 }
 
 void CallTreeVisualisation::PrintCallTree(int maxdepth, CallTree* CalTre){
-	
+	std::cout << "\n CALL TREE VISUALISATION \n";
+	CallTreeNode* currentNode = CalTre->getRoot();
+#ifdef DEBUG
+	const Identification* currentIdent = currentNode->GetID();
+  std::cout << *currentIdent << '\n';
+#endif
+	PrintCallTreeRecursively (currentNode, 0, maxdepth);
 }
 
 void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth)
@@ -143,6 +149,17 @@ void CallTreeVisualisation::PrintRecursiveOnlyPattern(PatternCodeRegion* CodeReg
 	}
 }
 
+void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int depth, int maxdepth){
+	if(depth > maxdepth){
+		return;
+	}
+	PrintIndent(depth);
+	std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m ";
+	for(CallTreeNode* Callee : *(ClTrNode->GetCallees())){
+		PrintCallTreeRecursively(Callee, depth + 1, maxdepth);
+	}
+}
+
 /**
  * @brief Prints an indent according to the passed depth.
  *
@@ -150,15 +167,17 @@ void CallTreeVisualisation::PrintRecursiveOnlyPattern(PatternCodeRegion* CodeReg
  **/
 void CallTreeVisualisation::PrintIndent(int depth)
 {
-	int i = 0;
+	if(depth!=0){
+		int i = 0;
 
-	for (; i < depth - 1; i++)
-	{
-		std::cout << "    ";
-	}
+		for (; i < depth - 1; i++)
+		{
+			std::cout << "    ";
+		}
 
-	for (; i < depth; i++)
-	{
-		std::cout << "--> ";
+		for (; i < depth; i++)
+		{
+			std::cout << "--> ";
+		}
 	}
 }

@@ -176,6 +176,7 @@ int main (int argc, const char** argv)
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
 		CallTreeVisualisation::PrintRelationTree(mxdspldpth - 1, OnlyPatterns.getValue());
+    CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre);
 	  }
 
 		for (HPCPatternStatistic* Stat : Statistics)

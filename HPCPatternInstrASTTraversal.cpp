@@ -39,8 +39,9 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			PatternGraph::GetInstance()->RegisterFunction(Decl);
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
-
-		ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+		if(!Decl->isMain()){
+			ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+		}
 
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;

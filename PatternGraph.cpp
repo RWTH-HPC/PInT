@@ -202,7 +202,7 @@ bool PatternGraph::RegisterFunction(clang::FunctionDecl* Decl)
 	if (Decl->isMain())
 	{
 		this->RootNode = Func;
-		ClTre->setRootNode(FnName);
+		ClTre->setRootNode(HashVal);
 	}
 
 	return Func;
@@ -310,39 +310,63 @@ std::vector<PatternCodeRegion*> PatternGraph::GetAllPatternCodeRegions()
 
 CallTree* ClTre = new CallTree();
 
+Identification::~Identification()
+{
+	std::cout << "Identification of:" <<IdentificationString <<
+"or" << IdentificationUnsigned << "is deleted"<< '\n';
+}
+
 Identification::Identification(){
 }
 
 Identification::Identification(CallTreeNodeType type, std::string identification)
 {
+
 	if(type == Pattern_Begin || type == Pattern_End){
 		this->IdentificationString = identification;
+		std::cout << "Identification of:" <<IdentificationString <<
+	"or" << IdentificationUnsigned << "is created"<< '\n';
 	}
 }
 
 Identification::Identification(CallTreeNodeType type, unsigned identification)
 {
 	if(type == Function || type == Function_Decl || type == Root){
-		this->IdentificationUsigned = identification;
+		this->IdentificationUnsigned = identification;
+		std::cout << "Identification of:" <<IdentificationString <<
+	"or" << IdentificationUnsigned << "is created"<< '\n';
 	}
 }
 
 bool Identification::compare(Identification* ident)
 {
 	if(ident->IdentificationString.empty()){
-		return IdentificationUsigned == ident->IdentificationUsigned;
+		return IdentificationUnsigned == ident->IdentificationUnsigned;
 	}
 	return !IdentificationString.compare(ident->IdentificationString);
 }
 
 bool Identification::compare(unsigned Hash)
 {
-	return IdentificationUsigned == Hash;
+	return IdentificationUnsigned == Hash;
 }
 
 bool Identification::compare(std::string Id)
 {
 	return !IdentificationString.compare(Id);
+}
+
+std::ostream& operator<<(std::ostream &os, Identification const &ident)
+{
+	if((ident.getIdentificationString()).compare(""))
+	{
+		return os << ident.getIdentificationString();
+
+	}
+	if(ident.getIdentificationUnsigned() != 0){
+		return os << ident.getIdentificationUnsigned();
+	}
+	return os << "Something went wrong the Identification is not set";
 }
 
 bool CallTree::everyPatternHasEnd()
@@ -404,7 +428,7 @@ void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, C
 }
 
 
-void CallTree::setRootNode(std::string identification)
+void CallTree::setRootNode(unsigned identification)
 {
 	CallTreeNode* root = new CallTreeNode(Root, identification);
 	RootNode = root;
@@ -470,7 +494,7 @@ void CallTree::insertNodeIntoDeclVector(CallTreeNode* Node)
 
 void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 {
-	for(CallTreeNode* Callee : Node->GetCallees())
+	for(CallTreeNode* Callee : *Node->GetCallees())
 	{
 		for(CallTreeNode* CalleeDecl : DeclarationVector)
 		{
@@ -489,32 +513,31 @@ CallTreeNode::~CallTreeNode(){
 
 }
 
-CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : NodeType(type) , ident(type, identification)
+CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : NodeType(type)
 {
 	if(NodeType == Pattern_Begin)
 	{
 		ClTre->insertNodeIntoPatternVector(this);
 	}
-
-	ident = Identification(type, identification);
+	ident = new Identification(type, identification);
 }
 
-CallTreeNode::CallTreeNode(CallTreeNodeType type ,unsigned identification) : NodeType(type) , ident(type, identification)
+CallTreeNode::CallTreeNode(CallTreeNodeType type ,unsigned identification) : NodeType(type)
 {
 	if(NodeType == Function_Decl)
 	{
 		ClTre->insertNodeIntoDeclVector(this);
 	}
-	ident = Identification(type, identification);
+	ident = new Identification(type, identification);
 }
 
-Identification CallTreeNode::GetID()
+Identification* CallTreeNode::GetID()
 {
 	return this->ident;
 }
 
-std::vector<CallTreeNode*> CallTreeNode::GetCallees(){
-	return Callees;
+std::vector<CallTreeNode*>* CallTreeNode::GetCallees(){
+	return &Callees;
 }
 
 CallTreeNode* CallTreeNode::GetCaller(){
@@ -562,10 +585,10 @@ bool CallTreeNode::compare(CallTreeNode* otherNode)
 
 bool CallTreeNode::compare(unsigned Hash)
 {
-	return ident.compare(Hash);
+	return ident->compare(Hash);
 }
 
 bool CallTreeNode::compare(std::string Id)
 {
-	return ident.compare(Id);
+	return ident->compare(Id);
 }

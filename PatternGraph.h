@@ -225,16 +225,22 @@ enum CallTreeNodeType{
 class Identification
 {
 public:
+	~Identification();
 	Identification();
 	Identification(CallTreeNodeType type, std::string identification);
 	Identification(CallTreeNodeType type, unsigned identification);
 	bool compare(Identification* ident);
 	bool compare(unsigned Hash);
 	bool compare(std::string Id);
+	std::string  getIdentificationString() const {return IdentificationString;};
+	unsigned getIdentificationUnsigned() const {return IdentificationUnsigned;};
+
 private:
 	std::string IdentificationString = "";
-	unsigned IdentificationUsigned = 0;
+	unsigned IdentificationUnsigned = 0;
 };
+
+std::ostream& operator<<(std::ostream &os, Identification const &ident);
 
 class CallTree
 {
@@ -244,7 +250,7 @@ public:
 	bool everyPatternHasEnd();
 	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void setRootNode(std::string identification);
+	void setRootNode(unsigned identification);
 	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);
@@ -254,7 +260,7 @@ public:
 	CallTreeNode* getRoot(){return RootNode;};
 private:
 	std::vector<CallTreeNode*> PatternNodesOfCallTree;
-	//everyCallTreeNodeFromRoot inherits the root, with its calls.
+	// the RootNode is the main function, which is probably named differently
 	CallTreeNode* RootNode;
 	std::vector<CallTreeNode*> DeclarationVector;
 };
@@ -267,8 +273,8 @@ public:
 	CallTreeNode(CallTreeNodeType type, unsigned indentification);
 	bool hasEnd();
 	void setID();
-	Identification GetID();
-	std::vector<CallTreeNode*> GetCallees();
+	Identification* GetID();
+	std::vector<CallTreeNode*>* GetCallees();
 	CallTreeNode* GetCaller();
 	void insertCallee(CallTreeNode* Node);
 	void SetCaller(CallTreeNode* Node);
@@ -280,7 +286,7 @@ private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
 		There is no need to declare this class this is only to save memory.*/
-	Identification ident;
+	Identification* ident;
 	CallTreeNode* Caller;
 
 	std::vector<CallTreeNode*> Callees;

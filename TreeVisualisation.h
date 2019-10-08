@@ -23,8 +23,8 @@ private:
 
 	static void PrintRecursiveOnlyPattern(PatternCodeRegion* CodeRegion,int depth,int maxdepth);
 
+	static void PrintCallTreeRecursively(CallTreeNode* ClTrNode, int depth, int maxdepth);
+
 	static void PrintIndent(int depth);
-
-
 
 };
