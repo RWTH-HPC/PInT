@@ -324,8 +324,6 @@ Identification::Identification(CallTreeNodeType type, std::string identification
 
 	if(type == Pattern_Begin || type == Pattern_End){
 		this->IdentificationString = identification;
-		std::cout << "Identification of:" <<IdentificationString <<
-	"or" << IdentificationUnsigned << "is created"<< '\n';
 	}
 }
 
@@ -333,8 +331,6 @@ Identification::Identification(CallTreeNodeType type, unsigned identification)
 {
 	if(type == Function || type == Function_Decl || type == Root){
 		this->IdentificationUnsigned = identification;
-		std::cout << "Identification of:" <<IdentificationString <<
-	"or" << IdentificationUnsigned << "is created"<< '\n';
 	}
 }
 
@@ -391,30 +387,35 @@ CallTree::~CallTree(){
 void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, PatCodeReg->GetID());
-	if(NodeType == Pattern_Begin)
+	if(NodeType == Pattern_Begin || NodeType == Pattern_End)
 	{
 		if(LastVisited == Function_Decl)
 		{
 			appendCallerToNode(surroundingFunc, Node);
+			std::cout << "Last visited Functionsdeklaration von " <<surroundingFunc->GetHash()<< '\n';
 		}
 		else if(LastVisited == Pattern_Begin)
 		{
-			if(TopOfStack == NULL)
+			if(TopOfStack == NULL || (NodeType == Pattern_End && !(TopOfStack->GetID().compare(PatCodeReg->GetID()))))
 			{
 				appendCallerToNode(surroundingFunc, Node);
 			}
 			else
 			{
 				appendCallerToNode(TopOfStack, Node);
+				std::cout << "TopOfStack not empty" << '\n';
 			}
+			std::cout << "Last visited PatternCodeReg" << '\n';
 		}
 	}
+
 }
 
 void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
-	CallTreeNode* Node = new CallTreeNode(Function, FuncNode->GetHash());
-	if(LastVisited == Function_Decl){
+	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode->GetHash());
+	
+	if(LastVisited == Function_Decl && !Node->compare(surroundingFunc->GetHash())){
 		appendCallerToNode(surroundingFunc, Node);
 	}
 	else if(LastVisited == Pattern_Begin){
@@ -432,6 +433,7 @@ void CallTree::setRootNode(unsigned identification)
 {
 	CallTreeNode* root = new CallTreeNode(Root, identification);
 	RootNode = root;
+	this->insertNodeIntoDeclVector(root);
 }
 
 void CallTree::appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node)
@@ -443,29 +445,33 @@ void CallTree::appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node)
 	else{
 		for(CallTreeNode* VecNode : DeclarationVector){
 			if(VecNode->compare(Caller)){
-				Node->SetCaller(VecNode);
-				VecNode->insertCallee(Node);
+			std::cout << "Hänge gerade "<< *VecNode->GetID()<< "an " << *Caller->GetID() << "an"<< std::endl;
+				VecNode->SetCaller(Caller);
+				Caller->insertCallee(VecNode);
+				break;
 			}
 		}
 	}
+	std::cout << "getting now out of not infinite function" << std::endl;
 }
 
 void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
-{		//in dem Vector everyCallTreeNodeFromRoot richtigen Node raussuchen und dort anhängen
-		//vorher actural surraunding überprüfen
+{		
 	if(RootNode && RootNode->compare(Caller->GetHash())){
 		Node->SetCaller(RootNode);
 		RootNode->insertCallee(Node);
 	}
 	else{
-		for(CallTreeNode* VecNode : DeclarationVector){
-			if(VecNode->compare(Caller->GetHash())){
-				Node->SetCaller(VecNode);
-				VecNode->insertCallee(Node);
+			for(CallTreeNode* DeclOfCaller : this->DeclarationVector){
+				if(DeclOfCaller->compare(Caller->GetHash())){
+					Node->SetCaller(DeclOfCaller);
+					DeclOfCaller->insertCallee(Node);
+					return;
+				}
+				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector" << '\n';
 			}
 		}
 	}
-}
 
 void CallTree::appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node)
 {
@@ -493,20 +499,26 @@ void CallTree::insertNodeIntoDeclVector(CallTreeNode* Node)
 }
 
 void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
-{
-	for(CallTreeNode* Callee : *Node->GetCallees())
-	{
-		for(CallTreeNode* CalleeDecl : DeclarationVector)
-		{
-			if(Callee->compare(CalleeDecl))
-			{
-				appendCallerToNode(Callee, CalleeDecl);
-				appendAllDeclToCallTree(CalleeDecl, maxdepth-1);
+{	std::cout << "appen AllDecl of " << *Node->GetID()<< std::endl;
+	if(maxdepth > 0 ){
+		CallTreeNodeType NodeType = Node->getNodeType();
+		if(NodeType == Root || NodeType == Function_Decl){
+		   for(CallTreeNode* DeclOfCallee : DeclarationVector){
+			for(CallTreeNode* CalleeOfNode : *Node->GetCallees()){
+				if(CalleeOfNode->compare(DeclOfCallee)){ //falls die Kinder von Node die selbe indentität haben wie eine deklaration im Declaration Vector dann...
+					appendCallerToNode(CalleeOfNode, DeclOfCallee);
+					appendAllDeclToCallTree(DeclOfCallee, maxdepth - 1);
+				}
 			}
+		
+		   }
 		}
 	}
 }
 
+std::vector<CallTreeNode*>* CallTree::GetDeclarationVector(){
+	return &DeclarationVector;
+}
 
 CallTreeNode::~CallTreeNode(){
 	std::cout << "loesche gerade Knoten" << '\n';
@@ -520,6 +532,12 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : 
 		ClTre->insertNodeIntoPatternVector(this);
 	}
 	ident = new Identification(type, identification);
+		std::cout << "Node of:" << identification <<
+		"is created"<< '\n';
+		if(type == Pattern_Begin)
+		        std::cout << "NodeType = Pattern_Begin" << std::endl;
+		 else if (type == Pattern_End)
+		    	std::cout << "NodeType = Pattern_End" << std::endl;
 }
 
 CallTreeNode::CallTreeNode(CallTreeNodeType type ,unsigned identification) : NodeType(type)
@@ -529,6 +547,16 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type ,unsigned identification) : Nod
 		ClTre->insertNodeIntoDeclVector(this);
 	}
 	ident = new Identification(type, identification);
+		std::cout << "Node of:"<< identification << "is created"<< '\n';
+		if(type == Function)
+		   std::cout << "Node Type = Function" << std::endl;
+		else if (type == Function_Decl)
+		   std::cout << "Node Type = Function_Decl" << std::endl;
+
+		else if(type == Root)
+		   std::cout << "Node Type = Root" << std::endl;
+		else
+		   std::cout << "Was da los" << std::endl;
 }
 
 Identification* CallTreeNode::GetID()
@@ -545,7 +573,7 @@ CallTreeNode* CallTreeNode::GetCaller(){
 }
 
 void CallTreeNode::insertCallee(CallTreeNode* Node){
-	(this->Callees).push_back(Node);
+	(Callees).push_back(Node);
 }
 
 void CallTreeNode::SetCaller(CallTreeNode* Node)
@@ -580,7 +608,7 @@ bool CallTreeNode::hasEnd()
 
 bool CallTreeNode::compare(CallTreeNode* otherNode)
 {
-	return compare(otherNode);
+	return ident->compare(otherNode->GetID());
 }
 
 bool CallTreeNode::compare(unsigned Hash)
@@ -591,4 +619,13 @@ bool CallTreeNode::compare(unsigned Hash)
 bool CallTreeNode::compare(std::string Id)
 {
 	return ident->compare(Id);
+}
+
+bool CallTreeNode::isCalleeOf(CallTreeNode* Caller){
+	for(CallTreeNode* CalleeOfCaller : *Caller->GetCallees())
+	{
+		if(this->compare(CalleeOfCaller))
+			return true;
+		return false;
+	}
 }

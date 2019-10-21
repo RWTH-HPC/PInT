@@ -257,11 +257,12 @@ public:
 	void insertNodeIntoPatternVector(CallTreeNode* Node);
 	void insertNodeIntoDeclVector(CallTreeNode* Node);
 	void appendAllDeclToCallTree(CallTreeNode* Root, int maxdepth);
+	std::vector<CallTreeNode*>* GetDeclarationVector();
 	CallTreeNode* getRoot(){return RootNode;};
 private:
 	std::vector<CallTreeNode*> PatternNodesOfCallTree;
 	// the RootNode is the main function, which is probably named differently
-	CallTreeNode* RootNode;
+	CallTreeNode* RootNode = NULL;
 	std::vector<CallTreeNode*> DeclarationVector;
 };
 
@@ -282,6 +283,8 @@ public:
 	bool compare(CallTreeNode* otherNode);
 	bool compare(unsigned Hash);
 	bool compare(std::string Id);
+	bool isCalleeOf(CallTreeNode* Caller);
+	CallTreeNodeType getNodeType(){return NodeType;};
 private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.

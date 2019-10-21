@@ -2,7 +2,7 @@
 
 #include <iostream>
 //#define PRINT_ONLYPATTERNDENUG
-//#define DEBUG
+#define DEBUG
 
 /**
  * @brief Prints the call tree recursively, beginning with the main function.
@@ -154,7 +154,15 @@ void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int
 		return;
 	}
 	PrintIndent(depth);
-	std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m ";
+	std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;
+	#ifdef DEBUG
+		std::cout << "Caller:" << *(ClTrNode->GetCaller()->GetID())<< std::endl;
+		std::cout << "Callees:" << std::endl;
+		for(CallTreeNode* Callee : *ClTrNode->GetCallees())
+		{
+			std::cout << *Callee->GetID() << std::endl;
+		}
+	#endif
 	for(CallTreeNode* Callee : *(ClTrNode->GetCallees())){
 		PrintCallTreeRecursively(Callee, depth + 1, maxdepth);
 	}

@@ -18,6 +18,7 @@
 #include "HPCError.h"
 #endif
 
+#define DEBUG
 int  MAX_DEPTH = 6;
 
 /**
@@ -162,7 +163,41 @@ int main (int argc, const char** argv)
 		int retcode = 0;
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
+     
+
+      #ifdef DEBUG
+        std::cout << "Printing out DeclarationVector: " << std::endl;
+        for(CallTreeNode* Node : *ClTre->GetDeclarationVector())
+        {
+          if(Node->getNodeType() == Function){
+              std::cout << *Node->GetID() << "Function" << std::endl;
+          }
+          else if (Node->getNodeType() == Function_Decl){
+            std::cout << *Node->GetID() << "Function_Decl" << std::endl;
+          }
+          else{
+            std::cout << *Node->GetID() << "Root" << std::endl;
+          }
+
+          for(CallTreeNode* Callee : *Node->GetCallees()){
+
+            if(Callee->getNodeType() == Function){
+                std::cout << "--> " << *Callee->GetID() << "Function" << std::endl;
+            }
+            else if (Callee->getNodeType() == Function_Decl){
+              std::cout << "--> "<< *Callee->GetID() << "Function_Decl" << std::endl;
+            }
+            else if (Callee->getNodeType() == Pattern_Begin || Callee->getNodeType() == Pattern_End){
+              std::cout << "--> "<< *Callee->GetID() << "Pattern" << std::endl;
+            }
+            else{
+              std::cout << "--> "<< *Callee->GetID() << "Root" << std::endl;
+            }
+          }
+        }
+      #endif
       ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
+
 			lookIfEveryPatternEnds();
 		}
 		catch(std::exception& terminate){

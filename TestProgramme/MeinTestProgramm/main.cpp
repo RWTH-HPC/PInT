@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
 	//Test::TestOperatorTypeQualifiers();
-	
+
 	PatternInstrumentation::Pattern_End("TQ1");
 	/* int, float, char,double, long, short, signed, unsigned, void
 	*/
@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	  const int i = 0;
 	//+1 "::",  +1 "()"
 
-
+Test::TestOperatorTypeQualifiers();
 
 	return 0;
 }
