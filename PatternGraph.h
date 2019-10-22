@@ -284,13 +284,13 @@ public:
 	bool compare(unsigned Hash);
 	bool compare(std::string Id);
 	bool isCalleeOf(CallTreeNode* Caller);
-	CallTreeNodeType getNodeType(){return NodeType;};
+	CallTreeNodeType GetNodeType(){return NodeType;};
 private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
 		There is no need to declare this class this is only to save memory.*/
 	Identification* ident;
-	CallTreeNode* Caller;
+	CallTreeNode* Caller = NULL;
 
 	std::vector<CallTreeNode*> Callees;
 	const CallTreeNodeType NodeType;

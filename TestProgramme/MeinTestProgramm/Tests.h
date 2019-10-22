@@ -14,6 +14,8 @@ public:
   virtual void VirtualFunction();
   //+1 "()"
   static void TestOperatorTypeQualifiers();
+
+  void OtherFunction();
   // +1 "friend",   +1 "::",   +1 "()"
   friend int OtherClass::uselessFunc();
 };

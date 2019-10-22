@@ -5,7 +5,7 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
-//#define DEBUG_PATTERNREGISTRATIION
+#define DEBUG
 
 /*
  * Function Declaration Database Entry functions
@@ -387,6 +387,7 @@ CallTree::~CallTree(){
 void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, PatCodeReg->GetID());
+	std::cout << "Hallo" << '\n';
 	if(NodeType == Pattern_Begin || NodeType == Pattern_End)
 	{
 		if(LastVisited == Function_Decl)
@@ -396,9 +397,10 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 		}
 		else if(LastVisited == Pattern_Begin)
 		{
-			if(TopOfStack == NULL || (NodeType == Pattern_End && !(TopOfStack->GetID().compare(PatCodeReg->GetID()))))
+			if(TopOfStack == NULL)
 			{
 				appendCallerToNode(surroundingFunc, Node);
+				std::cout << "Last visited PatternCodereg von " <<PatCodeReg->GetID()<< " and Stack not empty!"<< '\n';
 			}
 			else
 			{
@@ -407,6 +409,7 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 			}
 			std::cout << "Last visited PatternCodeReg" << '\n';
 		}
+		std::cout << "Last visited probably not set" << '\n';
 	}
 
 }
@@ -414,7 +417,7 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode->GetHash());
-	
+ // warunung das hier muss später ersetzt werden so wird auch die Rekursion ausgeschlossen
 	if(LastVisited == Function_Decl && !Node->compare(surroundingFunc->GetHash())){
 		appendCallerToNode(surroundingFunc, Node);
 	}
@@ -444,19 +447,37 @@ void CallTree::appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node)
 	}
 	else{
 		for(CallTreeNode* VecNode : DeclarationVector){
-			if(VecNode->compare(Caller)){
-			std::cout << "Hänge gerade "<< *VecNode->GetID()<< "an " << *Caller->GetID() << "an"<< std::endl;
+			// it is not allowed to append a Node to itself, in the Code this is also not possible
+				if(VecNode->compare(Caller) && VecNode != Caller){
+				 #ifdef DEBUG
+					if(VecNode->GetNodeType() == Function){
+								std::cout << "Hänge gerade "<< *VecNode->GetID()<<" typ Function "<< "an " << *Caller->GetID() << "an"<< std::endl;
+					}
+					else if (VecNode->GetNodeType() == Function_Decl){
+							std::cout << "Hänge gerade "<< *VecNode->GetID()<<" typ Function_Decl "<< "an " << *Caller->GetID() << "an"<< std::endl;
+					}
+					else if (VecNode->GetNodeType() == Pattern_End){
+							std::cout << "Hänge gerade "<< *VecNode->GetID()<<" typ Pattern_End "<< "an " << *Caller->GetID() << "an"<< std::endl;
+					}
+					else if(VecNode->GetNodeType() == Root){
+							std::cout << "Hänge gerade "<< *VecNode->GetID()<<" typ Root "<< "an " << *Caller->GetID() << "an"<< std::endl;
+					}
+					else if (VecNode->GetNodeType() == Pattern_Begin)	{
+							std::cout << "Hänge gerade "<< *VecNode->GetID()<<" typ Pattern_Begin "<< "an " << *Caller->GetID() << "an"<< std::endl;
+					}
+				#endif
 				VecNode->SetCaller(Caller);
 				Caller->insertCallee(VecNode);
 				break;
 			}
+
 		}
 	}
 	std::cout << "getting now out of not infinite function" << std::endl;
 }
 
 void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
-{		
+{
 	if(RootNode && RootNode->compare(Caller->GetHash())){
 		Node->SetCaller(RootNode);
 		RootNode->insertCallee(Node);
@@ -468,7 +489,7 @@ void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
 					DeclOfCaller->insertCallee(Node);
 					return;
 				}
-				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector" << '\n';
+				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Function)" << '\n';
 			}
 		}
 	}
@@ -480,11 +501,14 @@ void CallTree::appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node)
 		RootNode->insertCallee(Node);
 	}
 	else{
-		for(CallTreeNode* VecNode : PatternNodesOfCallTree){
-			if(VecNode->compare(Caller->GetID())){
-				Node->SetCaller(VecNode);
+			for(CallTreeNode* DeclOfCaller : this->DeclarationVector){
+				if(DeclOfCaller->compare(Caller->GetID())){
+					Node->SetCaller(DeclOfCaller);
+					DeclOfCaller->insertCallee(Node);
+					return;
+				}
+				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Pattern)" << '\n';
 			}
-		}
 	}
 }
 
@@ -501,20 +525,23 @@ void CallTree::insertNodeIntoDeclVector(CallTreeNode* Node)
 void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 {	std::cout << "appen AllDecl of " << *Node->GetID()<< std::endl;
 	if(maxdepth > 0 ){
-		CallTreeNodeType NodeType = Node->getNodeType();
+		CallTreeNodeType NodeType = Node->GetNodeType();
 		if(NodeType == Root || NodeType == Function_Decl){
-		   for(CallTreeNode* DeclOfCallee : DeclarationVector){
+		 for(CallTreeNode* DeclOfCallee : DeclarationVector){
 			for(CallTreeNode* CalleeOfNode : *Node->GetCallees()){
-				if(CalleeOfNode->compare(DeclOfCallee)){ //falls die Kinder von Node die selbe indentität haben wie eine deklaration im Declaration Vector dann...
+				if(CalleeOfNode->GetNodeType() != Pattern_End && CalleeOfNode->compare(DeclOfCallee)){ //falls die Kinder von Node die selbe indentität haben wie eine deklaration im Declaration Vector dann...
 					appendCallerToNode(CalleeOfNode, DeclOfCallee);
 					appendAllDeclToCallTree(DeclOfCallee, maxdepth - 1);
 				}
-			}
-		
-		   }
-		}
+			 }
+	    }
+		 }
+		 //hier was passieren sollwenn Pattern_Begin kommt
+		 if(NodeType == Pattern_Begin){
+
+		 }
 	}
-}
+ }
 
 std::vector<CallTreeNode*>* CallTree::GetDeclarationVector(){
 	return &DeclarationVector;
@@ -529,7 +556,7 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : 
 {
 	if(NodeType == Pattern_Begin)
 	{
-		ClTre->insertNodeIntoPatternVector(this);
+		ClTre->insertNodeIntoDeclVector(this);
 	}
 	ident = new Identification(type, identification);
 		std::cout << "Node of:" << identification <<

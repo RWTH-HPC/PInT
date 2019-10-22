@@ -9,6 +9,17 @@ void Test::TestOperatorTypeQualifiers(){
   const int i = 0;
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ2");
 	PatternInstrumentation::Pattern_End("TQ2");
+ PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ4");
+	PatternInstrumentation::Pattern_End("TQ4");
+
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ5");
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ6");
+  TestOperatorTypeQualifiers();
+  PatternInstrumentation::Pattern_End("TQ6");
+	PatternInstrumentation::Pattern_End("TQ5");
+
+
+
 /*
   Here we have a special case: we defines the number of operants when declares in one
   statement differently.
@@ -32,3 +43,5 @@ void Test::TestOperatorTypeQualifiers(){
   volatile int a = 4;
 
 }
+
+Test::OtherFunction(){}

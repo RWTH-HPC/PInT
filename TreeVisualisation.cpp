@@ -156,8 +156,9 @@ void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int
 	PrintIndent(depth);
 	std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;
 	#ifdef DEBUG
+	if(ClTrNode->GetCaller())
 		std::cout << "Caller:" << *(ClTrNode->GetCaller()->GetID())<< std::endl;
-		std::cout << "Callees:" << std::endl;
+	  std::cout << "Callees:" << std::endl;
 		for(CallTreeNode* Callee : *ClTrNode->GetCallees())
 		{
 			std::cout << *Callee->GetID() << std::endl;
