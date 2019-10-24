@@ -411,23 +411,24 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 		}
 		std::cout << "Last visited probably not set" << '\n';
 	}
-
 }
 
 void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode->GetHash());
- // warunung das hier muss später ersetzt werden so wird auch die Rekursion ausgeschlossen
-	if(LastVisited == Function_Decl && !Node->compare(surroundingFunc->GetHash())){
-		appendCallerToNode(surroundingFunc, Node);
-	}
-	else if(LastVisited == Pattern_Begin){
-		if(TopOfStack == NULL){
-			appendCallerToNode(surroundingFunc, Node);
-		}
-		else{
-			appendCallerToNode(TopOfStack, Node);
-		}
+ if(NodeType == Function){
+  // warunung das hier muss später ersetzt werden so wird auch die Rekursion ausgeschlossen
+	 if(LastVisited == Function_Decl && !Node->compare(surroundingFunc->GetHash())){
+		 appendCallerToNode(surroundingFunc, Node);
+	 }
+	 else if(LastVisited == Pattern_Begin){
+		 if(TopOfStack == NULL){
+	 			appendCallerToNode(surroundingFunc, Node);
+	 		}
+	 		else{
+	 			appendCallerToNode(TopOfStack, Node);
+	 		}
+	 	}
 	}
 }
 
@@ -489,8 +490,8 @@ void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
 					DeclOfCaller->insertCallee(Node);
 					return;
 				}
-				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Function)" << '\n';
 			}
+			std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Function)" << '\n';
 		}
 	}
 
@@ -507,8 +508,8 @@ void CallTree::appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node)
 					DeclOfCaller->insertCallee(Node);
 					return;
 				}
-				std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Pattern)" << '\n';
 			}
+			std::cout << "Something went wrong could not find DeclOfCaller in DeclVector (Pattern)" << '\n';
 	}
 }
 
@@ -535,10 +536,6 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 				}
 			 }
 	    }
-		 }
-		 //hier was passieren sollwenn Pattern_Begin kommt
-		 if(NodeType == Pattern_Begin){
-
 		 }
 	}
  }

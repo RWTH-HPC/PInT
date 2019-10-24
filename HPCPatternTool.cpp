@@ -19,7 +19,7 @@
 #endif
 
 #define DEBUG
-int  MAX_DEPTH = 6;
+int  MAX_DEPTH = 12;
 
 /**
  * @mainpage Clang Pattern Instrumentation Tool
