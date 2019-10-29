@@ -50,8 +50,8 @@ const char* WrongSyntaxException::what() const throw(){
   return str.c_str();
 };
 
-missingPatternEnd::missingPatternEnd(std::stack<PatternCodeRegion*> PatContext){
-  this->PatternStack = PatContext;
+missingPatternEnd::missingPatternEnd(std::vector<PatternCodeRegion*> PatContext){
+  this->PatternVector = PatContext;
 };
 
 const char* missingPatternEnd::what() const throw(){
@@ -62,14 +62,14 @@ const char* missingPatternEnd::what() const throw(){
 };
 
 void missingPatternEnd::printPatternWithNoEnd() const{
-  std::stack<PatternCodeRegion*> tempStack = this->PatternStack;
+  std::vector<PatternCodeRegion*> tempStack = this->PatternVector;
   if(!(tempStack.empty())){
     PatternCodeRegion* PatCodeReg;
     for(unsigned long i=0; i< tempStack.size(); i++){
-      PatCodeReg = tempStack.top();
+      PatCodeReg = tempStack.back();
       PatCodeReg->Print();
       std::cout <<'\n';
-      tempStack.pop();
+      tempStack.pop_back();
     }
   }
 };

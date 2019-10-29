@@ -169,36 +169,9 @@ int main (int argc, const char** argv)
         std::cout << "\nPrinting out DeclarationVector: " << std::endl;
         for(CallTreeNode* Node : *ClTre->GetDeclarationVector())
         {
-          if(Node->GetNodeType() == Function){
-              std::cout << *Node->GetID() << "Function" << std::endl;
-          }
-          else if (Node->GetNodeType() == Function_Decl){
-            std::cout << *Node->GetID() << "Function_Decl" << std::endl;
-          }
-          else if  (Node->GetNodeType() == Pattern_Begin){
-            std::cout << *Node->GetID() << "Pattern_Begin" << std::endl;
-          }
-          else if (Node->GetNodeType() == Root){
-            std::cout << *Node->GetID() << "Root" << std::endl;
-          }
-
+          std::cout << *Node->GetID() << " " << Node->GetNodeType()<< std::endl;
           for(CallTreeNode* Callee : *Node->GetCallees()){
-
-            if(Callee->GetNodeType() == Function){
-                std::cout << "--> " << *Callee->GetID() << "Function" << std::endl;
-            }
-            else if (Callee->GetNodeType() == Function_Decl){
-              std::cout << "--> "<< *Callee->GetID() << "Function_Decl" << std::endl;
-            }
-            else if (Callee->GetNodeType() == Pattern_End){
-              std::cout << "--> "<< *Callee->GetID() << "Pattern_end" << std::endl;
-            }
-            else if(Callee->GetNodeType() == Root){
-              std::cout << "--> "<< *Callee->GetID() << "Root" << std::endl;
-            }
-            else if (Callee->GetNodeType() == Pattern_Begin)	{
-              std::cout << "-->" << *Callee->GetID() << "Pattern_Begin" << std::endl;
-            }
+            std::cout << "--> " << *Callee->GetID() << " " << Callee->GetNodeType()<< std::endl;
           }
         }
       #endif
@@ -216,7 +189,7 @@ int main (int argc, const char** argv)
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
-		CallTreeVisualisation::PrintRelationTree(mxdspldpth - 1, OnlyPatterns.getValue());
+		//CallTreeVisualisation::PrintRelationTree(mxdspldpth - 1, OnlyPatterns.getValue());
     CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre);
 	  }
 

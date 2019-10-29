@@ -180,11 +180,11 @@ private:
 /**
  * The pattern stack is used to keep track of the nesting of patterns and functions.
  */
-extern std::stack<PatternCodeRegion*> PatternContext;
+extern std::vector<PatternCodeRegion*> PatternContext;
 /**
 	*The OnlyPatternContext only keeps track of the nesting of patterns.
 	*/
-extern std::stack<PatternCodeRegion*> OnlyPatternContext;
+extern std::vector<PatternCodeRegion*> OnlyPatternContext;
 
 extern std::vector<PatternOccurrence*> OccStackForHalstead;
 

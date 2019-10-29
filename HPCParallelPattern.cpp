@@ -319,8 +319,8 @@ void PatternCodeRegion::PrintVecOfPattern(std::vector<PatternCodeRegion*> Region
 /*
  * Pattern Stack Management
  */
-std::stack<PatternCodeRegion*> PatternContext;
-std::stack<PatternCodeRegion*> OnlyPatternContext;
+std::vector<PatternCodeRegion*> PatternContext;
+std::vector<PatternCodeRegion*> OnlyPatternContext;
 
 /**
  * @brief Add a PatternCodeRegion to the top of the pattern context stack.
@@ -329,13 +329,13 @@ std::stack<PatternCodeRegion*> OnlyPatternContext;
  **/
 void AddToPatternStack(PatternCodeRegion* PatternReg)
 {
-	PatternContext.push(PatternReg);
+	PatternContext.push_back(PatternReg);
 }
 
 void AddToOnlyPatternStack(PatternCodeRegion* PatternReg)
 {
 
-	OnlyPatternContext.push(PatternReg);
+	OnlyPatternContext.push_back(PatternReg);
 }
 
 /**
@@ -347,7 +347,7 @@ PatternCodeRegion* GetTopPatternStack()
 {
 	if (!PatternContext.empty())
 	{
-		return PatternContext.top();
+		return PatternContext.back();
 	}
 		return NULL;
 }
@@ -355,7 +355,7 @@ PatternCodeRegion* GetTopPatternStack()
 PatternCodeRegion* GetTopOnlyPatternStack(){
 	if (!OnlyPatternContext.empty())
 	{
-		return OnlyPatternContext.top();
+		return OnlyPatternContext.back();
 	}
 		return NULL;
 }
@@ -370,14 +370,14 @@ void RemoveFromPatternStack(std::string ID)
 	try{
 		if (!PatternContext.empty())
 		{
-			PatternCodeRegion* Top = PatternContext.top();
+			PatternCodeRegion* Top = PatternContext.back();
 			try{
 				if (ID.compare(Top->GetID()))
 				{
-					throw WrongNestingException(ID, Top->GetID());
+					//throw WrongNestingException(ID, Top->GetID());
 				}
 				else{
-					PatternContext.pop();
+					PatternContext.pop_back();
 				}
 			}
 			catch(WrongNestingException& wrongNest){
@@ -400,17 +400,19 @@ void RemoveFromPatternStack(std::string ID)
 void RemoveFromOnlyPatternStack(std::string ID){
 	if(!OnlyPatternContext.empty())
 	{
-		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.top();
+		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.back();
 		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack
 		/*usually the WrongNestingException is encountered before this function*/
 		try{
-			if (ID.compare(OnlyPatternTop->GetID()))
-			{
-				throw WrongNestingException(ID, OnlyPatternTop->GetID());
+			for(PatternCodeRegion* PatCodeReg : PatternContext){
+				int i = 0;
+				if (!ID.compare(PatCodeReg->GetID()))
+				{
+					OnlyPatternContext.erase(PatternContext.begin()+i);
+				}
+				i++;
 			}
-			else{
-			  OnlyPatternContext.pop();
-			}
+			throw WrongNestingException(ID, (PatternContext.back()->)GetID());
 		}
 		catch(WrongNestingException& wrongNest){
 			std::cout << wrongNest.what() << std::endl;
@@ -418,7 +420,7 @@ void RemoveFromOnlyPatternStack(std::string ID){
 		}
 	}
 	else{
-			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
+			//std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
 	}
 }
 

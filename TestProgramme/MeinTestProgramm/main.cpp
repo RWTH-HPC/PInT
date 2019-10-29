@@ -15,10 +15,6 @@ int main(int argc, char* argv[])
 
 	Test::TestOperatorTypeQualifiers();
 
-	PatternInstrumentation::Pattern_End("TQ1");
-
 	  const int i = 0;
-
-Test::TestOperatorTypeQualifiers();
 	return 0;
 }

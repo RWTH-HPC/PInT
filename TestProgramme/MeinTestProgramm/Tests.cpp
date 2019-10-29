@@ -15,7 +15,7 @@ void Test::TestOperatorTypeQualifiers(){
   PatternInstrumentation::Pattern_End("TQ6");
 	PatternInstrumentation::Pattern_End("TQ5");
 
-  TestOperatorTypeQualifiers();
+  PatternInstrumentation::Pattern_End("TQ1");
 
   const int s = 0 , t = 0, d = 0;
 
@@ -25,6 +25,5 @@ void Test::TestOperatorTypeQualifiers(){
 
 void Test::OtherFunction(){
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ7");
-  OtherFunction();
 	PatternInstrumentation::Pattern_End("TQ7");
 }
