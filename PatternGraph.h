@@ -240,8 +240,6 @@ private:
 	unsigned IdentificationUnsigned = 0;
 };
 
-std::ostream& operator<<(std::ostream &os, Identification const &ident);
-
 class CallTree
 {
 public:
@@ -278,6 +276,7 @@ public:
 	std::vector<CallTreeNode*>* GetCallees();
 	CallTreeNode* GetCaller();
 	void insertCallee(CallTreeNode* Node);
+	bool isAlreadyCallee(CallTreeNode* Callee);
 	void SetCaller(CallTreeNode* Node);
 		//returns 1 if the node has the same underlying function/pattern otherwise 0
 	bool compare(CallTreeNode* otherNode);
@@ -298,3 +297,6 @@ private:
 
 //
 extern CallTree* ClTre;
+
+std::ostream& operator<<(std::ostream &os, Identification const &ident);
+std::ostream& operator<<(std::ostream &os, CallTreeNodeType const &NodeType);

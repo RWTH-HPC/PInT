@@ -15,7 +15,7 @@ void Test::TestOperatorTypeQualifiers(){
   PatternInstrumentation::Pattern_End("TQ6");
 	PatternInstrumentation::Pattern_End("TQ5");
 
-  OtherFunction();
+  TestOperatorTypeQualifiers();
 
   const int s = 0 , t = 0, d = 0;
 
