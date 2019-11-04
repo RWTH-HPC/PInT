@@ -202,7 +202,7 @@ bool PatternGraph::RegisterFunction(clang::FunctionDecl* Decl)
 	if (Decl->isMain())
 	{
 		this->RootNode = Func;
-		ClTre->setRootNode(HashVal);
+		ClTre->setRootNode(Func);
 	}
 
 	return Func;
@@ -373,7 +373,7 @@ CallTree::~CallTree(){
 
 void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
-	CallTreeNode* Node = new CallTreeNode(NodeType, PatCodeReg->GetID());
+	CallTreeNode* Node = new CallTreeNode(NodeType, PatCodeReg);
 	if(NodeType == Pattern_Begin || NodeType == Pattern_End)
 	{
 		if(LastVisited == Function_Decl)
@@ -411,7 +411,7 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 
 void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
-	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode->GetHash());
+	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode);
  if(NodeType == Function){
   // warunung das hier muss später ersetzt werden so wird auch die Rekursion ausgeschlossen
 	 if(LastVisited == Function_Decl){
@@ -429,9 +429,9 @@ void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, C
 }
 
 
-void CallTree::setRootNode(unsigned identification)
+void CallTree::setRootNode(FunctionNode* Func)
 {
-	CallTreeNode* root = new CallTreeNode(Root, identification);
+	CallTreeNode* root = new CallTreeNode(Root, Func);
 	RootNode = root;
 	this->insertNodeIntoDeclVector(root);
 }
@@ -535,14 +535,14 @@ CallTreeNode::~CallTreeNode(){
 
 }
 
-CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : NodeType(type)
+CallTreeNode::CallTreeNode(CallTreeNodeType type, PatternCodeRegion* CorrespondingPat) : NodeType(type)
 {
 	if(NodeType == Pattern_Begin)
 	{
 		ClTre->insertNodeIntoDeclVector(this);
 	}
-	ident = new Identification(type, identification);
-		std::cout << "Node of:" << identification <<
+	ident = new Identification(type, CorrespondingPat->GetID());
+		std::cout << "Node of:" << CorrespondingPat->GetID() <<
 		"is created"<< '\n';
 		if(type == Pattern_Begin)
 		        std::cout << "NodeType = Pattern_Begin" << std::endl;
@@ -550,15 +550,15 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification) : 
 		    	std::cout << "NodeType = Pattern_End" << std::endl;
 }
 
-CallTreeNode::CallTreeNode(CallTreeNodeType type ,unsigned identification) : NodeType(type)
+CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespongingFunction) : NodeType(type)
 {
 	if(NodeType == Function_Decl)
 	{
 		ClTre->insertNodeIntoDeclVector(this);
 	}
-	ident = new Identification(type, identification);
+	ident = new Identification(type, CorrespongingFunction->GetHash());
 	#ifdef DEGUB
-		std::cout << "Node of:"<< identification << "is created"<< '\n';
+		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << "is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
 	#endif
 }

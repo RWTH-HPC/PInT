@@ -248,7 +248,7 @@ public:
 	bool everyPatternHasEnd();
 	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
 	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void setRootNode(unsigned identification);
+	void setRootNode(FunctionNode* Func);
 	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);
@@ -268,8 +268,8 @@ class CallTreeNode
 {
 public:
 	~CallTreeNode();
-	CallTreeNode(CallTreeNodeType type, std::string indentification);
-	CallTreeNode(CallTreeNodeType type, unsigned indentification);
+	CallTreeNode(CallTreeNodeType type, PatternCodeRegion* CorrespondingPat);
+	CallTreeNode(CallTreeNodeType type, FunctionNode* CorrespongingFunction);
 	bool hasEnd();
 	void setID();
 	Identification* GetID();

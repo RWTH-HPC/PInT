@@ -193,7 +193,7 @@ int main (int argc, const char** argv)
     CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre);
 	  }
 
-		for (HPCPatternStatistic* Stat : Statistics)
+		/*for (HPCPatternStatistic* Stat : Statistics)
 		{
 			std::cout << std::endl << std::endl;
 			Stat->Calculate();
@@ -203,6 +203,7 @@ int main (int argc, const char** argv)
 		Statistics[0]->CSVExport("Counts.csv");
 		Statistics[1]->CSVExport("FIFO.csv");
 		Statistics[2]->CSVExport("LOC.csv");
+    */
 
 		/* Similarity Measures
 		std::vector<HPCParallelPattern*> SimPatterns;

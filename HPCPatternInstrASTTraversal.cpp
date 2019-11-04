@@ -132,7 +132,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				}
 				catch(TooManyEndsException& e){
 					e.what();
-					throw TerminateEarlyException();
+					//throw TerminateEarlyException();
 				}
 
 				/* Get the location of the fn call which denotes the end of this pattern */
@@ -140,7 +140,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceLocation LocEnd = CallExpr->getEndLoc();
 				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 
-				PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
+				//PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
 				PatternCodeReg->SetEndSourceLoc(LocEnd);
 				ClTre->registerNode(Pattern_End, PatternCodeReg, LastNodeType, PatternCodeReg, CurrentFnEntry);
