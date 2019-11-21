@@ -159,6 +159,10 @@ public:
 
 	void PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec);
 
+	void insertCorrespondingCallTreeNode(CallTreeNode* Node){
+		CorrespondingCallTreeNodes.push_back(Node);
+	}
+
 private:
 	PatternOccurrence* PatternOcc;
 
@@ -173,6 +177,8 @@ private:
 	std::vector<PatternCodeRegion*> PatternParents;
 	std::vector<PatternCodeRegion*> PatternChildren;
 	int LinesOfCode = 0;
+
+	std::vector<CallTreeNode*> CorrespondingCallTreeNodes;
 };
 
 
@@ -200,4 +206,4 @@ void RemoveFromPatternStack(std::string ID);
 
 void RemoveFromOnlyPatternStack(std::string ID);
 
-bool PatternIDisUsed(std::string ID);
+PatternCodeRegion* PatternIDisUsed(std::string ID);

@@ -158,9 +158,8 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 	std::string PatternID = patternstr->getString().str();
 
 	LastPattern = GetTopPatternStack();
-	if(LastPattern==NULL){
-		throw TooManyEndsException();
-	}
+
+	LastPatternID = PatternID;
 
 	RemoveFromPatternStack(PatternID);
 

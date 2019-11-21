@@ -5,7 +5,7 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 
-#define DEBUG
+//#define DEBUG
 
 /*
  * Function Declaration Database Entry functions
@@ -202,7 +202,6 @@ bool PatternGraph::RegisterFunction(clang::FunctionDecl* Decl)
 	if (Decl->isMain())
 	{
 		this->RootNode = Func;
-		ClTre->setRootNode(Func);
 	}
 
 	return Func;
@@ -352,17 +351,6 @@ bool Identification::compare(std::string Id)
 	return !IdentificationString.compare(Id);
 }
 
-bool CallTree::everyPatternHasEnd()
-{
-	std::vector<CallTreeNode*> temp = this->PatternNodesOfCallTree;
-  for(CallTreeNode* Node : temp){
-		if(!Node->hasEnd()){
-			return false;
-		}
-	}
-	return true;
-}
-
 CallTree::CallTree()
 {
 		RootNode = NULL;
@@ -371,7 +359,7 @@ CallTree::CallTree()
 CallTree::~CallTree(){
 }
 
-void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
+CallTreeNode* CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, PatCodeReg);
 	if(NodeType == Pattern_Begin || NodeType == Pattern_End)
@@ -407,9 +395,10 @@ void CallTree::registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCod
 			std::cout << "Last visited probably not set" << '\n';
 		#endif
 	}
+	return Node;
 }
 
-void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
+CallTreeNode* CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc)
 {
 	CallTreeNode* Node = new CallTreeNode(NodeType, FuncNode);
  if(NodeType == Function){
@@ -426,12 +415,48 @@ void CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, C
 	 		}
 	 	}
 	}
+	return Node;
+}
+
+CallTreeNode* CallTree::registerEndNode(CallTreeNodeType NodeType, std::string identification, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc){
+	PatternCodeRegion* CorrespReg = PatternIDisUsed(identification);
+	CallTreeNode* Node = new CallTreeNode(NodeType, CorrespReg);
+		if(LastVisited == Function_Decl)
+		{
+			appendCallerToNode(surroundingFunc, Node);
+			#ifdef DEBUG
+				std::cout << "Last visited Functionsdeklaration von " <<surroundingFunc->GetHash()<< '\n';
+			#endif
+		}
+		else if(LastVisited == Pattern_Begin)
+		{
+			if(TopOfStack == NULL)
+			{
+				appendCallerToNode(surroundingFunc, Node);
+				#ifdef DEBUG
+					std::cout << "Last visited PatternCodereg von " <<identification<< " and Stack not empty!"<< '\n';
+				#endif
+			}
+			else
+			{
+				appendCallerToNode(TopOfStack, Node);
+				#ifdef DEBUG
+					std::cout << "TopOfStack not empty" << '\n';
+				#endif
+			}
+			#ifdef DEBUG
+				std::cout << "Last visited PatternCodeReg" << '\n';
+			#endif
+		}
+		#ifdef DEBUG
+			std::cout << "Last visited probably not set" << '\n';
+		#endif
+		return Node;
 }
 
 
-void CallTree::setRootNode(FunctionNode* Func)
+void CallTree::setRootNode(CallTreeNode* root)
 {
-	CallTreeNode* root = new CallTreeNode(Root, Func);
 	RootNode = root;
 	this->insertNodeIntoDeclVector(root);
 }
@@ -456,7 +481,6 @@ void CallTree::appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node)
 
 		}
 	}
-	std::cout << "getting now out of not infinite function" << std::endl;
 }
 
 void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
@@ -495,9 +519,9 @@ void CallTree::appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node)
 	}
 }
 
-void CallTree::insertNodeIntoPatternVector(CallTreeNode* Node)
+void CallTree::insertNodeIntoPattern_EndVector(CallTreeNode* Node)
 {
-	PatternNodesOfCallTree.push_back(Node);
+	Pattern_EndVector.push_back(Node);
 }
 
 void CallTree::insertNodeIntoDeclVector(CallTreeNode* Node)
@@ -541,22 +565,45 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, PatternCodeRegion* Correspondi
 	{
 		ClTre->insertNodeIntoDeclVector(this);
 	}
+	else if(NodeType == Pattern_End)
+		ClTre->insertNodeIntoPattern_EndVector(this);
 	ident = new Identification(type, CorrespondingPat->GetID());
+	this->SetCorrespondingNode(CorrespondingPat);
+	CorrespondingPat->insertCorrespondingCallTreeNode(this);
+
+	#ifdef DEBUG
 		std::cout << "Node of:" << CorrespondingPat->GetID() <<
 		"is created"<< '\n';
 		if(type == Pattern_Begin)
 		        std::cout << "NodeType = Pattern_Begin" << std::endl;
 		 else if (type == Pattern_End)
 		    	std::cout << "NodeType = Pattern_End" << std::endl;
+	#endif
 }
 
-CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespongingFunction) : NodeType(type)
+CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespondingFunction) : NodeType(type)
 {
 	if(NodeType == Function_Decl)
 	{
 		ClTre->insertNodeIntoDeclVector(this);
 	}
-	ident = new Identification(type, CorrespongingFunction->GetHash());
+	ident = new Identification(type, CorrespondingFunction->GetHash());
+	this->SetCorrespondingNode(CorrespondingFunction);
+	CorrespondingFunction->insertCorrespondingCallTreeNode(this);
+
+	#ifdef DEGUB
+		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << "is created"<< '\n';
+		std::cout << "Node Type = " << type << std::endl;
+	#endif
+}
+
+CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification): NodeType(type)
+{
+	if(NodeType == Pattern_Begin)
+	{
+		ClTre->insertNodeIntoDeclVector(this);
+	}
+	ident = new Identification(type, identification);
 	#ifdef DEGUB
 		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << "is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
@@ -641,6 +688,25 @@ bool CallTreeNode::isCalleeOf(CallTreeNode* Caller){
 		if(this->compare(CalleeOfCaller))
 			return true;
 		return false;
+	}
+}
+
+void CallTreeNode::print(){
+	if((NodeType == Pattern_Begin || NodeType == Pattern_End)&& CorrespondingNode!= NULL && clang::dyn_cast<PatternCodeRegion>(CorrespondingNode)){
+		PatternCodeRegion* CorrespRegion = clang::dyn_cast<PatternCodeRegion>(CorrespondingNode);
+		std::cout << "\033[36m";
+		if(NodeType == Pattern_End){
+			std::cout << " END ";
+		}
+		std::cout << CorrespRegion->GetPatternOccurrence()->GetPattern()->GetDesignSpaceStr() << ":\33[33m " << CorrespRegion->GetPatternOccurrence()->GetPattern()->GetPatternName() << "\33[0m";
+			std::cout << "(" << *ident << ")" << std::endl;
+	}
+	else if((NodeType == Function || NodeType == Root) && CorrespondingNode!=NULL && clang::dyn_cast<FunctionNode>(CorrespondingNode)){
+		FunctionNode* CorrespFunc = clang::dyn_cast<FunctionNode>(CorrespondingNode);
+		std::cout << "\033[31m" << CorrespFunc->GetFnName() << "\033[0m" << " (Hash: " << *ident << ")" << std::endl;
+	}
+	else if(CorrespondingNode == NULL){
+		std::cout << "\033[36m" << "Only Printing Identification "<< ":\33[33m"<< *ident << "\033[0m" << std::endl;
 	}
 }
 

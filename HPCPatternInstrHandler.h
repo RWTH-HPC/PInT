@@ -15,7 +15,7 @@ class HPCPatternBeginInstrHandler : public clang::ast_matchers::MatchFinder::Mat
 public:
 	void SetCurrentFnEntry(FunctionNode* FnEntry);
 
-	PatternCodeRegion* GetLastPattern() { return GetTopPatternStack(); }
+	PatternCodeRegion* GetLastPattern() { return GetTopPatternStack(); };
 
 	virtual void run (const clang::ast_matchers::MatchFinder::MatchResult &Result);
 
@@ -32,7 +32,9 @@ class HPCPatternEndInstrHandler : public clang::ast_matchers::MatchFinder::Match
 public:
 	void SetCurrentFnEntry(FunctionNode* FnEntry);
 
-	PatternCodeRegion* GetLastPattern() { return LastPattern; }
+	PatternCodeRegion* GetLastPattern() { return LastPattern; };
+
+	std::string GetLastPatternID(){ return LastPatternID;};
 
 	virtual void run (const clang::ast_matchers::MatchFinder::MatchResult &Result);
 
@@ -40,6 +42,8 @@ private:
 	FunctionNode* CurrentFnEntry;
 
 	PatternCodeRegion* LastPattern;
+
+	std::string LastPatternID;
 
 	PatternCodeRegion* LastOnlyPattern;
 };

@@ -370,7 +370,7 @@ void RemoveFromPatternStack(std::string ID)
 	if (!PatternContext.empty())
 	{
 		PatternCodeRegion* Top = PatternContext.back();
-		try{	
+		try{
 			int i = 0;
 			for(PatternCodeRegion* PatCodeReg : PatternContext){
 			if (!ID.compare(PatCodeReg->GetID()))
@@ -417,14 +417,14 @@ void RemoveFromOnlyPatternStack(std::string ID){
 	}
 }
 
-bool PatternIDisUsed(std::string ID){
+PatternCodeRegion* PatternIDisUsed(std::string ID){
 	std::vector<PatternCodeRegion*> PatternCodeRegions = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
 	for(PatternCodeRegion* PatCodeReg : PatternCodeRegions){
 		if(!(ID.compare(PatCodeReg->GetID()))){
-			return true;
+			return PatCodeReg;
 		}
 	}
-	return false;
+	return NULL;
 }
 /*Stack for Halstead */
 std::vector<PatternOccurrence*> OccStackForHalstead;

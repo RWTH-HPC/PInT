@@ -55,7 +55,7 @@ missingPatternEnd::missingPatternEnd(std::vector<PatternCodeRegion*> PatContext)
 };
 
 const char* missingPatternEnd::what() const throw(){
-  std::cout << "\n\033[31mYou forgott to end the following PatternCodeRegions: "<< "\n\n";
+  std::cout << "\n\033[31mYou forgot to end the following PatternCodeRegions: "<< "\n\n";
   this->printPatternWithNoEnd();
   std::cout << "\033[0m" << '\n';
   return "";

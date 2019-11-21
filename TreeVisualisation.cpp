@@ -2,7 +2,7 @@
 
 #include <iostream>
 //#define PRINT_ONLYPATTERNDENUG
-#define DEBUG
+//#define DEBUG
 
 /**
  * @brief Prints the call tree recursively, beginning with the main function.
@@ -153,22 +153,28 @@ void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int
 	if(depth > maxdepth){
 		return;
 	}
-	PrintIndent(depth);
-	#ifndef DEBUG
-		std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;
-	#endif
+	if(ClTrNode->GetNodeType()!= Function_Decl){
+		PrintIndent(depth);
+		ClTrNode->print();
+	}
 	#ifdef DEBUG
-	std::cout << "\033[36m" << *ClTrNode->GetID() << ": "<< ClTrNode->GetNodeType()<< " "<<"\33[33m" << std::endl;
-	if(ClTrNode->GetCaller())
-		std::cout << "Caller:" << *(ClTrNode->GetCaller()->GetID())<<" Type: "<< ClTrNode->GetCaller()->GetNodeType() << std::endl;
-	  std::cout << "Callees:" << std::endl;
-		for(CallTreeNode* Callee : *ClTrNode->GetCallees())
-		{
-			std::cout << *Callee->GetID() << " Type: " << Callee->GetNodeType() << std::endl;
-		}
+		std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;
+
+		if(ClTrNode->GetCaller())
+			std::cout << "Caller:" << *(ClTrNode->GetCaller()->GetID())<<" Type: "<< ClTrNode->GetCaller()->GetNodeType() << std::endl;
+		  std::cout << "Callees:" << std::endl;
+			for(CallTreeNode* Callee : *ClTrNode->GetCallees())
+			{
+				std::cout << *Callee->GetID() << " Type: " << Callee->GetNodeType() << std::endl;
+			}
 	#endif
 	for(CallTreeNode* Callee : *(ClTrNode->GetCallees())){
-		PrintCallTreeRecursively(Callee, depth + 1, maxdepth);
+		if(ClTrNode->GetNodeType() == Function_Decl){
+				PrintCallTreeRecursively(Callee, depth, maxdepth);
+		}
+		else{
+			PrintCallTreeRecursively(Callee, depth + 1, maxdepth);
+		}
 	}
 }
 

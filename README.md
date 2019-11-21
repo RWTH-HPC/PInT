@@ -87,7 +87,7 @@ this pattern is not displayed in the tree.
 You can use this flag if you want to cut off the deepest parts of the tree. This is really usefull for large files, to avoid printing the tree for hours. The other statistics are working with a uncut version of the tree.
 Per default this is set to 10.
 For large codes you can set it to a smaller number for example 5.
-<code> ./HPC-pattern-tool /path/to/compile_commands/file/ -maxTreeDisplyDepth=5 --extra-arg=-I/path/to/headers</code>
+<code> ./HPC-pattern-tool /path/to/compile_commands/file/ -maxTreeDisplayDepth=5 --extra-arg=-I/path/to/headers</code>
 <h4>-displayCompilationsList</h4>
 This flag is usefull for checking if all files you need to analyze are in the compilation database, which means considered by the tool.
 <h4>-pintVersion</h4>

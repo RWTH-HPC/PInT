@@ -18,8 +18,8 @@
 #include "HPCError.h"
 #endif
 
-#define DEBUG
-int  MAX_DEPTH = 12;
+//#define DEBUG
+int  MAX_DEPTH = 4;
 
 /**
  * @mainpage Clang Pattern Instrumentation Tool
@@ -92,7 +92,7 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  */
 
  void lookIfEveryPatternEnds(){
-		try{
+		/*try{
  			if(!PatternContext.empty()){
  				throw missingPatternEnd(PatternContext);
  				}
@@ -104,13 +104,13 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  		catch(missingPatternEnd& me){
  			me.what();
 			throw TerminateEarlyException();
- 		}
+ 		}*/
  }
 
 
 int main (int argc, const char** argv)
 {
-	MaxTreeDisplayDepth.setInitialValue(10);
+	MaxTreeDisplayDepth.setInitialValue(MAX_DEPTH);
 
 		clang::tooling::CommonOptionsParser OptsParserVersion(argc, argv, pintVersion);
 
@@ -189,12 +189,13 @@ int main (int argc, const char** argv)
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
-		//CallTreeVisualisation::PrintRelationTree(mxdspldpth - 1, OnlyPatterns.getValue());
+		CallTreeVisualisation::PrintRelationTree(mxdspldpth, OnlyPatterns.getValue());
     CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre);
 	  }
 
-		/*for (HPCPatternStatistic* Stat : Statistics)
+		for (HPCPatternStatistic* Stat : Statistics)
 		{
+
 			std::cout << std::endl << std::endl;
 			Stat->Calculate();
 			Stat->Print();
@@ -203,7 +204,7 @@ int main (int argc, const char** argv)
 		Statistics[0]->CSVExport("Counts.csv");
 		Statistics[1]->CSVExport("FIFO.csv");
 		Statistics[2]->CSVExport("LOC.csv");
-    */
+
 
 		/* Similarity Measures
 		std::vector<HPCParallelPattern*> SimPatterns;

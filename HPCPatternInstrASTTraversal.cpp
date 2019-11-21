@@ -17,6 +17,7 @@
 #include "HPCError.h"
 #endif
 //#define PRINT_DEBUG
+
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.
  * We set helper variables in the PatternBeginHandler and PatternEndHandler to the FunctionNode for correct parent-child-relations.
@@ -39,10 +40,12 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			PatternGraph::GetInstance()->RegisterFunction(Decl);
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
-		if(!Decl->isMain()){
-			ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+		if(Decl->isMain()){
+			CallTreeNode* root = ClTre->registerNode(Root, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+			ClTre->setRootNode(root);
 		}
-
+		else
+			ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 	#endif
@@ -104,7 +107,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				/* Store this PatternCodeRegion Begin in the CallTree (ClTre)*/
 
-				ClTre->registerNode(Pattern_Begin, PatternCodeReg, LastNodeType, PatBeforethisPat, CurrentFnEntry);
+				CallTreeNode* BeginNode = ClTre->registerNode(Pattern_Begin, PatternCodeReg, LastNodeType, PatBeforethisPat, CurrentFnEntry);
 
 
 				/* Get the location of the fn call which denotes the beginning of this pattern */
@@ -112,8 +115,10 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceLocation LocStart = CallExpr->getBeginLoc();
 
 				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
+				BeginNode->SetSourceLoc(&LocStart);
 				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
 				PatternCodeReg->SetStartSourceLoc(LocStart);
+
 
 				PatternCodeReg->isInMain = SourceMan.isInMainFile(LocStart);
 
@@ -122,9 +127,10 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 			else if (!FnName.compare(PATTERN_END_CXX_FNNAME) || !FnName.compare(PATTERN_END_C_FNNAME))
 			{
 				clang::Expr** Args = CallExpr->getArgs();
-	#ifdef PRINT_DEBUG
-				Args[0]->dump();
-	#endif
+				#ifdef PRINT_DEBUG
+							std::cout << "Degub dump of Args before matching" << '\n';
+							Args[0]->dump();
+				#endif
 				PatternCodeRegion* PatternCodeReg;
 				try{
 					PatternEndFinder.match(*Args[0], *Context);
@@ -134,6 +140,10 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 					e.what();
 					//throw TerminateEarlyException();
 				}
+				#ifdef PRINT_DEBUG
+				std::cout << "Degub dump of Args after matching" << '\n';
+							Args[0]->dump();
+				#endif
 
 				/* Get the location of the fn call which denotes the end of this pattern */
 				clang::SourceManager& SourceMan = Context->getSourceManager();
@@ -142,8 +152,10 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				//PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
 
-				PatternCodeReg->SetEndSourceLoc(LocEnd);
-				ClTre->registerNode(Pattern_End, PatternCodeReg, LastNodeType, PatternCodeReg, CurrentFnEntry);
+				CallTreeNode* EndNode = ClTre->registerEndNode(Pattern_End, PatternEndHandler.GetLastPatternID(), LastNodeType, PatternCodeReg, CurrentFnEntry);
+
+				EndNode->SetSourceLoc(&LocEnd);
+
 			}
 			// If no: search the called function for patterns
 			else
@@ -163,8 +175,11 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 	#endif
 
 				/* Store this function call in the CallTree (ClTre)*/
-				ClTre->registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+				CallTreeNode* FuncNode = ClTre->registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
+				clang::SourceLocation LocStart = CallExpr->getBeginLoc();
+
+				FuncNode->SetSourceLoc(&LocStart);
 				PatternCodeRegion* Top;
 				/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
 				if ((Top = GetTopPatternStack()) != NULL)

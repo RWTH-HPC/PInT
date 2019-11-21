@@ -122,6 +122,10 @@ public:
 		return Node->GetKind() == PatternGraphNode::GNK_FnCall;
 	}
 
+	void insertCorrespondingCallTreeNode(CallTreeNode* Node){
+		CorrespondingCallTreeNodes.push_back(Node);
+	}
+
 private:
 	std::string FnName;
 	unsigned Hash;
@@ -132,6 +136,8 @@ private:
 
 	std::vector<PatternGraphNode*> Children;
 	std::vector<PatternGraphNode*> Parents;
+
+	std::vector<CallTreeNode*> CorrespondingCallTreeNodes;
 };
 
 
@@ -245,20 +251,22 @@ class CallTree
 public:
 	~CallTree();
 	CallTree();
-	bool everyPatternHasEnd();
-	void registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
-	void setRootNode(FunctionNode* Func);
+	CallTreeNode* registerNode(CallTreeNodeType NodeType, PatternCodeRegion* PatCodeReg, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
+	CallTreeNode* registerNode(CallTreeNodeType NodeType, FunctionNode* FuncNode, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
+	CallTreeNode* registerEndNode(CallTreeNodeType NodeType,std::string identification, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc);
+
+	void setRootNode(CallTreeNode* root);
 	void appendCallerToNode(CallTreeNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node);
 	void appendCallerToNode(PatternCodeRegion* Caller, CallTreeNode* Node);
-	void insertNodeIntoPatternVector(CallTreeNode* Node);
+	void insertNodeIntoPattern_EndVector(CallTreeNode* Node);
 	void insertNodeIntoDeclVector(CallTreeNode* Node);
 	void appendAllDeclToCallTree(CallTreeNode* Root, int maxdepth);
 	std::vector<CallTreeNode*>* GetDeclarationVector();
 	CallTreeNode* getRoot(){return RootNode;};
 private:
-	std::vector<CallTreeNode*> PatternNodesOfCallTree;
+	//we store the Pattern in a Vector so we can go up to the parents
+	std::vector<CallTreeNode*> Pattern_EndVector;
 	// the RootNode is the main function, which is probably named differently
 	CallTreeNode* RootNode = NULL;
 	std::vector<CallTreeNode*> DeclarationVector;
@@ -268,8 +276,9 @@ class CallTreeNode
 {
 public:
 	~CallTreeNode();
-	CallTreeNode(CallTreeNodeType type, PatternCodeRegion* CorrespondingPat);
-	CallTreeNode(CallTreeNodeType type, FunctionNode* CorrespongingFunction);
+	CallTreeNode(CallTreeNodeType type,  PatternCodeRegion* CorrespondingPat);
+	CallTreeNode(CallTreeNodeType type, FunctionNode* CorrespondingFunction);
+	CallTreeNode(CallTreeNodeType type, std::string identification);
 	bool hasEnd();
 	void setID();
 	Identification* GetID();
@@ -283,16 +292,21 @@ public:
 	bool compare(unsigned Hash);
 	bool compare(std::string Id);
 	bool isCalleeOf(CallTreeNode* Caller);
+	void print();
 	CallTreeNodeType GetNodeType(){return NodeType;};
-private:
+	void SetSourceLoc(clang::SourceLocation* Loc){Location = Loc;};
+	void SetCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
+	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};
+	private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
 		There is no need to declare this class this is only to save memory.*/
 	Identification* ident;
 	CallTreeNode* Caller = NULL;
-
+	PatternGraphNode* CorrespondingNode = NULL;
 	std::vector<CallTreeNode*> Callees;
 	const CallTreeNodeType NodeType;
+	clang::SourceLocation* Location;
 };
 
 //
