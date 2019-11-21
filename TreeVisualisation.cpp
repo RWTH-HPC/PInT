@@ -168,7 +168,8 @@ void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int
 				std::cout << *Callee->GetID() << " Type: " << Callee->GetNodeType() << std::endl;
 			}
 	#endif
-	for(CallTreeNode* Callee : *(ClTrNode->GetCallees())){
+	for(const auto &CalleePair : *(ClTrNode->GetCallees())){
+		CallTreeNode* Callee = CalleePair.second;
 		if(ClTrNode->GetNodeType() == Function_Decl){
 				PrintCallTreeRecursively(Callee, depth, maxdepth);
 		}

@@ -538,7 +538,8 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 		CallTreeNodeType NodeType = Node->GetNodeType();
 		//if(NodeType == Root || NodeType == Function_Decl){
 		 for(CallTreeNode* DeclOfCallee : DeclarationVector){
-			for(CallTreeNode* CalleeOfNode : *Node->GetCallees()){
+			for(const auto &CalleeOfNodePair : *Node->GetCallees()){
+				CallTreeNode* CalleeOfNode = CalleeOfNodePair.second;
 				if(CalleeOfNode->GetNodeType() != Pattern_End && CalleeOfNode->compare(DeclOfCallee)){
 					//falls die Kinder von Node die gleiche indentität haben wie eine deklaration im Declaration Vector dann...
 					appendCallerToNode(CalleeOfNode, DeclOfCallee);
@@ -615,7 +616,7 @@ Identification* CallTreeNode::GetID()
 	return this->ident;
 }
 
-std::vector<CallTreeNode*>* CallTreeNode::GetCallees(){
+std::map<int, CallTreeNode*>* CallTreeNode::GetCallees(){
 	return &Callees;
 }
 
@@ -626,12 +627,13 @@ CallTreeNode* CallTreeNode::GetCaller(){
 void CallTreeNode::insertCallee(CallTreeNode* Node){
 	// it is not allowed to appent the same object (with the same adress) twice
 	if(!isAlreadyCallee(Node))
-		(Callees).push_back(Node);
+		Callees[actNumOfChild] = Node;
+		actNumOfChild++;
 }
 
 bool CallTreeNode::isAlreadyCallee(CallTreeNode* Callee){
-	for(CallTreeNode* Cle: *GetCallees()){
-		if(Cle == Callee)
+	for(const auto &calleePair: Callees){
+		if(calleePair.second == Callee)
 			return true;
 	}
 	return false;
@@ -646,7 +648,7 @@ bool CallTreeNode::hasEnd()
 {
 	if(this->NodeType == Pattern_Begin)
 	{
-		std::vector<CallTreeNode*> tempQueue = this->Callees;
+		std::map<int, CallTreeNode*> tempQueue (Callees.begin(), Callees.end());
 		CallTreeNode* tempNode;
 		bool returnBool;
 		for(int i = 0; i < tempQueue.size(); i++){
@@ -683,8 +685,9 @@ bool CallTreeNode::compare(std::string Id)
 }
 
 bool CallTreeNode::isCalleeOf(CallTreeNode* Caller){
-	for(CallTreeNode* CalleeOfCaller : *Caller->GetCallees())
+	for(const auto &CalleeOfCallerPair : *Caller->GetCallees())
 	{
+		CallTreeNode* CalleeOfCaller = CalleeOfCallerPair.second;
 		if(this->compare(CalleeOfCaller))
 			return true;
 		return false;

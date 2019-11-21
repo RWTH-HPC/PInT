@@ -8,6 +8,7 @@
 #include <queue>
 #include "clang/AST/Decl.h"
 #include "llvm/Support/Casting.h"
+#include <map>
 
 
 
@@ -282,7 +283,7 @@ public:
 	bool hasEnd();
 	void setID();
 	Identification* GetID();
-	std::vector<CallTreeNode*>* GetCallees();
+	std::map<int, CallTreeNode*>* GetCallees();
 	CallTreeNode* GetCaller();
 	void insertCallee(CallTreeNode* Node);
 	bool isAlreadyCallee(CallTreeNode* Callee);
@@ -304,7 +305,8 @@ public:
 	Identification* ident;
 	CallTreeNode* Caller = NULL;
 	PatternGraphNode* CorrespondingNode = NULL;
-	std::vector<CallTreeNode*> Callees;
+	std::map<int, CallTreeNode*> Callees;
+	int actNumOfChild = 0;
 	const CallTreeNodeType NodeType;
 	clang::SourceLocation* Location;
 };
