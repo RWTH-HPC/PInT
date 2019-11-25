@@ -11,6 +11,7 @@
  **/
 void CallTreeVisualisation::PrintRelationTree(int maxdepth, bool onlyPattern)
 {
+	std::cout << "\n RELATION TREE VISUALISATION \n";
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
 	if(onlyPattern){
 			PrintOnlyPatternTree(maxdepth);

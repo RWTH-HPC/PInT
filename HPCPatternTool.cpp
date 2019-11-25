@@ -176,6 +176,7 @@ int main (int argc, const char** argv)
         }
       #endif
       ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
+      ClTre->setUpTree();
 
 			lookIfEveryPatternEnds();
 		}
@@ -195,7 +196,6 @@ int main (int argc, const char** argv)
 
 		for (HPCPatternStatistic* Stat : Statistics)
 		{
-
 			std::cout << std::endl << std::endl;
 			Stat->Calculate();
 			Stat->Print();

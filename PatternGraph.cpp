@@ -4,8 +4,8 @@
 
 #include <iostream>
 #include "clang/AST/ODRHash.h"
-
-//#define DEBUG
+#include "HPCError.h"
+#define CURRDEBUG
 
 /*
  * Function Declaration Database Entry functions
@@ -420,7 +420,11 @@ CallTreeNode* CallTree::registerNode(CallTreeNodeType NodeType, FunctionNode* Fu
 
 CallTreeNode* CallTree::registerEndNode(CallTreeNodeType NodeType, std::string identification, CallTreeNodeType LastVisited, PatternCodeRegion* TopOfStack, FunctionNode* surroundingFunc){
 	PatternCodeRegion* CorrespReg = PatternIDisUsed(identification);
-	CallTreeNode* Node = new CallTreeNode(NodeType, CorrespReg);
+	CallTreeNode* Node;
+	if(CorrespReg!=NULL)
+		Node = new CallTreeNode(NodeType, CorrespReg);
+	else
+		Node = new CallTreeNode(NodeType, identification);
 		if(LastVisited == Function_Decl)
 		{
 			appendCallerToNode(surroundingFunc, Node);
@@ -535,21 +539,101 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 		std::cout << "appen AllDecl of " << *Node->GetID()<< std::endl;
 	#endif
 	if(maxdepth > 0 ){
-		CallTreeNodeType NodeType = Node->GetNodeType();
-		//if(NodeType == Root || NodeType == Function_Decl){
-		 for(CallTreeNode* DeclOfCallee : DeclarationVector){
-			for(const auto &CalleeOfNodePair : *Node->GetCallees()){
-				CallTreeNode* CalleeOfNode = CalleeOfNodePair.second;
-				if(CalleeOfNode->GetNodeType() != Pattern_End && CalleeOfNode->compare(DeclOfCallee)){
-					//falls die Kinder von Node die gleiche indentität haben wie eine deklaration im Declaration Vector dann...
-					appendCallerToNode(CalleeOfNode, DeclOfCallee);
-					appendAllDeclToCallTree(DeclOfCallee, maxdepth - 1);
-				}
-			 }
+	 for(CallTreeNode* DeclOfCallee : DeclarationVector){
+		for(const auto &CalleeOfNodePair : *Node->GetCallees()){
+			CallTreeNode* CalleeOfNode = CalleeOfNodePair.second;
+			if(CalleeOfNode->GetNodeType() != Pattern_End && CalleeOfNode->compare(DeclOfCallee)){
+				//falls die Kinder von Node die gleiche indentität haben wie eine deklaration im Declaration Vector dann...
+				appendCallerToNode(CalleeOfNode, DeclOfCallee);
+				appendAllDeclToCallTree(DeclOfCallee, maxdepth - 1);
 			}
-		//}
+		 }
+		}
 	}
 }
+
+void CallTree::setUpTree(){
+		for(CallTreeNode* EndNode : Pattern_EndVector){
+			#ifdef CURRDEBUG
+				std::cout << "Current End Node "<< '\n';
+				EndNode->print();
+			#endif
+			CallTreeNode* CorrespBegin  = findCorrespBegin(EndNode);
+			try{
+				if(CorrespBegin != NULL){
+					CorrespBegin->setCorrespEndRelation(EndNode);
+				}
+				else
+				throw TooManyEndsException();
+			}
+			catch(TooManyEndsException &e){
+				e.what();
+				throw TerminateEarlyException();
+			}
+		}
+}
+
+CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
+	if(EndNode->GetNodeType() != Pattern_End)
+		return NULL;
+
+	CallTreeNode* Caller = EndNode->GetCaller();
+	CallTreeNode* Callertemp = NULL;
+	if(Caller != NULL && Caller->GetNodeType() == Function_Decl)
+	{
+		Callertemp = Caller;
+		Caller = Callertemp->GetCaller();
+	}
+	#ifdef CURRDEBUG
+		std::cout << "Actual Caller: "<< '\n';
+		Caller->print();
+		std::cout << "stored Caller of Caller: " << '\n';
+		(Caller->GetCaller())->print();
+	#endif
+	if (Caller == NULL)
+		throw TooManyEndsException();
+
+	bool hasBegin = Caller->compare(EndNode);
+
+	Caller->setLOCTillPatternEnd(EndNode);
+
+	while(!hasBegin){
+		Caller->setCorrespEndRelation(EndNode);
+		Callertemp = Caller;
+		Caller = Callertemp->GetCaller();
+		#ifdef CURRDEBUG
+
+			std::cout << "Actual Caller: " << '\n';
+			if(Caller != NULL)
+				Caller->print();
+			else
+				std::cout << "The Caller does not exist." << '\n';
+
+			std::cout << "Actual Node: "<< '\n';
+			Callertemp->print();
+
+		#endif
+
+		if(Caller != NULL && Caller->GetNodeType() == Function_Decl)
+		{
+			continue;
+		}
+		else if (Caller == NULL)
+		 throw TooManyEndsException();
+
+		Caller->setLOCTillPatternEnd(EndNode);
+		hasBegin = Caller->compare(EndNode);
+	}
+
+	Caller->setCorrespEndRelation(EndNode);
+
+	if(hasBegin){
+		return Caller;
+	}
+	return NULL;
+}
+
+
 
 std::vector<CallTreeNode*>* CallTree::GetDeclarationVector(){
 	return &DeclarationVector;
@@ -712,6 +796,16 @@ void CallTreeNode::print(){
 		std::cout << "\033[36m" << "Only Printing Identification "<< ":\33[33m"<< *ident << "\033[0m" << std::endl;
 	}
 }
+
+void CallTreeNode::setCorrespEndRelation(CallTreeNode* EndNode){
+	correspPatCallNode = EndNode;
+}
+
+void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* EndNode){
+	int locNodeToEndNode = EndNode->getLineNumber() - getLineNumber();
+	locTillPatternEnd = locNodeToEndNode;
+}
+
 
 std::ostream& operator<<(std::ostream &os, Identification const &ident)
 {

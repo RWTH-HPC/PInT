@@ -34,6 +34,10 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 	if(SourceMan.isInMainFile(Decl->getBeginLoc()))
 	{
 		CurrentFn = Decl;
+		clang::SourceLocation beginLoc = Decl->getBeginLoc();
+		clang::SourceManager& SourceMan = Context->getSourceManager();
+		clang::FullSourceLoc SourceLoc(beginLoc, SourceMan);
+		CallTreeNode* Node;
 
 		if ((CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl)) == NULL)
 		{
@@ -41,11 +45,13 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			CurrentFnEntry = PatternGraph::GetInstance()->GetFunctionNode(Decl);
 		}
 		if(Decl->isMain()){
-			CallTreeNode* root = ClTre->registerNode(Root, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
-			ClTre->setRootNode(root);
+			Node = ClTre->registerNode(Root, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+			ClTre->setRootNode(Node);
 		}
 		else
-			ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+			Node = ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
+
+		Node->SetLineNumber(SourceLoc.getLineNumber());
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 	#endif
@@ -115,7 +121,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceLocation LocStart = CallExpr->getBeginLoc();
 
 				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
-				BeginNode->SetSourceLoc(&LocStart);
+				BeginNode->SetLineNumber(SourceLoc.getLineNumber());
 				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
 				PatternCodeReg->SetStartSourceLoc(LocStart);
 
@@ -150,12 +156,8 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				clang::SourceLocation LocEnd = CallExpr->getEndLoc();
 				clang::FullSourceLoc SourceLoc(LocEnd, SourceMan);
 
-				//PatternCodeReg->SetLastLine(SourceLoc.getLineNumber());
-
 				CallTreeNode* EndNode = ClTre->registerEndNode(Pattern_End, PatternEndHandler.GetLastPatternID(), LastNodeType, PatternCodeReg, CurrentFnEntry);
-
-				EndNode->SetSourceLoc(&LocEnd);
-
+				EndNode->SetLineNumber(SourceLoc.getLineNumber());
 			}
 			// If no: search the called function for patterns
 			else
@@ -177,9 +179,11 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				/* Store this function call in the CallTree (ClTre)*/
 				CallTreeNode* FuncNode = ClTre->registerNode(Function, Func, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
+				clang::SourceManager& SourceMan = Context->getSourceManager();
 				clang::SourceLocation LocStart = CallExpr->getBeginLoc();
+				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
+				FuncNode->SetLineNumber(SourceLoc.getLineNumber());
 
-				FuncNode->SetSourceLoc(&LocStart);
 				PatternCodeRegion* Top;
 				/* if we are within a Pattern -> register this Functon as a child of the pattern etc. */
 				if ((Top = GetTopPatternStack()) != NULL)

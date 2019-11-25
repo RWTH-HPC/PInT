@@ -17,6 +17,14 @@ void Test::TestOperatorTypeQualifiers(){
 
   PatternInstrumentation::Pattern_End("TQ1");
 
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ8");
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ9");
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ10");
+
+
+  PatternInstrumentation::Pattern_End("TQ8");
+  PatternInstrumentation::Pattern_End("TQ9");
+  PatternInstrumentation::Pattern_End("TQ10");
   const int s = 0 , t = 0, d = 0;
 
   const volatile int q = 0 , r = 0, p = 0;

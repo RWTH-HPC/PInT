@@ -263,6 +263,8 @@ public:
 	void insertNodeIntoPattern_EndVector(CallTreeNode* Node);
 	void insertNodeIntoDeclVector(CallTreeNode* Node);
 	void appendAllDeclToCallTree(CallTreeNode* Root, int maxdepth);
+	void setUpTree();
+	CallTreeNode* findCorrespBegin(CallTreeNode* EndNode);
 	std::vector<CallTreeNode*>* GetDeclarationVector();
 	CallTreeNode* getRoot(){return RootNode;};
 private:
@@ -295,9 +297,13 @@ public:
 	bool isCalleeOf(CallTreeNode* Caller);
 	void print();
 	CallTreeNodeType GetNodeType(){return NodeType;};
-	void SetSourceLoc(clang::SourceLocation* Loc){Location = Loc;};
+	void SetLineNumber(int Loc){locTillPatternEnd = Loc;};
+	int getLineNumber(){return lineNumber;};
 	void SetCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
 	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};
+	void setCorrespEndRelation(CallTreeNode* EndNode);
+	void setLOCTillPatternEnd(CallTreeNode* EndNode);
+	int* getLOCTillPatternEnd(){return &locTillPatternEnd;};
 	private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
@@ -307,8 +313,11 @@ public:
 	PatternGraphNode* CorrespondingNode = NULL;
 	std::map<int, CallTreeNode*> Callees;
 	int actNumOfChild = 0;
+	int locTillPatternEnd = 0;
 	const CallTreeNodeType NodeType;
-	clang::SourceLocation* Location;
+	int lineNumber;
+
+	CallTreeNode* correspPatCallNode;
 };
 
 //

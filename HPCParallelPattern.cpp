@@ -369,7 +369,6 @@ void RemoveFromPatternStack(std::string ID)
 {
 	if (!PatternContext.empty())
 	{
-		PatternCodeRegion* Top = PatternContext.back();
 		try{
 			int i = 0;
 			for(PatternCodeRegion* PatCodeReg : PatternContext){
