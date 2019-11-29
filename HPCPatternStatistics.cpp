@@ -3,7 +3,7 @@
 #include <fstream>
 #include "Debug.h"
 
-
+#define LOCDEBUG
 
 /*
  * Methods for the Cyclomatic Complexity Statistic
@@ -227,7 +227,23 @@ void LinesOfCodeStatistic::Print()
 
 		for (PatternOccurrence* PatternOcc : Occurrences)
 		{
-			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
+			#ifdef LOCDEBUG
+				std::cout << "Originalausgabe" << '\n';
+			#endif
+				std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
+
+			#ifdef LOCDEBUG
+			for(PatternCodeRegion* PatCodeReg : PatternOcc->GetCodeRegions()){
+				std::cout << "IDCodeReg: " << PatCodeReg->GetID()<< '\n';
+				std::cout << "Printing out stored LOC for every corresponding CallTreeNode" << '\n';
+				int a = 0;
+				for(CallTreeNode* Node : PatCodeReg->getCorrespondingCallTreeNodes()){
+					std::cout << Node << '\n';
+					std::cout << a <<". " << *Node->getLOCTillPatternEnd() << '\n';
+					a++;
+				}
+			}
+			#endif
 		}
 
 		std::cout << "Line(s) of code respectively." << std::endl << std::endl;

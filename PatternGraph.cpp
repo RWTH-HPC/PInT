@@ -5,8 +5,8 @@
 #include <iostream>
 #include "clang/AST/ODRHash.h"
 #include "HPCError.h"
-#define CURRDEBUG
 
+//#define LOCDEBUG
 /*
  * Function Declaration Database Entry functions
  */
@@ -621,8 +621,9 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 		else if (Caller == NULL)
 		 throw TooManyEndsException();
 
-		Caller->setLOCTillPatternEnd(EndNode);
 		hasBegin = Caller->compare(EndNode);
+		if(hasBegin)
+			Caller->setLOCTillPatternEnd(EndNode);
 	}
 
 	Caller->setCorrespEndRelation(EndNode);
@@ -657,8 +658,8 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, PatternCodeRegion* Correspondi
 	CorrespondingPat->insertCorrespondingCallTreeNode(this);
 
 	#ifdef DEBUG
-		std::cout << "Node of:" << CorrespondingPat->GetID() <<
-		"is created"<< '\n';
+		std::cout << "Node of: " << CorrespondingPat->GetID() <<
+		" is created"<< '\n';
 		if(type == Pattern_Begin)
 		        std::cout << "NodeType = Pattern_Begin" << std::endl;
 		 else if (type == Pattern_End)
@@ -676,8 +677,8 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespondingFun
 	this->SetCorrespondingNode(CorrespondingFunction);
 	CorrespondingFunction->insertCorrespondingCallTreeNode(this);
 
-	#ifdef DEGUB
-		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << "is created"<< '\n';
+	#ifdef DEBUG
+		std::cout << "Node of: "<< CorrespongingFunction->GetHash() << " is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
 	#endif
 }
@@ -689,8 +690,8 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification): N
 		ClTre->insertNodeIntoDeclVector(this);
 	}
 	ident = new Identification(type, identification);
-	#ifdef DEGUB
-		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << "is created"<< '\n';
+	#ifdef DEBUG
+		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << " is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
 	#endif
 }
@@ -802,7 +803,10 @@ void CallTreeNode::setCorrespEndRelation(CallTreeNode* EndNode){
 }
 
 void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* EndNode){
-	int locNodeToEndNode = EndNode->getLineNumber() - getLineNumber();
+	int locNodeToEndNode = EndNode->getLineNumber() - this->getLineNumber() - 1;
+	#ifdef LOCDEBUG
+		std::cout << "in setLOCTillPatternEnd: "<<  *EndNode->GetID()<<" "<< EndNode->getLineNumber() << " - "<< *this->GetID()<<" "<<this->getLineNumber() << " = "<<locNodeToEndNode << '\n';
+	#endif
 	locTillPatternEnd = locNodeToEndNode;
 }
 

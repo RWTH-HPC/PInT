@@ -1,8 +1,7 @@
 #include "TreeVisualisation.h"
 
 #include <iostream>
-//#define PRINT_ONLYPATTERNDENUG
-//#define DEBUG
+//#define LOCDEBUG
 
 /**
  * @brief Prints the call tree recursively, beginning with the main function.
@@ -34,6 +33,9 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, CallTree* CalTre){
 #ifdef DEBUG
 	const Identification* currentIdent = currentNode->GetID();
   std::cout << *currentIdent << '\n';
+#endif
+#ifdef LOCDEBUG
+	std::cout << currentNode << '\n';
 #endif
 	PrintCallTreeRecursively (currentNode, 0, maxdepth);
 }
@@ -157,6 +159,9 @@ void CallTreeVisualisation::PrintCallTreeRecursively(CallTreeNode* ClTrNode, int
 	if(ClTrNode->GetNodeType()!= Function_Decl){
 		PrintIndent(depth);
 		ClTrNode->print();
+		#ifdef LOCDEBUG
+			std::cout <<"Adress of CallTreeNode: "<< ClTrNode << '\n';
+		#endif
 	}
 	#ifdef DEBUG
 		std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;

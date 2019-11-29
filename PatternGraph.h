@@ -297,7 +297,7 @@ public:
 	bool isCalleeOf(CallTreeNode* Caller);
 	void print();
 	CallTreeNodeType GetNodeType(){return NodeType;};
-	void SetLineNumber(int Loc){locTillPatternEnd = Loc;};
+	void SetLineNumber(int Loc){lineNumber = Loc;};
 	int getLineNumber(){return lineNumber;};
 	void SetCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
 	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};

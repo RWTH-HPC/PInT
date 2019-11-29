@@ -163,6 +163,8 @@ public:
 		CorrespondingCallTreeNodes.push_back(Node);
 	}
 
+	std::vector<CallTreeNode*> getCorrespondingCallTreeNodes(){return CorrespondingCallTreeNodes;}
+
 private:
 	PatternOccurrence* PatternOcc;
 
@@ -176,6 +178,7 @@ private:
 	std::vector<PatternGraphNode*> Children;
 	std::vector<PatternCodeRegion*> PatternParents;
 	std::vector<PatternCodeRegion*> PatternChildren;
+	std::vector<int> LOCofCallTree;
 	int LinesOfCode = 0;
 
 	std::vector<CallTreeNode*> CorrespondingCallTreeNodes;

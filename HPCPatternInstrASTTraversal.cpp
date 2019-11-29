@@ -17,6 +17,7 @@
 #include "HPCError.h"
 #endif
 //#define PRINT_DEBUG
+//#define LOCDEBUG
 
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.
@@ -52,6 +53,9 @@ bool HPCPatternInstrVisitor::VisitFunctionDecl(clang::FunctionDecl *Decl)
 			Node = ClTre->registerNode(Function_Decl, CurrentFnEntry, LastNodeType, GetTopPatternStack(), CurrentFnEntry);
 
 		Node->SetLineNumber(SourceLoc.getLineNumber());
+		#ifdef LOCDEBUG
+			std::cout << "setted LineNumber of: "<< *Node->GetID()<<" to "<< SourceLoc.getLineNumber()<<" verification: "<<Node->getLineNumber()<< '\n';
+		#endif
 	#ifdef PRINT_DEBUG
 		std::cout << CurrentFnEntry->GetFnName() << " (" << CurrentFnEntry->GetHash() << ")" << std::endl;
 	#endif
@@ -122,6 +126,9 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				clang::FullSourceLoc SourceLoc(LocStart, SourceMan);
 				BeginNode->SetLineNumber(SourceLoc.getLineNumber());
+				#ifdef LOCDEBUG
+					std::cout << "setted LineNumber of: "<< *BeginNode->GetID()<<" to "<< SourceLoc.getLineNumber()<<" verification: "<<BeginNode->getLineNumber()<< '\n';
+				#endif
 				PatternCodeReg->SetFirstLine(SourceLoc.getLineNumber());
 				PatternCodeReg->SetStartSourceLoc(LocStart);
 
@@ -158,6 +165,9 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 
 				CallTreeNode* EndNode = ClTre->registerEndNode(Pattern_End, PatternEndHandler.GetLastPatternID(), LastNodeType, PatternCodeReg, CurrentFnEntry);
 				EndNode->SetLineNumber(SourceLoc.getLineNumber());
+				#ifdef LOCDEBUG
+					std::cout << "setted LineNumber of: "<< *EndNode->GetID()<<" to "<< SourceLoc.getLineNumber()<<" verification: "<<EndNode->getLineNumber()<< '\n';
+				#endif
 			}
 			// If no: search the called function for patterns
 			else
