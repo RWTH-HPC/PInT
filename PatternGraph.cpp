@@ -6,7 +6,7 @@
 #include "clang/AST/ODRHash.h"
 #include "HPCError.h"
 
-//#define LOCDEBUG
+#define LOCDEBUG
 /*
  * Function Declaration Database Entry functions
  */
@@ -553,24 +553,30 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 }
 
 void CallTree::setUpTree(){
-		for(CallTreeNode* EndNode : Pattern_EndVector){
-			#ifdef CURRDEBUG
-				std::cout << "Current End Node "<< '\n';
-				EndNode->print();
-			#endif
-			CallTreeNode* CorrespBegin  = findCorrespBegin(EndNode);
-			try{
-				if(CorrespBegin != NULL){
-					CorrespBegin->setCorrespEndRelation(EndNode);
-				}
-				else
-				throw TooManyEndsException();
-			}
-			catch(TooManyEndsException &e){
-				e.what();
-				throw TerminateEarlyException();
-			}
+	#ifdef LOCDEBUG
+		std::cout << "PRINTING PATTNER_ENDVECTOR:" << '\n';
+		for(CallTreeNode* Node : Pattern_EndVector){
+			std::cout << *Node->GetID() << '\n';
 		}
+	#endif
+	for(CallTreeNode* EndNode : Pattern_EndVector){
+		#ifdef CURRDEBUG
+			std::cout << "Current End Node "<< '\n';
+			EndNode->print();
+		#endif
+		CallTreeNode* CorrespBegin  = findCorrespBegin(EndNode);
+		try{
+			if(CorrespBegin != NULL){
+				CorrespBegin->setCorrespCallTreeNodeRelation(EndNode);
+			}
+			else
+				throw TooManyEndsException();
+		}
+		catch(TooManyEndsException &e){
+			e.what();
+			throw TerminateEarlyException();
+		}
+	}
 }
 
 CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
@@ -578,55 +584,43 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 		return NULL;
 
 	CallTreeNode* Caller = EndNode->GetCaller();
-	CallTreeNode* Callertemp = NULL;
-	if(Caller != NULL && Caller->GetNodeType() == Function_Decl)
-	{
-		Callertemp = Caller;
-		Caller = Callertemp->GetCaller();
-	}
+	CallTreeNode* Callertemp = EndNode;
+
 	#ifdef CURRDEBUG
 		std::cout << "Actual Caller: "<< '\n';
 		Caller->print();
 		std::cout << "stored Caller of Caller: " << '\n';
 		(Caller->GetCaller())->print();
 	#endif
-	if (Caller == NULL)
-		throw TooManyEndsException();
 
-	bool hasBegin = Caller->compare(EndNode);
-
-	Caller->setLOCTillPatternEnd(EndNode);
+	bool hasBegin = false;
 
 	while(!hasBegin){
-		Caller->setCorrespEndRelation(EndNode);
-		Callertemp = Caller;
-		Caller = Callertemp->GetCaller();
-		#ifdef CURRDEBUG
+		if (Caller == NULL)
+			throw TooManyEndsException();
 
+		#ifdef CURRDEBUG
 			std::cout << "Actual Caller: " << '\n';
 			if(Caller != NULL)
 				Caller->print();
 			else
 				std::cout << "The Caller does not exist." << '\n';
-
 			std::cout << "Actual Node: "<< '\n';
 			Callertemp->print();
-
 		#endif
 
-		if(Caller != NULL && Caller->GetNodeType() == Function_Decl)
-		{
-			continue;
-		}
-		else if (Caller == NULL)
-		 throw TooManyEndsException();
-
+		Caller->setLOCTillPatternEnd(Callertemp, EndNode);
 		hasBegin = Caller->compare(EndNode);
-		if(hasBegin)
-			Caller->setLOCTillPatternEnd(EndNode);
-	}
 
-	Caller->setCorrespEndRelation(EndNode);
+		if(hasBegin){
+			Caller->setCorrespCallTreeNodeRelation(EndNode);
+			EndNode->setCorrespCallTreeNodeRelation(Caller);
+			break;
+		}
+
+		Callertemp = Caller;
+		Caller = Callertemp->GetCaller();
+	}
 
 	if(hasBegin){
 		return Caller;
@@ -654,7 +648,7 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, PatternCodeRegion* Correspondi
 	else if(NodeType == Pattern_End)
 		ClTre->insertNodeIntoPattern_EndVector(this);
 	ident = new Identification(type, CorrespondingPat->GetID());
-	this->SetCorrespondingNode(CorrespondingPat);
+	this->setCorrespondingNode(CorrespondingPat);
 	CorrespondingPat->insertCorrespondingCallTreeNode(this);
 
 	#ifdef DEBUG
@@ -674,7 +668,7 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespondingFun
 		ClTre->insertNodeIntoDeclVector(this);
 	}
 	ident = new Identification(type, CorrespondingFunction->GetHash());
-	this->SetCorrespondingNode(CorrespondingFunction);
+	this->setCorrespondingNode(CorrespondingFunction);
 	CorrespondingFunction->insertCorrespondingCallTreeNode(this);
 
 	#ifdef DEBUG
@@ -688,6 +682,9 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification): N
 	if(NodeType == Pattern_Begin)
 	{
 		ClTre->insertNodeIntoDeclVector(this);
+	}
+	else if(NodeType == Pattern_End){
+		ClTre->insertNodeIntoPattern_EndVector(this);
 	}
 	ident = new Identification(type, identification);
 	#ifdef DEBUG
@@ -798,16 +795,53 @@ void CallTreeNode::print(){
 	}
 }
 
-void CallTreeNode::setCorrespEndRelation(CallTreeNode* EndNode){
-	correspPatCallNode = EndNode;
+void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* Child, CallTreeNode* EndNode){
+	int locNodeToEndNode;
+	if(Child == EndNode){
+		#ifdef LOCDEBUG
+			std::cout << "Child and EndNode are the same." << '\n';
+		#endif
+		EndNode->insertLOCToPatternEnd(EndNode, 0);
+	}
+	/*if(GetNodeType()== Function_Decl){
+		std::map<CallTreeNode*, int>* map = Child->getMapLOCToPatternEnds();
+		int entry = map->find(EndNode)->second;
+		int lOC = entry +  Child->getLineNumber() - getLineNumber();
+		this->insertLOCToPatternEnd(EndNode, lOC);
+		#ifdef LOCDEBUG
+			std::cout << "FOR ENDNODE: "<<*EndNode->GetID() << '\n';
+			std::cout << "Caller is FunctionDecl:" << '\n';
+			int storedLineNumber = (getMapLOCToPatternEnds()->find(EndNode))->second;
+			std::cout << "in setLOCTillPatternEnd: "<< entry << " + "<<  *Child->GetID()<<" "<< Child->getLineNumber() << " - "<< *this->GetID()<<" "<<this->getLineNumber() << "= "<<lOC<< " verification" <<storedLineNumber << '\n';
+		#endif
+	}*/
+	if(Child->GetNodeType() == Function_Decl){
+		//copy corresponding entry of Function_Decl
+		auto correspEntry = (Child->getMapLOCToPatternEnds())->find(EndNode);
+		insertLOCToPatternEnd(correspEntry->first, correspEntry->second);
+		#ifdef LOCDEBUG
+			std::cout << "Copy operation:" << '\n';
+			std::cout << "copied "<<  *(correspEntry->first)->GetID()<<" "<< correspEntry->second<< " to "<< *GetID()<< '\n';
+		#endif
+	}
+	else{
+		int correspEntry = (Child->getMapLOCToPatternEnds())->find(EndNode)->second;
+		locNodeToEndNode = correspEntry + (Child->getLineNumber() - getLineNumber());
+		insertLOCToPatternEnd(EndNode, locNodeToEndNode);
+
+		#ifdef LOCDEBUG
+			int storedLineNumber = (getMapLOCToPatternEnds()->find(EndNode))->second;
+			std::cout << "FOR ENDNODE: "<<*EndNode->GetID() << '\n';
+			std::cout << "in setLOCTillPatternEnd: "<< correspEntry << " + "<<  *Child->GetID()<<" "<< Child->getLineNumber() << " - "<< *this->GetID()<<" "<<this->getLineNumber() << "= "<<locNodeToEndNode<< " verification" <<storedLineNumber << '\n';
+		#endif
+	}
+	if(this->compare(EndNode)){
+		locTillPatternEnd = getMapLOCToPatternEnds()->find(EndNode)->second;
+		}
 }
 
-void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* EndNode){
-	int locNodeToEndNode = EndNode->getLineNumber() - this->getLineNumber() - 1;
-	#ifdef LOCDEBUG
-		std::cout << "in setLOCTillPatternEnd: "<<  *EndNode->GetID()<<" "<< EndNode->getLineNumber() << " - "<< *this->GetID()<<" "<<this->getLineNumber() << " = "<<locNodeToEndNode << '\n';
-	#endif
-	locTillPatternEnd = locNodeToEndNode;
+void CallTreeNode::insertLOCToPatternEnd(CallTreeNode* Node, int Loc){
+	LocTillEnds.insert({Node, Loc});
 }
 
 

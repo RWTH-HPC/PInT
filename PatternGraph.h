@@ -299,11 +299,14 @@ public:
 	CallTreeNodeType GetNodeType(){return NodeType;};
 	void SetLineNumber(int Loc){lineNumber = Loc;};
 	int getLineNumber(){return lineNumber;};
-	void SetCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
+	void setCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
 	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};
-	void setCorrespEndRelation(CallTreeNode* EndNode);
-	void setLOCTillPatternEnd(CallTreeNode* EndNode);
+	void setCorrespCallTreeNodeRelation(CallTreeNode* PatCallNode){correspPatCallNode = PatCallNode;}
+	CallTreeNode* getCorrespCallTreeNodeRelation(){return correspPatCallNode;}
+	void setLOCTillPatternEnd(CallTreeNode* Child,  CallTreeNode* EndNode);
 	int* getLOCTillPatternEnd(){return &locTillPatternEnd;};
+	std::map<CallTreeNode*, int>* getMapLOCToPatternEnds(){return &LocTillEnds;};
+	void insertLOCToPatternEnd(CallTreeNode* Node, int Loc);
 	private:
 	/*The identification does not identify the CallTreeNode but it identifies the
 	  belonging Pattern or Function.
@@ -314,6 +317,7 @@ public:
 	std::map<int, CallTreeNode*> Callees;
 	int actNumOfChild = 0;
 	int locTillPatternEnd = 0;
+	std::map<CallTreeNode*, int> LocTillEnds;
 	const CallTreeNodeType NodeType;
 	int lineNumber;
 
