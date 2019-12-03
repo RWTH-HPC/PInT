@@ -803,18 +803,6 @@ void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* Child, CallTreeNode* EndNo
 		#endif
 		EndNode->insertLOCToPatternEnd(EndNode, 0);
 	}
-	/*if(GetNodeType()== Function_Decl){
-		std::map<CallTreeNode*, int>* map = Child->getMapLOCToPatternEnds();
-		int entry = map->find(EndNode)->second;
-		int lOC = entry +  Child->getLineNumber() - getLineNumber();
-		this->insertLOCToPatternEnd(EndNode, lOC);
-		#ifdef LOCDEBUG
-			std::cout << "FOR ENDNODE: "<<*EndNode->GetID() << '\n';
-			std::cout << "Caller is FunctionDecl:" << '\n';
-			int storedLineNumber = (getMapLOCToPatternEnds()->find(EndNode))->second;
-			std::cout << "in setLOCTillPatternEnd: "<< entry << " + "<<  *Child->GetID()<<" "<< Child->getLineNumber() << " - "<< *this->GetID()<<" "<<this->getLineNumber() << "= "<<lOC<< " verification" <<storedLineNumber << '\n';
-		#endif
-	}*/
 	if(Child->GetNodeType() == Function_Decl){
 		//copy corresponding entry of Function_Decl
 		auto correspEntry = (Child->getMapLOCToPatternEnds())->find(EndNode);
