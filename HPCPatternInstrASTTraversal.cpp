@@ -16,8 +16,7 @@
 #ifndef HPCERROR_H
 #include "HPCError.h"
 #endif
-//#define PRINT_DEBUG
-#define LOCDEBUG
+
 
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.

@@ -131,7 +131,13 @@ int PatternOccurrence::GetTotalLinesOfCode()
 
 	for (PatternCodeRegion* CodeReg : this->CodeRegions)
 	{
-		LOC += CodeReg->GetLinesOfCode();
+		LOC += *((CodeReg->getCorrespondingCallTreeNodes())->front())->getLOCTillPatternEnd();
+		#ifdef LOCDEBUG
+			for(CallTreeNode* Node : *getCorrespondingCallTreeNodes()){
+				std::cout << "FOR "<< Node->GetID()<< "printing" << '\n';
+				std::cout << Node->getLOCTillPatternEnd() << '\n';
+			}
+		#endif
 	}
 
 	return LOC;

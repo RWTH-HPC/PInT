@@ -285,9 +285,9 @@ public:
 	bool hasEnd();
 	void setID();
 	Identification* GetID();
-	std::map<int, CallTreeNode*>* GetCallees();
+	std::map<double, CallTreeNode*>* GetCallees();
 	CallTreeNode* GetCaller();
-	void insertCallee(CallTreeNode* Node);
+	void insertCallee(CallTreeNode* Node,double key = 0.0);
 	bool isAlreadyCallee(CallTreeNode* Callee);
 	void SetCaller(CallTreeNode* Node);
 		//returns 1 if the node has the same underlying function/pattern otherwise 0
@@ -314,7 +314,7 @@ public:
 	Identification* ident;
 	CallTreeNode* Caller = NULL;
 	PatternGraphNode* CorrespondingNode = NULL;
-	std::map<int, CallTreeNode*> Callees;
+	std::map<double, CallTreeNode*> Callees;
 	int actNumOfChild = 0;
 	int locTillPatternEnd = 0;
 	std::map<CallTreeNode*, int> LocTillEnds;

@@ -163,7 +163,7 @@ public:
 		CorrespondingCallTreeNodes.push_back(Node);
 	}
 
-	std::vector<CallTreeNode*> getCorrespondingCallTreeNodes(){return CorrespondingCallTreeNodes;}
+	std::vector<CallTreeNode*>* getCorrespondingCallTreeNodes(){return &CorrespondingCallTreeNodes;}
 
 private:
 	PatternOccurrence* PatternOcc;

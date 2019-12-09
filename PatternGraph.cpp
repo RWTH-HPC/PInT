@@ -6,7 +6,9 @@
 #include "clang/AST/ODRHash.h"
 #include "HPCError.h"
 
-#define LOCDEBUG
+#define TEST
+#define CURRDEBUG
+//#define DEBUG
 /*
  * Function Declaration Database Entry functions
  */
@@ -425,6 +427,9 @@ CallTreeNode* CallTree::registerEndNode(CallTreeNodeType NodeType, std::string i
 		Node = new CallTreeNode(NodeType, CorrespReg);
 	else
 		Node = new CallTreeNode(NodeType, identification);
+		#ifdef DEBUG
+			std::cout << "LastVisited = "<< LastVisited << '\n';
+		#endif
 		if(LastVisited == Function_Decl)
 		{
 			appendCallerToNode(surroundingFunc, Node);
@@ -438,7 +443,7 @@ CallTreeNode* CallTree::registerEndNode(CallTreeNodeType NodeType, std::string i
 			{
 				appendCallerToNode(surroundingFunc, Node);
 				#ifdef DEBUG
-					std::cout << "Last visited PatternCodereg von " <<identification<< " and Stack not empty!"<< '\n';
+					std::cout << "Last visited " <<surroundingFunc->GetHash()<< " and Stack is empty!"<< '\n';
 				#endif
 			}
 			else
@@ -495,7 +500,15 @@ void CallTree::appendCallerToNode(FunctionNode* Caller, CallTreeNode* Node)
 	}
 	else{
 			for(CallTreeNode* DeclOfCaller : this->DeclarationVector){
+				#ifdef DEBUG
+					if(Node->GetID()->getIdentificationString() == "TQ1"){
+						std::cout << "for TQ1 checking Declaration: "<< *DeclOfCaller->GetID() << '\n';
+					}
+				#endif
 				if(DeclOfCaller->compare(Caller->GetHash())){
+					#ifdef DEBUG
+						std::cout << "comparison successful. Appending "<<*DeclOfCaller->GetID()<<"as Caller" << '\n';
+					#endif
 					Node->SetCaller(DeclOfCaller);
 					DeclOfCaller->insertCallee(Node);
 					return;
@@ -542,8 +555,11 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 	 for(CallTreeNode* DeclOfCallee : DeclarationVector){
 		for(const auto &CalleeOfNodePair : *Node->GetCallees()){
 			CallTreeNode* CalleeOfNode = CalleeOfNodePair.second;
-			if(CalleeOfNode->GetNodeType() != Pattern_End && CalleeOfNode->compare(DeclOfCallee)){
+			if(CalleeOfNode->GetNodeType() != Pattern_End  && CalleeOfNode->compare(DeclOfCallee)){
 				//falls die Kinder von Node die gleiche indentität haben wie eine deklaration im Declaration Vector dann...
+				#ifdef DEBUG
+					std::cout << "appended "<< *CalleeOfNode->GetID()<< "as a Caller to "<<*DeclOfCallee->GetID() << '\n';
+				#endif
 				appendCallerToNode(CalleeOfNode, DeclOfCallee);
 				appendAllDeclToCallTree(DeclOfCallee, maxdepth - 1);
 			}
@@ -560,6 +576,10 @@ void CallTree::setUpTree(){
 		}
 	#endif
 	for(CallTreeNode* EndNode : Pattern_EndVector){
+		if(EndNode->GetCorrespondingNode()== NULL){
+			PatternCodeRegion* CorrespReg = PatternIDisUsed(EndNode->GetID()->getIdentificationString());
+			EndNode->setCorrespondingNode(CorrespReg);
+		}
 		#ifdef CURRDEBUG
 			std::cout << "Current End Node "<< '\n';
 			EndNode->print();
@@ -568,6 +588,7 @@ void CallTree::setUpTree(){
 		try{
 			if(CorrespBegin != NULL){
 				CorrespBegin->setCorrespCallTreeNodeRelation(EndNode);
+
 			}
 			else
 				throw TooManyEndsException();
@@ -587,10 +608,7 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 	CallTreeNode* Callertemp = EndNode;
 
 	#ifdef CURRDEBUG
-		std::cout << "Actual Caller: "<< '\n';
-		Caller->print();
-		std::cout << "stored Caller of Caller: " << '\n';
-		(Caller->GetCaller())->print();
+		std::cout << "Actual Caller: "<< *Caller->GetID()<<std::endl;
 	#endif
 
 	bool hasBegin = false;
@@ -602,7 +620,7 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 		#ifdef CURRDEBUG
 			std::cout << "Actual Caller: " << '\n';
 			if(Caller != NULL)
-				Caller->print();
+			std::cout<<	*Caller->GetID();
 			else
 				std::cout << "The Caller does not exist." << '\n';
 			std::cout << "Actual Node: "<< '\n';
@@ -672,7 +690,7 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type ,FunctionNode* CorrespondingFun
 	CorrespondingFunction->insertCorrespondingCallTreeNode(this);
 
 	#ifdef DEBUG
-		std::cout << "Node of: "<< CorrespongingFunction->GetHash() << " is created"<< '\n';
+		std::cout << "Node of: "<< CorrespondingFunction->GetHash() << " is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
 	#endif
 }
@@ -688,7 +706,7 @@ CallTreeNode::CallTreeNode(CallTreeNodeType type, std::string identification): N
 	}
 	ident = new Identification(type, identification);
 	#ifdef DEBUG
-		std::cout << "Node of:"<< CorrespongingFunction->GetHash() << " is created"<< '\n';
+		std::cout << "Node of:"<<identification<< " is created"<< '\n';
 		std::cout << "Node Type = " << type << std::endl;
 	#endif
 }
@@ -698,7 +716,7 @@ Identification* CallTreeNode::GetID()
 	return this->ident;
 }
 
-std::map<int, CallTreeNode*>* CallTreeNode::GetCallees(){
+std::map<double, CallTreeNode*>* CallTreeNode::GetCallees(){
 	return &Callees;
 }
 
@@ -706,11 +724,29 @@ CallTreeNode* CallTreeNode::GetCaller(){
 	return this->Caller;
 }
 
-void CallTreeNode::insertCallee(CallTreeNode* Node){
+void CallTreeNode::insertCallee(CallTreeNode* Node, double key){
+	#ifdef DEBUG
+	std::cout << "in insertCallee" << '\n';
+	#endif
 	// it is not allowed to appent the same object (with the same adress) twice
-	if(!isAlreadyCallee(Node))
-		Callees[actNumOfChild] = Node;
-		actNumOfChild++;
+	if(!isAlreadyCallee(Node)){
+		#ifdef DEBUG
+		std::cout << "!isAlreadyCallee = " << !isAlreadyCallee(Node) << '\n';
+		#endif
+		if(key != 0.0){
+			#ifdef DEBUG
+			std::cout << "inserting "<< *Node->GetID()<< " at position "<<key << '\n';
+			#endif
+			Callees[key] = Node;
+		}
+		else{
+			#ifdef DEBUG
+			std::cout << "inserting "<< *Node->GetID()<< " at position "<<actNumOfChild << '\n';
+			#endif
+			Callees[actNumOfChild] = Node;
+			actNumOfChild++;
+		}
+	}
 }
 
 bool CallTreeNode::isAlreadyCallee(CallTreeNode* Callee){
@@ -825,6 +861,47 @@ void CallTreeNode::setLOCTillPatternEnd(CallTreeNode* Child, CallTreeNode* EndNo
 	}
 	if(this->compare(EndNode)){
 		locTillPatternEnd = getMapLOCToPatternEnds()->find(EndNode)->second;
+
+		/*delete all Children of the PatternBegin which are't really children
+		 * that means erasing all children which where assigned after this one
+		 * (have higher keys)
+		*/
+		std::map<double, CallTreeNode*>* MapCallees = GetCallees();
+		int childKey;
+		CallTreeNode* callerOfThis = GetCaller();
+		double callerChildKey;
+		std::map<double, CallTreeNode*>* mapCallerCallees = callerOfThis->GetCallees();
+		for(auto nodeEntry = mapCallerCallees->begin() ; nodeEntry != mapCallerCallees->end();){
+			if(nodeEntry->second == this){
+				callerChildKey = nodeEntry->first;
+				break;
+			}
+			else
+				nodeEntry++;
+		}
+
+		for(auto nodeEntry = MapCallees->begin() ; nodeEntry != MapCallees->end();){
+			if(nodeEntry->second == Child){
+				childKey = nodeEntry->first;
+			}//for every Child wich comes after the Child which contains the as the end as an
+			//successor. Delete the Child as A child of Pattern_Begin and add his child
+			// to the Caller of Pattern_Begin
+			if(nodeEntry->first > childKey){
+				#ifdef CHILDDEBUG
+					std::cout << "ERASING "<<nodeEntry->first << *((nodeEntry.second)->GetID()) << '\n';
+				#endif
+				callerChildKey += 0.1;
+				callerOfThis->insertCallee(nodeEntry->second, callerChildKey);
+				nodeEntry = MapCallees->erase(nodeEntry);
+			}
+			else{
+				nodeEntry++;
+			}
+
+		}
+		#ifdef LOCDEBUG
+			std::cout << "set locTillPatternEnd from "<< *GetID()<< " to "<< locTillPatternEnd << '\n';
+		#endif
 		}
 }
 

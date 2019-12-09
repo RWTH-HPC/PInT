@@ -19,7 +19,7 @@
 #endif
 
 //#define DEBUG
-int  MAX_DEPTH = 4;
+int  MAX_DEPTH = 8;
 
 /**
  * @mainpage Clang Pattern Instrumentation Tool
@@ -170,15 +170,16 @@ int main (int argc, const char** argv)
         for(CallTreeNode* Node : *ClTre->GetDeclarationVector())
         {
           std::cout << *Node->GetID() << " " << Node->GetNodeType()<< std::endl;
-          for(CallTreeNode* Callee : *Node->GetCallees()){
-            std::cout << "--> " << *Callee->GetID() << " " << Callee->GetNodeType()<< std::endl;
+          for(auto CalleeEntry = (Node->GetCallees())->begin() ; CalleeEntry != (Node->GetCallees())->end();){
+            std::cout << "--> " << *(CalleeEntry->second)->GetID() << " " << (CalleeEntry->second)->GetNodeType()<< std::endl;
+            CalleeEntry++;
           }
         }
       #endif
       ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
       ClTre->setUpTree();
 
-			lookIfEveryPatternEnds();
+			//lookIfEveryPatternEnds();
 		}
 		catch(std::exception& terminate){
 			std::cout << terminate.what() << '\n';
