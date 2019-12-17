@@ -150,7 +150,7 @@ bool HPCPatternInstrVisitor::VisitCallExpr(clang::CallExpr *CallExpr)
 				}
 				catch(TooManyEndsException& e){
 					e.what();
-					//throw TerminateEarlyException();
+					throw TerminateEarlyException();
 				}
 				#ifdef PRINT_DEBUG
 				std::cout << "Degub dump of Args after matching" << '\n';
