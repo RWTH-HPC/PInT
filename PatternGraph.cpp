@@ -705,31 +705,6 @@ void CallTreeNode::SetCaller(CallTreeNode* Node)
 	this->Caller = Node;
 }
 
-bool CallTreeNode::hasEnd()
-{
-	if(this->NodeType == Pattern_Begin)
-	{
-		std::map<int, CallTreeNode*> tempQueue (Callees.begin(), Callees.end());
-		CallTreeNode* tempNode;
-		bool returnBool;
-		for(int i = 0; i < tempQueue.size(); i++){
-			tempNode = tempQueue[i];
-
-			if(tempNode->compare(this) && tempNode->NodeType == Pattern_End){
-				return true;
-			}
-			else{
-				returnBool = tempNode->hasEnd();
-			}
-			if(returnBool){
-				return returnBool;
-			}
-		}
-		return false;
-	}
-	return false;
-}
-
 bool CallTreeNode::compare(CallTreeNode* otherNode)
 {
 	return ident->compare(otherNode->GetID());

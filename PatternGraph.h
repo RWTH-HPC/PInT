@@ -412,7 +412,7 @@ public:
 		**/
 	std::vector<CallTreeNode*>* GetDeclarationVector();
 	/**
-		* returns the root of the CallTree. 
+		* returns the root of the CallTree.
 		**/
 	CallTreeNode* getRoot(){return RootNode;};
 private:
@@ -420,60 +420,179 @@ private:
 	std::vector<CallTreeNode*> Pattern_EndVector;
 	// the RootNode is the main function, which is probably named differently
 	CallTreeNode* RootNode = NULL;
+	/**
+		*This vector stores all CallTreeNodes which are corresponding to a function declaration or a Pattern_Begin
+		**/
 	std::vector<CallTreeNode*> DeclarationVector;
 };
+
+/**
+	* There are five types of CallTreeNodes Function, Function_Decl, Pattern_Begin, Pattern_End and Root.
+	* A CallTreeNode with the NodeType Function is generated when we encounter a function call during the traversation. A CallTreeNode with the NodeType Function_Decl is gernerated when we encounter a function declaration, a Pattern_Begin when a Pattern_Begin call is encountered and a Pattern_End when a Pattern_End call is encountered. The CallTreeNode with NodeType Root is crated when the main is encountered. In general multiple CallTreeNodes can relate to a single function call or Pattern_Begin or Pattern_End.
+	**/
 
 class CallTreeNode
 {
 public:
+	/**
+		*Destructor.
+		**/
 	~CallTreeNode();
+	/**
+		*Constructor of a CallTreeNode eather corresponding to a Pattern_End or a Pattern_Begin.
+		**/
 	CallTreeNode(CallTreeNodeType type,  PatternCodeRegion* CorrespondingPat);
+	/**
+		* Constructor of a CallTreeNode eather corresponding to a function call or a function declaration.
+		**/
 	CallTreeNode(CallTreeNodeType type, FunctionNode* CorrespondingFunction);
+	/**
+		* Constructor of a CallTreeNode eather corresponding to a Pattern_End or a Pattern_Begin. When the specific PatternCodeRegion is not known during the generation of the CallTreeNode.
+		**/
 	CallTreeNode(CallTreeNodeType type, std::string identification);
-	bool hasEnd();
-	void setID();
+	/**
+		* Returns the Identification of a CallTreeNode
+		**/
 	Identification* GetID();
+	/**
+		* Returns a pointer of the Callee std::map.
+		**/
 	std::map<double, CallTreeNode*>* GetCallees();
+	/**
+		* Returns a pointer of the CallTreeNode Caller.
+		**/
 	CallTreeNode* GetCaller();
+	/**
+		* Inserts a CallTreeNode into the Callee std::map.
+		**/
 	void insertCallee(CallTreeNode* Node,double key = 0.0);
+	/**
+		* Proofes if a CallTreeNode Callee is already in the Callee std::map.
+		* returns 1 if Callee is already stored in the Callee std::map otherwise 0.
+		**/
 	bool isAlreadyCallee(CallTreeNode* Callee);
+	/**
+		* Declares the CallTreeNode Node to the Caller of this.
+		**/
 	void SetCaller(CallTreeNode* Node);
-		//returns 1 if the node has the same underlying function/pattern otherwise 0
+	/**
+		* returns 1 if the node has the same underlying function/pattern otherwise 0
+		**/
 	bool compare(CallTreeNode* otherNode);
+	/**
+		* returns 1 if the node has the same underlying function/pattern otherwise 0
+		**/
 	bool compare(unsigned Hash);
+	/**
+		* returns 1 if the node has the same underlying function/pattern otherwise 0
+		**/
 	bool compare(std::string Id);
+	/**
+		* returns 1 if this is a Callee of Caller
+		**/
 	bool isCalleeOf(CallTreeNode* Caller);
+	/**
+		* For pattern it prints the ID (hashValue/String), the pattern name, the DesignSpace and END if the CallTreeNode corresponds to an Pattern_End.
+		* For function ist prints the name of the function and a HashValue.
+		* For CallTreeNodes from wich we dont, know the corresponding pattern or function it prints out the Identification which is always declared.
+		**/
 	void print();
+	/**
+		* Returns the NodeType of this.
+		**/
 	CallTreeNodeType GetNodeType(){return NodeType;};
+	/**
+		* Declares the int lineNumber of this.
+		**/
 	void SetLineNumber(int Loc){lineNumber = Loc;};
+	/**
+		* Returns the int lineNumber of this.
+		**/
 	int getLineNumber(){return lineNumber;};
+	/**
+		* Sets the GraphNode CorrespondingNode to Node. This declares wo which GraphNode (PatternCodeRegion of FunctionNode) <b>this</b> belongs.
+		**/
 	void setCorrespondingNode(PatternGraphNode* Node){CorrespondingNode = Node;};
+	/**
+		* Returns the CorrespondingNode of this.
+		**/
 	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};
+	/**
+		* This sets correspPatCallNode to PatCallNode. It is used to store the belonging Pattern_Begin to a Pattern_End or the other way  arround. For CallTreeNodes with the type Function or Function_Decl this should be NULL.
+		**/
 	void setCorrespCallTreeNodeRelation(CallTreeNode* PatCallNode){correspPatCallNode = PatCallNode;}
+	/**
+		* Returns correspPatCallNode.
+		**/
 	CallTreeNode* getCorrespCallTreeNodeRelation(){return correspPatCallNode;}
+	/**
+		* This function stores amount of lines between this and EndNode. Child has to be a direct Child of this and EndNode has to be already within the std::map LocTillEnds of Child.
+		* If the Child is a Function_Decl the belonging entry (the entry of EndNode) is only copied in the std::map LocTillEnds of this.
+		**/
 	void setLOCTillPatternEnd(CallTreeNode* Child,  CallTreeNode* EndNode);
+	/**
+		* This stores the number of lines between a Patten_End and a Pattern_Begin. But it should be only read  in the CallTreeNode corresponding to the Pattern_Begin.
+		**/
 	int* getLOCTillPatternEnd(){return &locTillPatternEnd;};
+	/**
+		* Returns the std::map LocTillEnds which at the end of the traversation should contain all lines of code to all Pattern_Ends which surround  this CallTreeNode. (All the patterns in which are a parent of this CallTreeNode.)
+		**/
 	std::map<CallTreeNode*, int>* getMapLOCToPatternEnds(){return &LocTillEnds;};
+	/**
+		* Inserts a Node (key) and a number in LocTillEnds.
+		**/
 	void insertLOCToPatternEnd(CallTreeNode* Node, int Loc);
-	private:
-	/*The identification does not identify the CallTreeNode but it identifies the
-	  belonging Pattern or Function.
-		There is no need to declare this class this is only to save memory.*/
-	Identification* ident;
-	CallTreeNode* Caller = NULL;
-	PatternGraphNode* CorrespondingNode = NULL;
-	std::map<double, CallTreeNode*> Callees;
-	int actNumOfChild = 0;
-	int locTillPatternEnd = 0;
-	std::map<CallTreeNode*, int> LocTillEnds;
-	const CallTreeNodeType NodeType;
-	int lineNumber;
 
+	private:
+	/**The identification does not identify the CallTreeNode but it identifies the
+	  *belonging Pattern or Function. This class makes it easier to get the ID wich is a string or a hash value without the need to distinguish between the different NodeTypes.
+		**/
+	Identification* ident;
+	/**
+		* Identifies the Caller of the current CallTreeNode.
+		**/
+	CallTreeNode* Caller = NULL;
+	/**
+		* Identifies the Corresponding PatternCodeRegion or FunctionNode
+		**/
+	PatternGraphNode* CorrespondingNode = NULL;
+	/**
+		* This is an std::map which holds all Callees at the end of the traversation.
+		**/
+	std::map<double, CallTreeNode*> Callees;
+	/**
+		*	This is used to define the order of the children of a CallTreeNode. A child which appears earlier in the analyzed sourcecode has a lower int value in LocTillEns.
+		**/
+	int actNumOfChild = 0;
+	/**
+		* This holds the Lines of Code between a PattenBegin to the CorespondingPatternEnd. Only redable from the CallTreeNode corresponding to the Pattern_Begin.
+		**/
+	int locTillPatternEnd = 0;
+	/**
+		* After the traversation this should store the distance in lines of Code, of all enclosing Pattern, between a CallTreeNode coresponding to a Pattern_End and this.
+		**/
+	std::map<CallTreeNode*, int> LocTillEnds;
+	/**
+		* Stores the type of this CallTreeNode. Can range between Root, Function_Decl, Function, Pattern_Begin and Pattern_End
+		**/
+	const CallTreeNodeType NodeType;
+	/**
+		* stores the line Number in the analyzed sourcecode belonging to this CallTreeNode.
+		**/
+	int lineNumber;
+	/**
+		* Stores the corresponding Pattern_Begin/Pattern_End to a Pattern_End/Pattern_Begin.
+		**/
 	CallTreeNode* correspPatCallNode;
 };
 
 //
 extern CallTree* ClTre;
-
+/**
+	* Makes it possible to print the Identification directly.
+	**/
 std::ostream& operator<<(std::ostream &os, Identification const &ident);
+/**
+	* Makes it possible to print the CallTreeNodeType directly.
+	**/
 std::ostream& operator<<(std::ostream &os, CallTreeNodeType const &NodeType);

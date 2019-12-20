@@ -11,20 +11,39 @@
 class CallTreeVisualisation
 {
 public:
+	/**
+		* Prints the relation Tree
+		**/
 	static void PrintRelationTree(int maxdepth, bool onlyPattern);
+	/**
+		* Prints the CallTree
+		**/
 	static void PrintCallTree(int maxdepth, CallTree* CalTre);
 
 private:
+	/**
+		* Prints the OnlyPatterntree and is called from PrintRelationTree.
+		**/
 	static void PrintOnlyPatternTree(int maxdepth);
-
+	/**
+		* Prints a Pattern
+		**/
 	static void PrintPattern(PatternCodeRegion* PatternCodeRegion, int depth, int maxdepth);
-
+	/**
+		* Prints a Function
+		**/
 	static void PrintFunction(FunctionNode* FnCall, int depth, int maxdepth);
-
+	/**
+		* Prints recursevely the OnlyPatternTree
+		**/
 	static void PrintRecursiveOnlyPattern(PatternCodeRegion* CodeRegion,int depth,int maxdepth);
-
+	/**
+		* Prints recursevely the CallTree
+		**/
 	static void PrintCallTreeRecursively(CallTreeNode* ClTrNode, int depth, int maxdepth);
-
+	/**
+		* Prints a indent in dependent on depth.
+		**/
 	static void PrintIndent(int depth);
 
 };
