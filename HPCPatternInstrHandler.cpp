@@ -137,14 +137,13 @@ void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::Matc
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
 
-	std::string PatternID = patternstr->getString().str();
-
+	LastPatternID = patternstr->getString().str();
 	LastPattern = GetTopPatternStack();
 
-	RemoveFromPatternStack(PatternID);
+	RemoveFromPatternStack(LastPatternID);
 
 	LastOnlyPattern = GetTopOnlyPatternStack();
-	RemoveFromOnlyPatternStack(PatternID);
+	RemoveFromOnlyPatternStack(LastPatternID);
 }
 
 void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry)

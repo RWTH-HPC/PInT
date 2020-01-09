@@ -18,7 +18,7 @@ public:
 	/**
 		* Prints the CallTree
 		**/
-	static void PrintCallTree(int maxdepth, CallTree* CalTre);
+	static void PrintCallTree(int maxdepth, CallTree* CalTre, bool onlyPattern);
 
 private:
 	/**
@@ -40,10 +40,12 @@ private:
 	/**
 		* Prints recursevely the CallTree
 		**/
-	static void PrintCallTreeRecursively(CallTreeNode* ClTrNode, int depth, int maxdepth);
+ 	static void PrintCallTreeRecursively(int &HelpKey, std::vector<std::tuple<int, CallTreeNode*>> &CallTreeHelp, CallTreeNode* ClTrNode, int depth, int maxdepth, bool onlyPattern);
 	/**
 		* Prints a indent in dependent on depth.
 		**/
 	static void PrintIndent(int depth);
+
+	static int searchDepthInCallTreeHelp(std::vector<std::tuple<int, CallTreeNode*>> &CallTreeHelp, CallTreeNode* EndNode);
 
 };

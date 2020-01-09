@@ -523,6 +523,11 @@ void CallTree::setUpTree(){
 			PatternCodeRegion* CorrespReg = PatternIDisUsed(EndNode->GetID()->getIdentificationString());
 			EndNode->setCorrespondingNode(CorrespReg);
 		}
+		else{
+			#ifdef DEBUG
+			 std::cout << "EndNode->setCorrespondingNode(CorrespReg) is not NULL in setUpTree" << '\n';
+			#endif
+		}
 		#ifdef CURRDEBUG
 			std::cout << "Current End Node "<< '\n';
 			EndNode->print();
