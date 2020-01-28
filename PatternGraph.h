@@ -9,6 +9,10 @@
 #include "clang/AST/Decl.h"
 #include "llvm/Support/Casting.h"
 #include <map>
+#include <iostream>
+
+
+//#define TOOMANYBEGINSDEBUG
 
 
 
@@ -335,6 +339,16 @@ private:
 };
 
 /**
+	* Makes it possible to print the Identification directly.
+	**/
+std::ostream& operator<<(std::ostream &os, Identification const &ident);
+/**
+	* Makes it possible to print the CallTreeNodeType directly.
+	**/
+std::ostream& operator<<(std::ostream &os, CallTreeNodeType const &NodeType);
+
+
+/**
 	* This Class is used to display the CallTree and check the correct instrumentation
 	* of the code. Also keeps trak of the relations between the different
 	* CallTreeNodes
@@ -411,6 +425,10 @@ public:
 		* returns a pointer at the Vector which contains all the CallTreeNodes corresponding eather to a Pattern_Begin or a function declaration.
 		**/
 	std::vector<CallTreeNode*>* GetDeclarationVector();
+	/**
+		* Throws errors if the nesting of the pattern is incorrect.
+		**/
+	bool lookIfTreeIsCorrect();
 	/**
 		* returns the root of the CallTree.
 		**/
@@ -516,11 +534,20 @@ public:
 	/**
 		* Returns the CorrespondingNode of this.
 		**/
-	PatternGraphNode* GetCorrespondingNode(){return CorrespondingNode;};
+	PatternGraphNode* getCorrespondingCodeRegion(){return CorrespondingNode;};
 	/**
 		* This sets correspPatCallNode to PatCallNode. It is used to store the belonging Pattern_Begin to a Pattern_End or the other way  arround. For CallTreeNodes with the type Function or Function_Decl this should be NULL.
 		**/
-	void setCorrespCallTreeNodeRelation(CallTreeNode* PatCallNode){correspPatCallNode = PatCallNode;}
+	void setCorrespCallTreeNodeRelation(CallTreeNode* PatCallNode){
+		correspPatCallNode = PatCallNode;
+		#ifdef TOOMANYBEGINSDEBUG
+		/*
+			this Debugmessages helps to find an error if the TooManyBegins exception is not working properly.
+			Only pattern with no correspPatCallNode are causing to throw this error.
+		*/
+			std::cout << "correspPatCallNode setted for "<< *GetID() <<" "<< this <<". Now correspPatCallNode = "<< PatCallNode<<  '\n';
+		#endif
+	}
 	/**
 		* Returns correspPatCallNode.
 		**/
@@ -542,7 +569,12 @@ public:
 		* Inserts a Node (key) and a number in LocTillEnds.
 		**/
 	void insertLOCToPatternEnd(CallTreeNode* Node, int Loc);
+	/**
+		* sets the is suited bool from the corresponding Pattern to zero
+		**/
+	void setSuitedForNestingStatisticsTo(bool suited);
 
+	bool isSuitedForNestingStatistics = true;
 	private:
 	/**The identification does not identify the CallTreeNode but it identifies the
 	  *belonging Pattern or Function. This class makes it easier to get the ID wich is a string or a hash value without the need to distinguish between the different NodeTypes.
@@ -583,16 +615,8 @@ public:
 	/**
 		* Stores the corresponding Pattern_Begin/Pattern_End to a Pattern_End/Pattern_Begin.
 		**/
-	CallTreeNode* correspPatCallNode;
+	CallTreeNode* correspPatCallNode = NULL;
 };
 
 //
 extern CallTree* ClTre;
-/**
-	* Makes it possible to print the Identification directly.
-	**/
-std::ostream& operator<<(std::ostream &os, Identification const &ident);
-/**
-	* Makes it possible to print the CallTreeNodeType directly.
-	**/
-std::ostream& operator<<(std::ostream &os, CallTreeNodeType const &NodeType);

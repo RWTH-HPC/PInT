@@ -23,9 +23,7 @@
 #define PATTERN_BEGIN_CXX_FNNAME "Pattern_Begin"
 #define PATTERN_END_CXX_FNNAME "Pattern_End"
 
-#include "HPCRunningStats.h"
-
-
+#include "HPCPatternStatistics.h"
 
 /**
  * A custom visitor, overriding functions from the RecursiveASTVisitor.

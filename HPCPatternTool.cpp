@@ -1,3 +1,4 @@
+
 #include "HPCPatternInstrASTTraversal.h"
 #include "TreeVisualisation.h"
 #include "HPCPatternStatistics.h"
@@ -6,7 +7,10 @@
 #include "SimilarityMetrics.h"
 
 #include "ToolInformation.h"
-#include "HPCRunningStats.h"
+#ifndef HPCRUNNINGSTATS_H
+  #include "HPCRunningStats.h"
+#endif
+//#include "HPCRunningStats.h"
 
 #include <iostream>
 #include "clang/Tooling/Tooling.h"
@@ -62,7 +66,7 @@ static llvm::cl::OptionCategory onlyPattern("Patterntree without function calls"
 static llvm::cl::extrahelp Help("-onlyPattern Use this flag, if you want to see the Patterntree without function calls\n \n");
 static llvm::cl::opt<bool> OnlyPatterns("onlyPattern", llvm::cl::cat(onlyPattern));
 
-static llvm::cl::OptionCategory noTree("Output without the call tree");
+static llvm::cl::OptionCategory noTree("Output without the relation tree");
 static llvm::cl::extrahelp HelpNoTree("-noTree Use this flag, if you don't want to see tree\n \n");
 static llvm::cl::opt<bool> NoTree("noTree", llvm::cl::cat(noTree));
 
@@ -82,6 +86,10 @@ static llvm::cl::OptionCategory pintVersion("Shows the currently used version of
 static llvm::cl::extrahelp HelpPintVersion("Use this option if you want to know which version you builded");
 static llvm::cl::opt<bool> PintVersion("pintVersion", llvm::cl::cat(pintVersion));
 
+static llvm::cl::OptionCategory relationTree("Output the relation tree");
+static llvm::cl::extrahelp HelpRelationTree("-relationTree Use this flag, if you want to see the relation tree\n \n");
+static llvm::cl::opt<bool> RelationTree("relationTree", llvm::cl::cat(noTree));
+
 Halstead* actHalstead = new Halstead();
 
 static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), new FanInFanOutStatistic(20), new LinesOfCodeStatistic(), new CyclomaticComplexityStatistic(), actHalstead };
@@ -91,25 +99,9 @@ static HPCPatternStatistic* Statistics[] = { new SimplePatternCountStatistic(), 
  * Register statistics and similarity measures here.
  */
 
- void lookIfEveryPatternEnds(){
-		/*try{
- 			if(!PatternContext.empty()){
- 				throw missingPatternEnd(PatternContext);
- 				}
-
- 			if(!OnlyPatternContext.empty()){
- 				throw missingPatternEnd(OnlyPatternContext);
- 			}
- 		}
- 		catch(missingPatternEnd& me){
- 			me.what();
-			throw TerminateEarlyException();
- 		}*/
- }
-
-
 int main (int argc, const char** argv)
 {
+  setCommandArguments(OnlyPatterns.getValue(), NoTree.getValue(), UseSpecFiles.getValue(), MaxTreeDisplayDepth.getValue(), DisplayCompilationsList.getValue(), PintVersion.getValue(), RelationTree.getValue());
 	MaxTreeDisplayDepth.setInitialValue(MAX_DEPTH);
 
 		clang::tooling::CommonOptionsParser OptsParserVersion(argc, argv, pintVersion);
@@ -164,7 +156,6 @@ int main (int argc, const char** argv)
 		try{
 			retcode = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HPCPatternInstrAction>().get());
 
-
       #ifdef DEBUG
         std::cout << "\nPrinting out DeclarationVector: " << std::endl;
         for(CallTreeNode* Node : *ClTre->GetDeclarationVector())
@@ -176,23 +167,32 @@ int main (int argc, const char** argv)
           }
         }
       #endif
-      ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
-      ClTre->setUpTree();
-
-			//lookIfEveryPatternEnds();
+      if(!NoTree.getValue()){
+        ClTre->appendAllDeclToCallTree(ClTre->getRoot(), MAX_DEPTH);
+        ClTre->setUpTree();
+      }
 		}
 		catch(std::exception& terminate){
-			std::cout << terminate.what() << '\n';
-			return 0;
+			std::cout << terminate.what();
+      return 0;
 		}
-
-
-
+    try{
+      ClTre->lookIfTreeIsCorrect();
+    }
+    catch(TooManyBeginsException& begins){
+      begins.what();
+      return 0;
+    }
 		//int halstead = HPCPatternTool.run(clang::tooling::newFrontendActionFactory<HalsteadClassAction>().get());
 	  if(!NoTree.getValue()){
 			int mxdspldpth = MaxTreeDisplayDepth.getValue();
-		CallTreeVisualisation::PrintRelationTree(mxdspldpth, OnlyPatterns.getValue());
-    CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre, OnlyPatterns.getValue());
+      if(RelationTree.getValue())
+      {
+		    CallTreeVisualisation::PrintRelationTree(mxdspldpth, OnlyPatterns.getValue());
+        CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre, OnlyPatterns.getValue());
+      }
+      else
+        CallTreeVisualisation::PrintCallTree(mxdspldpth, ClTre, OnlyPatterns.getValue());
 	  }
 
 		for (HPCPatternStatistic* Stat : Statistics)

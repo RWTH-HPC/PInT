@@ -12,11 +12,11 @@
 #include "clang/Basic/SourceLocation.h"
 #include <string>
 #include "llvm/ADT/SmallVector.h"
+#include "HPCRunningStats.h"
 
 #ifndef HPCERROR_H
 #include "HPCError.h"
 #endif
-
 
 /**
  * @brief If a function declaration is encountered, look up the corresponding database entry.

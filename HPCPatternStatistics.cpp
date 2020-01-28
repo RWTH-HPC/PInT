@@ -3,8 +3,8 @@
 #include <fstream>
 #include "Debug.h"
 
-#define LOCDEBUG
-
+//#define LOCDEBUG
+#define PRINT_DEBUG
 /*
  * Methods for the Cyclomatic Complexity Statistic
  */
@@ -283,7 +283,7 @@ void FanInFanOutStatistic::Calculate()
 		std::vector<PatternOccurrence*> Parents;
 		std::vector<PatternOccurrence*> Children;
 
-		for (PatternCodeRegion* CodeReg : Pattern->GetCodeRegions())
+		for (PatternCodeRegion* CodeReg : GetCodeRegions(Pattern))
 		{
 #ifdef PRINT_DEBUG
 			CodeReg->Print();
@@ -291,8 +291,8 @@ void FanInFanOutStatistic::Calculate()
 #endif
 			/* Search in Parent and Child Directions */
 			FindParentPatterns(CodeReg, Parents, maxdepth);
-#ifdef PRINT_DEBUG
-			std::cout << "List of parents: " << std::endl;
+#ifdef PRINT_DEBUGPARENTS
+			std::cout << "LIST OF PARENTS " << std::endl;
 
 			for (PatternOccurrence* Parent : Parents)
 			{
@@ -347,6 +347,16 @@ void FanInFanOutStatistic::CSVExport(std::string FileName)
 	}
 
 	File.close();
+}
+
+std::vector<PatternCodeRegion*> FanInFanOutStatistic::GetCodeRegions(HPCParallelPattern* Pattern){
+	std::vector<PatternCodeRegion*> returnVector;
+	for(PatternCodeRegion* CodeReg : Pattern->GetCodeRegions()){
+		if(CodeReg->isSuitedForNestingStatistics){
+			returnVector.push_back(CodeReg);
+		}
+	}
+	return returnVector;
 }
 
 

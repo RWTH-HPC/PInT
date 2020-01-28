@@ -12,13 +12,6 @@
 #include "HPCPatternInstrHandler.h"
 
 #endif
-
-/*#ifndef HPCPATTERNINSTRASTTRAVERSAL_H
-
-#include "HPCPatternInstrASTTraversal.h"
-
-#endif*/
-
 /**
  * Abstract class for pattern statistics.
  * Statistics have to inherit from this class and implement the virtual methods.
@@ -202,7 +195,10 @@ public:
 	 * @param FileName File name of the output file.
 	 **/
 	void CSVExport(std::string FileName);
-
+	/**
+	 *@brief this method is used to gether the CallTreeNodes which are suitable to be used by this statistic.
+	 **/
+	 std::vector<PatternCodeRegion*> GetCodeRegions(HPCParallelPattern* Pattern);
 private:
 	struct FanInFanOutCounter
 	{
@@ -246,6 +242,7 @@ private:
 	void FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Children, int maxdepth);
 
 	int maxdepth;
+	std::vector<HPCParallelPattern*> Pattern;
 
 	std::vector<FanInFanOutCounter*> FIFOCounter;
 };

@@ -6,7 +6,7 @@ void Test::TestOperatorTypeQualifiers(){
   const int i = 0;
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ2");
 	PatternInstrumentation::Pattern_End("TQ2");
- PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ4");
+  PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ4");
 	PatternInstrumentation::Pattern_End("TQ4");
 
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ5");
@@ -16,6 +16,7 @@ void Test::TestOperatorTypeQualifiers(){
 	PatternInstrumentation::Pattern_End("TQ5");
 
   PatternInstrumentation::Pattern_End("TQ1");
+  PatternInstrumentation::Pattern_End("TQ11");
 
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ8");
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ9");
@@ -25,6 +26,7 @@ void Test::TestOperatorTypeQualifiers(){
   PatternInstrumentation::Pattern_End("TQ8");
   PatternInstrumentation::Pattern_End("TQ9");
   PatternInstrumentation::Pattern_End("TQ10");
+  OtherFunction();
   const int s = 0 , t = 0, d = 0;
 
   const volatile int q = 0 , r = 0, p = 0;
@@ -34,4 +36,5 @@ void Test::TestOperatorTypeQualifiers(){
 void Test::OtherFunction(){
   PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ7");
 	PatternInstrumentation::Pattern_End("TQ7");
+  PatternInstrumentation::Pattern_End("TQ3");
 }

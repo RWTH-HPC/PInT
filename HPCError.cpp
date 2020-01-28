@@ -1,22 +1,20 @@
 #include "HPCError.h"
-
+//#include "HPCRunningStats.h"
 
 TooManyEndsException::TooManyEndsException(std::string ID){
   this->ID = ID;
 }
 const char* TooManyEndsException::what() const throw(){
-
-  std::string s = "\033[31mYou probably added one end of a patten to much.\n " + this->ID+ " ends outside of any Pattern.\033[0m";
-  std::cout << s << '\n';
-
-  return s.c_str();
-};
+std::string s= this->ID;
+std::cout<<"\033[31mYou probably added one end of a patten to much.\n" + s;
+return " ends outside of any Pattern.\033[0m ";
+}
 
 TooManyBeginsException::TooManyBeginsException(std::string ID){
   this->ID = ID;
 }
 const char* TooManyBeginsException::what() const throw(){
-  std::cout << "\033[31mYou have used more than one Pattern_Begin with the same ID, "<< this->ID << ".\n\033[0m";
+  std::cout << "\033[31mYou have eather used more than one Pattern_Begin with the same ID, "<< this->ID << " or you forgott to end this pattern.\n\033[0m";
   return "You have used more than one begin with the same ID, ";
 };
 

@@ -385,11 +385,11 @@ void RemoveFromPatternStack(std::string ID)
 			}
 			i++;
 		}
-		throw WrongNestingException(ID, ID);
+		throw TooManyEndsException(ID);
 		}
-		catch(WrongNestingException& wrongNest){
+		catch(TooManyEndsException& endsExeption){
 
-			wrongNest.what();
+			endsExeption.what();
 			throw TerminateEarlyException();
 		}
 	}

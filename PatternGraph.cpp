@@ -6,7 +6,8 @@
 #include "clang/AST/ODRHash.h"
 #include "HPCError.h"
 
-#define TEST
+#define SUITEDFORSTATSDEBUG
+//#define TEST
 //#define CURRDEBUG
 //#define DEBUG
 /*
@@ -513,13 +514,13 @@ void CallTree::appendAllDeclToCallTree(CallTreeNode* Node, int maxdepth)
 
 void CallTree::setUpTree(){
 	#ifdef LOCDEBUG
-		std::cout << "PRINTING PATTNER_ENDVECTOR:" << '\n';
+		std::cout << "PRINTING PATTNERN_ENDVECTOR:" << '\n';
 		for(CallTreeNode* Node : Pattern_EndVector){
 			std::cout << *Node->GetID() << '\n';
 		}
 	#endif
 	for(CallTreeNode* EndNode : Pattern_EndVector){
-		if(EndNode->GetCorrespondingNode()== NULL){
+		if(EndNode->getCorrespondingCodeRegion()== NULL){
 			PatternCodeRegion* CorrespReg = PatternIDisUsed(EndNode->GetID()->getIdentificationString());
 			EndNode->setCorrespondingNode(CorrespReg);
 		}
@@ -536,7 +537,6 @@ void CallTree::setUpTree(){
 		try{
 			if(CorrespBegin != NULL){
 				CorrespBegin->setCorrespCallTreeNodeRelation(EndNode);
-
 			}
 			else
 				throw TooManyEndsException();
@@ -545,6 +545,20 @@ void CallTree::setUpTree(){
 			e.what();
 			throw TerminateEarlyException();
 		}
+	}
+	//check if we have too many Begins
+	try{
+	for(CallTreeNode* BeginNode : *GetDeclarationVector()){
+		if(BeginNode->GetNodeType()!= Pattern_Begin)
+			break;
+		if(BeginNode->getCorrespCallTreeNodeRelation()==NULL){
+			throw TooManyBeginsException(BeginNode->GetID()->getIdentificationString());
+		}
+	}
+	}
+	catch(TooManyBeginsException& exept){
+		exept.what();
+		throw TerminateEarlyException();
 	}
 }
 
@@ -563,7 +577,7 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 
 	while(!hasBegin){
 		if (Caller == NULL)
-			throw TooManyEndsException();
+			throw TooManyEndsException(EndNode->GetID()->getIdentificationString());
 
 		#ifdef CURRDEBUG
 			std::cout << "Actual Caller: " << '\n';
@@ -577,6 +591,14 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 
 		Caller->setLOCTillPatternEnd(Callertemp, EndNode);
 		hasBegin = Caller->compare(EndNode);
+
+		if(Caller->GetNodeType() == Pattern_Begin && !hasBegin){
+			EndNode->setSuitedForNestingStatisticsTo(false);
+			#ifdef SUITEDFORSTATSDEBUG
+				std::cout << "Pattern " << *EndNode->GetID()<< " is not suited for statistics which need full nesting of Pattern. " << '\n';
+				std::cout << "Caller is "<< *Caller->GetID() << '\n';
+			#endif
+		}
 
 		if(hasBegin){
 			Caller->setCorrespCallTreeNodeRelation(EndNode);
@@ -594,7 +616,21 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 	return NULL;
 }
 
-
+ bool CallTree::lookIfTreeIsCorrect(){
+	 for(CallTreeNode* BeginNode : DeclarationVector){
+		 if(BeginNode->GetNodeType()== Pattern_Begin){
+			 if(!BeginNode->getCorrespCallTreeNodeRelation())
+			 throw TooManyBeginsException(BeginNode->GetID()->getIdentificationString());
+		 }
+	 }
+	 for(CallTreeNode* EndNode : Pattern_EndVector){
+		 if(EndNode->GetNodeType() == Pattern_End){
+			 if(!EndNode->getCorrespCallTreeNodeRelation())
+			 	throw TooManyEndsException(EndNode->GetID()->getIdentificationString());
+		 }
+	 }
+	 return true;
+ }
 
 std::vector<CallTreeNode*>* CallTree::GetDeclarationVector(){
 	return &DeclarationVector;
@@ -602,7 +638,6 @@ std::vector<CallTreeNode*>* CallTree::GetDeclarationVector(){
 
 CallTreeNode::~CallTreeNode(){
 	std::cout << "loesche gerade Knoten" << '\n';
-
 }
 
 CallTreeNode::CallTreeNode(CallTreeNodeType type, PatternCodeRegion* CorrespondingPat) : NodeType(type)
@@ -740,7 +775,7 @@ void CallTreeNode::print(){
 		PatternCodeRegion* CorrespRegion = clang::dyn_cast<PatternCodeRegion>(CorrespondingNode);
 		std::cout << "\033[36m";
 		if(NodeType == Pattern_End){
-			std::cout << " END ";
+			std::cout << "END ";
 		}
 		std::cout << CorrespRegion->GetPatternOccurrence()->GetPattern()->GetDesignSpaceStr() << ":\33[33m " << CorrespRegion->GetPatternOccurrence()->GetPattern()->GetPatternName() << "\33[0m";
 			std::cout << "(" << *ident << ")" << std::endl;
@@ -832,6 +867,12 @@ void CallTreeNode::insertLOCToPatternEnd(CallTreeNode* Node, int Loc){
 	LocTillEnds.insert({Node, Loc});
 }
 
+void CallTreeNode::setSuitedForNestingStatisticsTo(bool suited){
+	isSuitedForNestingStatistics = suited;
+	PatternGraphNode* GraphNode = getCorrespondingCodeRegion();
+	PatternCodeRegion* CodeReg = clang::dyn_cast<PatternCodeRegion>(GraphNode);
+	CodeReg->isSuitedForNestingStatistics = suited;
+}
 
 std::ostream& operator<<(std::ostream &os, Identification const &ident)
 {

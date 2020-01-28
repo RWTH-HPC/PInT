@@ -10,15 +10,15 @@
 int main(int argc, char* argv[])
 {
 	bool wahr,falsch;
-
+	//PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ50");
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
+	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ11");
 
 	Test::TestOperatorTypeQualifiers();
 	//TQ3 is not a child of TQ1
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ3");
-	 PatternInstrumentation::Pattern_End("TQ3");
 	// TestOperatorTypeQualifiers is also not a child of TQ1
-//	Test::OtherFunction();
+	Test::OtherFunction();
 	  const int i = 0;
 	return 0;
 }

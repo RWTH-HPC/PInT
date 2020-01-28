@@ -165,6 +165,7 @@ public:
 
 	std::vector<CallTreeNode*>* getCorrespondingCallTreeNodes(){return &CorrespondingCallTreeNodes;}
 
+	bool isSuitedForNestingStatistics = true;
 private:
 	PatternOccurrence* PatternOcc;
 
@@ -182,6 +183,7 @@ private:
 	int LinesOfCode = 0;
 
 	std::vector<CallTreeNode*> CorrespondingCallTreeNodes;
+
 };
 
 
