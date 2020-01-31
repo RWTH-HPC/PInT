@@ -4,7 +4,7 @@
 #include "Debug.h"
 
 //#define LOCDEBUG
-#define PRINT_DEBUG
+//#define PRINT_DEBUG
 /*
  * Methods for the Cyclomatic Complexity Statistic
  */
@@ -388,6 +388,14 @@ void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vec
 	/* Find the parent pattern code regions using API functionality */
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindParentPatternCodeRegions(Start, CodeRegions, maxdepth);
+
+	int i = 0;
+	for(PatternCodeRegion* CodeReg : CodeRegions){
+		if(!CodeReg->isSuitedForNestingStatistics){
+			CodeRegions.erase(CodeRegions.begin()+i);
+		}
+		i++;
+	}
 
 	std::vector<PatternOccurrence*> TempParents = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 
