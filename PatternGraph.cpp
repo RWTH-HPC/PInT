@@ -597,7 +597,7 @@ CallTreeNode* CallTree::findCorrespBegin(CallTreeNode* EndNode){
 			Caller->setSuitedForNestingStatisticsTo(false);
 
 			std::cout << "PRINTING PATTERN THAT ARE NOT SUITED FOR STATISTICS WHICH NEED CLEAR NESTING" << '\n';
-			std::cout << "Pattern " << *EndNode->GetID()<<" and "<< *Caller->GetID()<< " is not suited for statistics which need full nesting of Pattern. " << '\n';
+			std::cout << "Pattern " << *EndNode->GetID()<<" and "<< *Caller->GetID()<< " is not suited for statistics which need clear nesting of Pattern. " << '\n';
 			std::cout << "The first Pattern_Begin occurence before the Pattern_End of "<<*EndNode->GetID()<<" is "<< *Caller->GetID() << '\n';
 		}
 

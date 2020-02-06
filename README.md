@@ -168,7 +168,7 @@ It is allowed to spread pattern parts over different functions.
 
 </code></pre>
 Some metrics are applicable for those constructions. FanIn-FanOut and Cyclomatic Complexity for example.
-<h3>Remarks for FanIn-FanOut</h3> <br>
+<h4>Remarks for FanIn-FanOut</h4>
 For the calculation of FanIn-FanOut we excluded the Pattern parts (CodeRegions) which are not nexted clearly, those pattern which are not completely inside or outside of another pattern. <br>
 Exmaples would be:
 <pre><code>
@@ -192,5 +192,5 @@ Exmaples would be:
 </code></pre>
 In this example the Pattern patternName is divided in three CodeRegions One, Two and Three. The CodeRegions One and Two are excluded in the calculation of FanIn-FanOut because they are not nested clearly.<br>
 Those Pattern are listed at the beginning of the output of our tool.
-<h3> Remakrs for Cyclomatic  Complexity</h3><br>
+<h4> Remarks for Cyclomatic  Complexity</h4>
 The Cyclomatic Complexity is computed on the generated Pattern Graph. We did not change anything on the implementation of this metric. This means when a Pattern_Begin is within another Pattern it is treated as if it were fully within this pattern. You get to decide if this metric is still usefull for your purpose
