@@ -1,0 +1,138 @@
+CALL TREE VISUALISATION
+main (Hash: 1002402201)
+--> FindingConcurrency: TypeQualifiers(TQ1)
+   --> TestOperatorTypeQualifiers (Hash: 3837192489)
+       --> FindingConcurrency: TypeQualifiers(TQ2)
+       --> END FindingConcurrency: TypeQualifiers(TQ2)
+       --> FindingConcurrency: TypeQualifiers(TQ4)
+       --> END FindingConcurrency: TypeQualifiers(TQ4)
+       --> FindingConcurrency: TypeQualifiers(TQ5)
+           --> FindingConcurrency: TypeQualifiers(TQ6)
+           --> END FindingConcurrency: TypeQualifiers(TQ6)
+       --> END FindingConcurrency: TypeQualifiers(TQ5)
+       --> TestOperatorTypeQualifiers (Hash: 3837192489)
+           --> FindingConcurrency: TypeQualifiers(TQ2)
+           --> END FindingConcurrency: TypeQualifiers(TQ2)
+           --> FindingConcurrency: TypeQualifiers(TQ4)
+           --> END FindingConcurrency: TypeQualifiers(TQ4)
+           --> FindingConcurrency: TypeQualifiers(TQ5)
+               --> FindingConcurrency: TypeQualifiers(TQ6)
+               --> END FindingConcurrency: TypeQualifiers(TQ6)
+           --> END FindingConcurrency: TypeQualifiers(TQ5)
+           --> TestOperatorTypeQualifiers (Hash: 3837192489)
+               --> FindingConcurrency: TypeQualifiers(TQ2)
+               --> END FindingConcurrency: TypeQualifiers(TQ2)
+               --> FindingConcurrency: TypeQualifiers(TQ4)
+               --> END FindingConcurrency: TypeQualifiers(TQ4)
+               --> FindingConcurrency: TypeQualifiers(TQ5)
+                   --> FindingConcurrency: TypeQualifiers(TQ6)
+                   --> END FindingConcurrency: TypeQualifiers(TQ6)
+               --> END FindingConcurrency: TypeQualifiers(TQ5)
+               --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                   --> FindingConcurrency: TypeQualifiers(TQ2)
+                   --> END FindingConcurrency: TypeQualifiers(TQ2)
+                   --> FindingConcurrency: TypeQualifiers(TQ4)
+                   --> END FindingConcurrency: TypeQualifiers(TQ4)
+                   --> FindingConcurrency: TypeQualifiers(TQ5)
+                       --> FindingConcurrency: TypeQualifiers(TQ6)
+                       --> END FindingConcurrency: TypeQualifiers(TQ6)
+                   --> END FindingConcurrency: TypeQualifiers(TQ5)
+                   --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                       --> FindingConcurrency: TypeQualifiers(TQ2)
+                       --> END FindingConcurrency: TypeQualifiers(TQ2)
+                       --> FindingConcurrency: TypeQualifiers(TQ4)
+                       --> END FindingConcurrency: TypeQualifiers(TQ4)
+                       --> FindingConcurrency: TypeQualifiers(TQ5)
+                           --> FindingConcurrency: TypeQualifiers(TQ6)
+                       --> END FindingConcurrency: TypeQualifiers(TQ5)
+                       --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                           --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> FindingConcurrency: TypeQualifiers(TQ5)
+                           --> TestOperatorTypeQualifiers (Hash: 3837192489)
+--> END FindingConcurrency: TypeQualifiers(TQ1)
+--> TestOperatorTypeQualifiers (Hash: 3837192489)
+   --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+   --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+   --> FindingConcurrency: TypeQualifiers(TQ5)
+       --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+   --> TestOperatorTypeQualifiers (Hash: 3837192489)
+       --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+       --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+       --> FindingConcurrency: TypeQualifiers(TQ5)
+           --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+       --> TestOperatorTypeQualifiers (Hash: 3837192489)
+           --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+           --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+           --> FindingConcurrency: TypeQualifiers(TQ5)
+               --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+           --> TestOperatorTypeQualifiers (Hash: 3837192489)
+               --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+               --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+               --> FindingConcurrency: TypeQualifiers(TQ5)
+                   --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+               --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                   --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+                   --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+                   --> FindingConcurrency: TypeQualifiers(TQ5)
+                       --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+                   --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                       --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> END FindingConcurrency: TypeQualifiers(TQ2)
+                       --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> END FindingConcurrency: TypeQualifiers(TQ4)
+                       --> FindingConcurrency: TypeQualifiers(TQ5)
+                           --> FindingConcurrency: TypeQualifiers(TQ6)
+                           --> END FindingConcurrency: TypeQualifiers(TQ5)
+                       --> TestOperatorTypeQualifiers (Hash: 3837192489)
+                           --> FindingConcurrency: TypeQualifiers(TQ2)
+                           --> FindingConcurrency: TypeQualifiers(TQ4)
+                           --> FindingConcurrency: TypeQualifiers(TQ5)
+                           --> TestOperatorTypeQualifiers (Hash: 3837192489)
+
+
+Pattern TypeQualifiers occurs 6 times.
+
+
+Pattern TypeQualifiers has
+Fan-In: 2
+Fan-Out: 5
+
+
+TypeQualifiers has 14 line(s) of code in total.
+6 occurrences in code.
+TQ2: 1 LOC in 1 regions.
+TQ4: 1 LOC in 1 regions.
+TQ5: 4 LOC in 1 regions.
+TQ6: 2 LOC in 1 regions.
+TQ7: 2 LOC in 1 regions.
+TQ1: 4 LOC in 1 regions.
+Line(s) of code respectively.
+
+
+
+WARNING: Results from the Cyclomatic Complexity Statistic might be inconsistent!
+Number of Edges: 6
+Number of Nodes: 6
+Number of Connected Components: 2
+Resulting Cyclomatic Complexity: 4
