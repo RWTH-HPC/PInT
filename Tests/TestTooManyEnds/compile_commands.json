@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/mainTooManyEnds.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/mainTooManyEnds.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/mainTooManyEnds.cpp"
+},
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/TestsTooManyEnds.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/TestsTooManyEnds.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestTooManyEnds/TestsTooManyEnds.cpp"
+}
+]

@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/mainCorrectChildRegistration.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/mainCorrectChildRegistration.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/mainCorrectChildRegistration.cpp"
+},
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/TestsCorrectChildRegistration.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/TestsCorrectChildRegistration.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestCorrectChildRegistration/TestsCorrectChildRegistration.cpp"
+}
+]

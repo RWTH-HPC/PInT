@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestClearNesting/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/main.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestClearNesting/main.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestClearNesting/main.cpp"
+},
+{
+  "directory": "/home/eh671079/patternInstrumentation/Tests/TestClearNesting/build",
+  "command": "/rwthfs/rz/SW/UTIL/clang/8.0.1/bin/clang++      -o CMakeFiles/MyExample.dir/TestsTest3.cpp.o -c /home/eh671079/patternInstrumentation/Tests/TestClearNesting/TestsTest3.cpp",
+  "file": "/home/eh671079/patternInstrumentation/Tests/TestClearNesting/TestsTest3.cpp"
+}
+]
