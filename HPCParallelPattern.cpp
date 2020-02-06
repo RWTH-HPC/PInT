@@ -131,7 +131,13 @@ int PatternOccurrence::GetTotalLinesOfCode()
 
 	for (PatternCodeRegion* CodeReg : this->CodeRegions)
 	{
-		LOC += CodeReg->GetLinesOfCode();
+		LOC += *((CodeReg->getCorrespondingCallTreeNodes())->front())->getLOCTillPatternEnd();
+		#ifdef LOCDEBUG
+			for(CallTreeNode* Node : *getCorrespondingCallTreeNodes()){
+				std::cout << "FOR "<< Node->GetID()<< "printing" << '\n';
+				std::cout << Node->getLOCTillPatternEnd() << '\n';
+			}
+		#endif
 	}
 
 	return LOC;
@@ -168,6 +174,8 @@ void PatternOccurrence::Print()
 /*
  * Pattern Code Region Class Functions
  */
+PatternCodeRegion::~PatternCodeRegion(){std::cout << "Deleted CodeRegion" << '\n';}
+
 PatternCodeRegion::PatternCodeRegion(PatternOccurrence* PatternOcc) : PatternGraphNode(GNK_Pattern), Parents(), Children()
 {
 	this->PatternOcc = PatternOcc;
@@ -317,8 +325,8 @@ void PatternCodeRegion::PrintVecOfPattern(std::vector<PatternCodeRegion*> Region
 /*
  * Pattern Stack Management
  */
-std::stack<PatternCodeRegion*> PatternContext;
-std::stack<PatternCodeRegion*> OnlyPatternContext;
+std::vector<PatternCodeRegion*> PatternContext;
+std::vector<PatternCodeRegion*> OnlyPatternContext;
 
 /**
  * @brief Add a PatternCodeRegion to the top of the pattern context stack.
@@ -327,13 +335,13 @@ std::stack<PatternCodeRegion*> OnlyPatternContext;
  **/
 void AddToPatternStack(PatternCodeRegion* PatternReg)
 {
-	PatternContext.push(PatternReg);
+	PatternContext.push_back(PatternReg);
 }
 
 void AddToOnlyPatternStack(PatternCodeRegion* PatternReg)
 {
 
-	OnlyPatternContext.push(PatternReg);
+	OnlyPatternContext.push_back(PatternReg);
 }
 
 /**
@@ -345,7 +353,7 @@ PatternCodeRegion* GetTopPatternStack()
 {
 	if (!PatternContext.empty())
 	{
-		return PatternContext.top();
+		return PatternContext.back();
 	}
 		return NULL;
 }
@@ -353,7 +361,7 @@ PatternCodeRegion* GetTopPatternStack()
 PatternCodeRegion* GetTopOnlyPatternStack(){
 	if (!OnlyPatternContext.empty())
 	{
-		return OnlyPatternContext.top();
+		return OnlyPatternContext.back();
 	}
 		return NULL;
 }
@@ -365,50 +373,44 @@ PatternCodeRegion* GetTopOnlyPatternStack(){
  **/
 void RemoveFromPatternStack(std::string ID)
 {
-	try{
-		if (!PatternContext.empty())
-		{
-			PatternCodeRegion* Top = PatternContext.top();
-			try{
-				if (ID.compare(Top->GetID()))
-				{
-					throw WrongNestingException(ID, Top->GetID());
-				}
-				else{
-					PatternContext.pop();
-				}
+	if (!PatternContext.empty())
+	{
+		try{
+			int i = 0;
+			for(PatternCodeRegion* PatCodeReg : PatternContext){
+			if (!ID.compare(PatCodeReg->GetID()))
+			{
+				PatternContext.erase(PatternContext.begin()+i);
+				return;
 			}
-			catch(WrongNestingException& wrongNest){
-
-				wrongNest.what();
-				throw TerminateEarlyException();
-			}
+			i++;
 		}
-		else{
-				throw TooManyEndsException(ID);
+		throw TooManyEndsException(ID);
+		}
+		catch(TooManyEndsException& endsExeption){
+
+			endsExeption.what();
+			throw TerminateEarlyException();
 		}
 	}
-	catch(TooManyEndsException& e){
-		e.what();
-		throw TerminateEarlyException();
-	}
-
 }
 
 void RemoveFromOnlyPatternStack(std::string ID){
 	if(!OnlyPatternContext.empty())
 	{
-		PatternCodeRegion* OnlyPatternTop = OnlyPatternContext.top();
 		// we need to compare if the ID is the same as the ID of the Pattern that we inserted first in the stack
 		/*usually the WrongNestingException is encountered before this function*/
 		try{
-			if (ID.compare(OnlyPatternTop->GetID()))
-			{
-				throw WrongNestingException(ID, OnlyPatternTop->GetID());
+			int i = 0;
+			for(PatternCodeRegion* PatCodeReg : OnlyPatternContext){
+				if (!ID.compare(PatCodeReg->GetID()))
+				{
+					OnlyPatternContext.erase(OnlyPatternContext.begin()+i);
+					return;
+				}
+				i++;
 			}
-			else{
-			  OnlyPatternContext.pop();
-			}
+			throw WrongNestingException(ID, ID);
 		}
 		catch(WrongNestingException& wrongNest){
 			std::cout << wrongNest.what() << std::endl;
@@ -416,18 +418,18 @@ void RemoveFromOnlyPatternStack(std::string ID){
 		}
 	}
 	else{
-			std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
+			//std::cout << "You probably added one end of a patten to much.\n" << ID << " ends outside of any Pattern." << std::endl;
 	}
 }
 
-bool PatternIDisUsed(std::string ID){
+PatternCodeRegion* PatternIDisUsed(std::string ID){
 	std::vector<PatternCodeRegion*> PatternCodeRegions = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
 	for(PatternCodeRegion* PatCodeReg : PatternCodeRegions){
 		if(!(ID.compare(PatCodeReg->GetID()))){
-			return true;
+			return PatCodeReg;
 		}
 	}
-	return false;
+	return NULL;
 }
 /*Stack for Halstead */
 std::vector<PatternOccurrence*> OccStackForHalstead;

@@ -3,8 +3,8 @@
 #include <fstream>
 #include "Debug.h"
 
-
-
+//#define LOCDEBUG
+//#define PRINT_DEBUG
 /*
  * Methods for the Cyclomatic Complexity Statistic
  */
@@ -13,9 +13,6 @@ CyclomaticComplexityStatistic::CyclomaticComplexityStatistic() : VisitedNodes()
 
 }
 
-/**
- * @brief Calls CyclomaticComplexityStatistic::CountEdges(), CyclomaticComplexityStatistic::CountNodes() and CyclomaticComplexityStatistic::CountConnectedComponents() to calculate the Cyclomatic Complexity Statistic C = (Edges - Nodes) + 2 * ConnectedComponents
- */
 void CyclomaticComplexityStatistic::Calculate()
 {
 	Edges = CountEdges();
@@ -26,9 +23,6 @@ void CyclomaticComplexityStatistic::Calculate()
 	CyclomaticComplexity = (Edges - Nodes) + 2 * ConnectedComponents;
 }
 
-/**
- * @brief Prints the number of edges, nodes, connected components and the resulting cyclomatic complexity.
- */
 void CyclomaticComplexityStatistic::Print()
 {
 	std::cout << "\033[33m" << "WARNING: Results from the Cyclomatic Complexity Statistic might be inconsistent!" << "\033[0m" << std::endl;
@@ -38,11 +32,6 @@ void CyclomaticComplexityStatistic::Print()
 	std::cout << "Resulting \033[33mCyclomatic Complexity\033[0m: " << CyclomaticComplexity << std::endl;
 }
 
-/**
- * @brief Function for csv output of the form "cycl. complexity, edges, nodes, connectedcomponents".
- *
- * @param FileName The file name of the desired output file.
- **/
 void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
 {
 	std::ofstream File;
@@ -54,11 +43,6 @@ void CyclomaticComplexityStatistic::CSVExport(std::string FileName)
 	File.close();
 }
 
-/**
- * @brief Set a node to visited for calculation of the number of edges in the pattern tree.
- *
- * @param Node The node that is set visited.
- **/
 void CyclomaticComplexityStatistic::SetNodeVisited(PatternGraphNode* Node)
 {
 	if (!IsNodeVisited(Node))
@@ -67,13 +51,6 @@ void CyclomaticComplexityStatistic::SetNodeVisited(PatternGraphNode* Node)
 	}
 }
 
-/**
- * @brief Enquire if the node is visited (see CyclomaticComplexityStatistic::SetNodeVisited()).
- *
- * @param Node Node that is checked.
- *
- * @return True if visited, false else.
- **/
 bool CyclomaticComplexityStatistic::IsNodeVisited(PatternGraphNode* Node)
 {
 	for (PatternGraphNode* N : VisitedNodes)
@@ -87,11 +64,6 @@ bool CyclomaticComplexityStatistic::IsNodeVisited(PatternGraphNode* Node)
 	return false;
 }
 
-/**
- * @brief Calls CyclomaticComplexityStatistic::CountEdges(PatternGraphNode*) with the entries of all functions in the FunctionDeclDatabase.
- *
- * @return The number of edges in the pattern tree.
- **/
 int CyclomaticComplexityStatistic::CountEdges()
 {
 	/* Start the tree traversal from all functions */
@@ -107,13 +79,6 @@ int CyclomaticComplexityStatistic::CountEdges()
 	return edges;
 }
 
-/**
- * @brief Counts the number of edges in the pattern tree (Disregarding function calls) recursively.
- *
- * @param Current The node with which the counting starts.
- *
- * @return The number of edges.
- **/
 int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
 {
 	int Edges = 0;
@@ -143,11 +108,6 @@ int CyclomaticComplexityStatistic::CountEdges(PatternGraphNode* Current)
 	return Edges;
 }
 
-/**
- * @brief Counts the number of nodes in the pattern tree (i.e. only PatternCodeRegions) by requesting from the HPCPatternDatabase.
- *
- * @return The number of nodes.
- **/
 int CyclomaticComplexityStatistic::CountNodes()
 {
 	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
@@ -164,12 +124,6 @@ int CyclomaticComplexityStatistic::CountNodes()
 	return nodes;
 }
 
-/**
- * @brief Connected components are marked by call of GraphAlgorithms::MarkConnectedComponents().
- * Then, the number of connected components is calculated.
- *
- * @return The number of connected components.
- **/
 int CyclomaticComplexityStatistic::CountConnectedComponents()
 {
 	GraphAlgorithms::MarkConnectedComponents();
@@ -211,9 +165,6 @@ void LinesOfCodeStatistic::Calculate()
 
 }
 
-/**
- * @brief Prints statistics about lines of code for each HPCParallelPattern and PatternOccurrence.
- */
 void LinesOfCodeStatistic::Print()
 {
 	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
@@ -227,18 +178,13 @@ void LinesOfCodeStatistic::Print()
 
 		for (PatternOccurrence* PatternOcc : Occurrences)
 		{
-			std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
+				std::cout << PatternOcc->GetID() << ": " << PatternOcc->GetTotalLinesOfCode() << " LOC in " << PatternOcc->GetNumberOfCodeRegions() << " regions." << std::endl;
 		}
 
 		std::cout << "Line(s) of code respectively." << std::endl << std::endl;
 	}
 }
 
-/**
- * @brief CSV export of the statistic. Format "Patternname, NumRegions, LOCByRegions (list), TotalLOCs".
- *
- * @param FileName File name of the output file.
- **/
 void LinesOfCodeStatistic::CSVExport(std::string FileName)
 {
 	std::ofstream File;
@@ -282,17 +228,11 @@ SimplePatternCountStatistic::SimplePatternCountStatistic()
 
 }
 
-/**
- * @brief Dummy function.
- */
 void SimplePatternCountStatistic::Calculate()
 {
 
 }
 
-/**
- * @brief Prints for each pattern, how often it occurs in the code.
- */
 void SimplePatternCountStatistic::Print()
 {
 	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
@@ -303,11 +243,6 @@ void SimplePatternCountStatistic::Print()
 	}
 }
 
-/**
- * @brief CSV export of the static. Format "Patternname, Count".
- *
- * @param FileName File name of the output file.
- **/
 void SimplePatternCountStatistic::CSVExport(std::string FileName)
 {
 	std::ofstream File;
@@ -326,23 +261,11 @@ void SimplePatternCountStatistic::CSVExport(std::string FileName)
 }
 
 
-
-/**
- * @brief Constructor for the Fan-In Fan-Out statistic.
- *
- * @param maxdepth The maximum recursion depth when descending in the tree.
- **/
 FanInFanOutStatistic::FanInFanOutStatistic(int maxdepth) : FIFOCounter()
 {
 	this->maxdepth = maxdepth;
 }
 
-/**
- * @brief Calculates the Fan-In and Fan-Out statistic for each Pattern.
- * First, all children and parents for all PatternOccurrence and PatternCodeRegions are gathered.
- * Then, duplicates are removed.
- * The remaining patterns are counted and saved in FanInFanOutStatistic::FanInFanOutCounter objects.
- */
 void FanInFanOutStatistic::Calculate()
 {
 	std::vector<HPCParallelPattern*> Patterns = PatternGraph::GetInstance()->GetAllPatterns();
@@ -360,7 +283,7 @@ void FanInFanOutStatistic::Calculate()
 		std::vector<PatternOccurrence*> Parents;
 		std::vector<PatternOccurrence*> Children;
 
-		for (PatternCodeRegion* CodeReg : Pattern->GetCodeRegions())
+		for (PatternCodeRegion* CodeReg : GetCodeRegions(Pattern))
 		{
 #ifdef PRINT_DEBUG
 			CodeReg->Print();
@@ -368,8 +291,8 @@ void FanInFanOutStatistic::Calculate()
 #endif
 			/* Search in Parent and Child Directions */
 			FindParentPatterns(CodeReg, Parents, maxdepth);
-#ifdef PRINT_DEBUG
-			std::cout << "List of parents: " << std::endl;
+#ifdef PRINT_DEBUGPARENTS
+			std::cout << "LIST OF PARENTS " << std::endl;
 
 			for (PatternOccurrence* Parent : Parents)
 			{
@@ -401,9 +324,6 @@ void FanInFanOutStatistic::Calculate()
 	}
 }
 
-/**
- * @brief Print Fan-In and Fan-Out for all patterns previously encountered.
- */
 void FanInFanOutStatistic::Print()
 {
 	for (FanInFanOutCounter* Counter : FIFOCounter)
@@ -414,11 +334,6 @@ void FanInFanOutStatistic::Print()
 	}
 }
 
-/**
- * @brief CSV export of the results. Format "PatternName, Fan-In, Fan-Out".
- *
- * @param FileName File name of the output file.
- **/
 void FanInFanOutStatistic::CSVExport(std::string FileName)
 {
 	std::ofstream File;
@@ -434,13 +349,17 @@ void FanInFanOutStatistic::CSVExport(std::string FileName)
 	File.close();
 }
 
-/**
- * @brief Retrieve the fan-in fan-out counter for a specific pattern.
- *
- * @param Pattern The pattern to find.
- *
- * @return The counter that belongs to the pattern.
- **/
+std::vector<PatternCodeRegion*> FanInFanOutStatistic::GetCodeRegions(HPCParallelPattern* Pattern){
+	std::vector<PatternCodeRegion*> returnVector;
+	for(PatternCodeRegion* CodeReg : Pattern->GetCodeRegions()){
+		if(CodeReg->isSuitedForNestingStatistics){
+			returnVector.push_back(CodeReg);
+		}
+	}
+	return returnVector;
+}
+
+
 FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::LookupFIFOCounter(HPCParallelPattern* Pattern)
 {
 	/* Look up the Pattern Counter for this pattern */
@@ -455,14 +374,6 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::LookupFIFOCounte
 	return NULL;
 }
 
-/**
- * @brief Create a fan-in fan-out counter for a pattern.
- * Adds the counter to the list of counters.
- *
- * @param Pattern
- *
- * @return The counter created.
- **/
 FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(HPCParallelPattern* Pattern)
 {
 	/* Create a new Pattern Counter for this Pattern */
@@ -472,28 +383,25 @@ FanInFanOutStatistic::FanInFanOutCounter* FanInFanOutStatistic::AddFIFOCounter(H
 	return Counter;
 }
 
-/**
- * @brief Finds the parent patterns, beginning from a PatternCodeRegion.
- * Saves the parent patterns in the list of PatternOccurrence passed as second parameter.
- *
- * @param Start Initial PatternCodeRegion from which the search is started.
- * @param Parents Reference to a std::vector of PatternOccurrence* in which the encountered occurrences are saved.
- * @param maxdepth Maximum depth of the recursion.
- **/
 void FanInFanOutStatistic::FindParentPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Parents, int maxdepth)
 {
 	/* Find the parent pattern code regions using API functionality */
 	std::vector<PatternCodeRegion*> CodeRegions;
 	GraphAlgorithms::FindParentPatternCodeRegions(Start, CodeRegions, maxdepth);
 
+	int i = 0;
+	for(PatternCodeRegion* CodeReg : CodeRegions){
+		if(!CodeReg->isSuitedForNestingStatistics){
+			CodeRegions.erase(CodeRegions.begin()+i);
+		}
+		i++;
+	}
+
 	std::vector<PatternOccurrence*> TempParents = PatternHelpers::GetPatternOccurrences(CodeRegions, true);
 
 	Parents.insert(Parents.end(),TempParents.begin(), TempParents.end());
 }
 
-/**
- * @brief Finds the child patterns from a starting point. See FanInFanOutStatistic::FindParentPatterns().
- **/
 void FanInFanOutStatistic::FindChildPatterns(PatternCodeRegion* Start, std::vector<PatternOccurrence*>& Children, int maxdepth)
 {
 	/* Find child pattern code regions using API */

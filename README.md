@@ -87,7 +87,7 @@ this pattern is not displayed in the tree.
 You can use this flag if you want to cut off the deepest parts of the tree. This is really usefull for large files, to avoid printing the tree for hours. The other statistics are working with a uncut version of the tree.
 Per default this is set to 10.
 For large codes you can set it to a smaller number for example 5.
-<code> ./HPC-pattern-tool /path/to/compile_commands/file/ -maxTreeDisplyDepth=5 --extra-arg=-I/path/to/headers</code>
+<code> ./HPC-pattern-tool /path/to/compile_commands/file/ -maxTreeDisplayDepth=5 --extra-arg=-I/path/to/headers</code>
 <h4>-displayCompilationsList</h4>
 This flag is usefull for checking if all files you need to analyze are in the compilation database, which means considered by the tool.
 <h4>-pintVersion</h4>
@@ -96,6 +96,11 @@ You can use this flag with the following command.
 <code>/path/to/your/build/directory/of/the/Tool/./HPC-pattern-tool /path/to/your/build/directory/of/the/Tool -pintVersion</code>
 If you are alredy in the build directory of the tool you can use:
 <code>./HPC-pattern-tool . -pintVersion </code>
+<h4>-relationTree</h4>
+This flag is used to show the relationTree next to the CallTree. This three only shows relations between the functions and the pattern, but it is not suited to display caller callee relationships.
+For example multiple calls to the same function are not considered, the nesting of the pattern and functions has to be clear.
+You can use this flag with the following command.
+<code>/path/to/your/build/directory/of/the/Tool/./HPC-pattern-tool /path/to/your/build/directory/of/the/Tool -relationTree</code>
 
 <h3>4. Limitations</h3>
 Since our tool is a static analysis tool there are some limitations.
@@ -144,8 +149,8 @@ This code for example throws no warning.
   }
 </code></pre>
 The pattern part of TypeQualifiers, ifA will appear as a parent of elseB.
-<h4>Pattern parts which are spread over different functions</h4>
-It is not allowed to spread pattern parts over different functions. We consider supporting that but for now we don't. Wrong results can appear with or without warning of the tool when doing this.
+<h4>Pattern parts (CodeRegions) which are spread over different functions</h4>
+It is allowed to spread pattern parts over different functions.
 <pre><code>
   #include "PatternInstrumentation.h"
 
@@ -162,4 +167,30 @@ It is not allowed to spread pattern parts over different functions. We consider 
   }
 
 </code></pre>
-This is not allowed and could throw an error or could not. By coincidence the result could be as intended, don't let that fool you.
+Some metrics are applicable for those constructions. FanIn-FanOut and Cyclomatic Complexity for example.
+<h3>Remarks for FanIn-FanOut</h3> <br>
+For the calculation of FanIn-FanOut we excluded the Pattern parts (CodeRegions) which are not nexted clearly, those pattern which are not completely inside or outside of another pattern. <br>
+Exmaples would be:
+<pre><code>
+  #include "PatternInstrumentation.h"
+
+  int main(int argc, const char** argv){
+  	PatternInstrumentation::Pattern_Begin("SupportingStructure patternName One");
+    //source code
+    PatternInstrumentation::Pattern_Begin("SupportingStructure patternName Two");
+    //source code
+    PatternInstrumentation::Pattern_End("One");
+    //source code
+    PatternInstrumentation::Pattern_End("Two");
+    //source code
+    PatternInstrumentation::Pattern_Begin("SupportingStructure patternName Three");
+    //source code
+    PatternInstrumentation::Pattern_End("Three");
+    //source code
+  	return 0;
+  }
+</code></pre>
+In this example the Pattern patternName is divided in three CodeRegions One, Two and Three. The CodeRegions One and Two are excluded in the calculation of FanIn-FanOut because they are not nested clearly.<br>
+Those Pattern are listed at the beginning of the output of our tool.
+<h3> Remakrs for Cyclomatic  Complexity</h3><br>
+The Cyclomatic Complexity is computed on the generated Pattern Graph. We did not change anything on the implementation of this metric. This means when a Pattern_Begin is within another Pattern it is treated as if it were fully within this pattern. You get to decide if this metric is still usefull for your purpose

@@ -9,18 +9,16 @@
 
 int main(int argc, char* argv[])
 {
-	// is not consideres because it isn't inside a pattern
 	bool wahr,falsch;
-
+	//PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ50");
 	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ1");
-	PatternInstrumentation::Pattern_End("TQ1");
-	/* int, float, char,double, long, short, signed, unsigned, void
-	*/
-	//+1 "const",   +1 "=",   +1 ";"
-	  const int i = 0;
-	//+1 "::",  +1 "()"
+	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ11");
+
 	Test::TestOperatorTypeQualifiers();
-
-
+	//TQ3 is not a child of TQ1
+	PatternInstrumentation::Pattern_Begin("FindingConcurrency TypeQualifiers TQ3");
+	// TestOperatorTypeQualifiers is also not a child of TQ1
+	Test::OtherFunction();
+	  const int i = 0;
 	return 0;
 }

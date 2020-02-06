@@ -106,6 +106,7 @@ private:
 class PatternCodeRegion : public PatternGraphNode
 {
 public:
+	~PatternCodeRegion();
 	PatternCodeRegion(PatternOccurrence* PatternOcc);
 
 	PatternOccurrence* GetPatternOccurrence() { return this->PatternOcc; }
@@ -158,6 +159,13 @@ public:
 
 	void PrintVecOfPattern(std::vector<PatternCodeRegion*> RegionVec);
 
+	void insertCorrespondingCallTreeNode(CallTreeNode* Node){
+		CorrespondingCallTreeNodes.push_back(Node);
+	}
+
+	std::vector<CallTreeNode*>* getCorrespondingCallTreeNodes(){return &CorrespondingCallTreeNodes;}
+
+	bool isSuitedForNestingStatistics = true;
 private:
 	PatternOccurrence* PatternOcc;
 
@@ -171,7 +179,11 @@ private:
 	std::vector<PatternGraphNode*> Children;
 	std::vector<PatternCodeRegion*> PatternParents;
 	std::vector<PatternCodeRegion*> PatternChildren;
+	std::vector<int> LOCofCallTree;
 	int LinesOfCode = 0;
+
+	std::vector<CallTreeNode*> CorrespondingCallTreeNodes;
+
 };
 
 
@@ -179,11 +191,11 @@ private:
 /**
  * The pattern stack is used to keep track of the nesting of patterns and functions.
  */
-extern std::stack<PatternCodeRegion*> PatternContext;
+extern std::vector<PatternCodeRegion*> PatternContext;
 /**
 	*The OnlyPatternContext only keeps track of the nesting of patterns.
 	*/
-extern std::stack<PatternCodeRegion*> OnlyPatternContext;
+extern std::vector<PatternCodeRegion*> OnlyPatternContext;
 
 extern std::vector<PatternOccurrence*> OccStackForHalstead;
 
@@ -199,4 +211,4 @@ void RemoveFromPatternStack(std::string ID);
 
 void RemoveFromOnlyPatternStack(std::string ID);
 
-bool PatternIDisUsed(std::string ID);
+PatternCodeRegion* PatternIDisUsed(std::string ID);

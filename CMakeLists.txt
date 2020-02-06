@@ -32,13 +32,16 @@ message (STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 include(AddLLVM)
 
+set(LLVM_ENABLE_EH ON)
+message(STATUS "LLVM_ENABLE_EH: ${LLVM_ENABLE_EH}")
 
 include_directories(${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS} ${CLANG_DEFINITIONS})
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 add_llvm_executable (HPC-pattern-tool HPCPatternTool.cpp HPCPatternInstrASTTraversal.cpp HPCParallelPattern.cpp HPCPatternInstrHandler.cpp TreeVisualisation.cpp HPCPatternStatistics.cpp Helpers.cpp SimilarityMetrics.cpp PatternGraph.cpp DesignSpaces.cpp HPCRunningStats.cpp ToolInformation.cpp HPCError.cpp)
 target_compile_options(HPC-pattern-tool
   PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fexceptions >
+	PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti >
 )
 target_link_libraries (HPC-pattern-tool PUBLIC ${llvm_libs} clangBasic clangTooling)

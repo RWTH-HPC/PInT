@@ -65,11 +65,11 @@ private:
 
 class missingPatternEnd: public PInTRuntimeException{
 public:
-  missingPatternEnd(std::stack<PatternCodeRegion*> PatContext);
+  missingPatternEnd(std::vector<PatternCodeRegion*> PatContext);
   missingPatternEnd(){};
   const char* what() const throw();
   void printPatternWithNoEnd() const;
 private:
-  std::stack<PatternCodeRegion*> PatternStack;
+  std::vector<PatternCodeRegion*> PatternVector;
 
 };

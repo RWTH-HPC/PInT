@@ -24,15 +24,6 @@ void HPCPatternBeginInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry)
 	CurrentFnEntry = FnEntry;
 }
 
-/**
- * @brief Analyse the match results from the pattern begin matcher to extract information about the pattern.
- * After extracting design space, pattern name and pattern identifier, HPCParallelPattern and PatternOccurrence objects are looked up in the database.
- * If they do not already exist, they are created.
- * Then, a PatternCodeRegion object is created for this particular encounter.
- *
- * @param Result Match results from the pattern begin matcher.
- **/
-
  // describes what has to happen if we encounter the beginning of a pattern
 void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::MatchResult &Result)
 {
@@ -142,37 +133,19 @@ void HPCPatternBeginInstrHandler::run(const clang::ast_matchers::MatchFinder::Ma
 #endif
 }
 
-
-
-/**
- * @brief Extracts the pattern identifier string from the match results and removes the PatternCodeRegion from the pattern stack.
- *
- * @param Result Match results from the pattern end matcher.
- **/
-
- //defines what has to happen if we encounter the end of an Pattern
 void HPCPatternEndInstrHandler::run(const clang::ast_matchers::MatchFinder::MatchResult &Result)
 {
 	const clang::StringLiteral* patternstr = Result.Nodes.getNodeAs<clang::StringLiteral>("patternstr");
 
-	std::string PatternID = patternstr->getString().str();
-
+	LastPatternID = patternstr->getString().str();
 	LastPattern = GetTopPatternStack();
-	if(LastPattern==NULL){
-		throw TooManyEndsException();
-	}
 
-	RemoveFromPatternStack(PatternID);
+	RemoveFromPatternStack(LastPatternID);
 
 	LastOnlyPattern = GetTopOnlyPatternStack();
-	RemoveFromOnlyPatternStack(PatternID);
+	RemoveFromOnlyPatternStack(LastPatternID);
 }
 
-/**
- * @brief See PatternBeginInstrHandler::SetCurrentFnEntry().
- *
- * @param FnEntry Current function declaration database entry.
- **/
 void HPCPatternEndInstrHandler::SetCurrentFnEntry(FunctionNode* FnEntry)
 {
 	CurrentFnEntry = FnEntry;

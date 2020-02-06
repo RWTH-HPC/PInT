@@ -1,16 +1,16 @@
 #include "TreeVisualisation.h"
-
+#include <tuple>
 #include <iostream>
-//#define PRINT_ONLYPATTERNDENUG
-
+//#define LOCDEBUG
 
 /**
  * @brief Prints the call tree recursively, beginning with the main function.
  *
  * @param maxdepth The maximum recursion (i.e., output depth)
  **/
-void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
+void CallTreeVisualisation::PrintRelationTree(int maxdepth, bool onlyPattern)
 {
+	std::cout << "\n RELATION TREE VISUALISATION \n";
 	PatternGraphNode* RootNode = PatternGraph::GetInstance()->GetRootNode();
 	if(onlyPattern){
 			PrintOnlyPatternTree(maxdepth);
@@ -25,6 +25,21 @@ void CallTreeVisualisation::PrintCallTree(int maxdepth, bool onlyPattern)
 			PrintPattern(CodeRegion, 0, maxdepth);
 		}
 	}
+}
+
+void CallTreeVisualisation::PrintCallTree(int maxdepth, CallTree* CalTre, bool onlyPattern){
+	std::cout << "\n CALL TREE VISUALISATION \n";
+	std::vector<std::tuple<int, CallTreeNode*>> CallTreeHelp;
+	int CallTreeHelpKey = 0;
+	CallTreeNode* currentNode = CalTre->getRoot();
+#ifdef DEBUG
+	const Identification* currentIdent = currentNode->GetID();
+  std::cout << *currentIdent << '\n';
+#endif
+#ifdef LOCDEBUG
+	std::cout << currentNode << '\n';
+#endif
+	PrintCallTreeRecursively (CallTreeHelpKey, CallTreeHelp, currentNode, 0, maxdepth, onlyPattern);
 }
 
 void CallTreeVisualisation::PrintOnlyPatternTree(int maxdepth)
@@ -139,6 +154,66 @@ void CallTreeVisualisation::PrintRecursiveOnlyPattern(PatternCodeRegion* CodeReg
 	}
 }
 
+void CallTreeVisualisation::PrintCallTreeRecursively(int &HelpKey, std::vector<std::tuple<int, CallTreeNode*>> &CallTreeHelp, CallTreeNode* ClTrNode, int depth, int maxdepth, bool onlyPattern){
+	if(depth > maxdepth){
+		return;
+	}
+	CallTreeNodeType nodeTypeOfClTr = ClTrNode->GetNodeType();
+	if(nodeTypeOfClTr == Pattern_Begin){
+		CallTreeHelp.push_back(std::make_tuple(depth, ClTrNode));
+	}
+
+	if(onlyPattern){
+		if(nodeTypeOfClTr == Pattern_End||nodeTypeOfClTr == Pattern_Begin){
+			if(nodeTypeOfClTr == Pattern_End){
+				int depthForEnd = searchDepthInCallTreeHelp(CallTreeHelp, ClTrNode);
+				PrintIndent(depthForEnd);
+				#ifdef LOCDEBUG
+					std::cout <<"Adress of CallTreeNode: "<< ClTrNode << '\n';
+				#endif
+			}
+			else{
+				PrintIndent(depth);
+			}
+			ClTrNode->print();
+		}
+	}
+	else if(nodeTypeOfClTr!= Function_Decl){
+		if(nodeTypeOfClTr != Pattern_End){
+			PrintIndent(depth);
+		}
+		else{
+			int depthForEnd = searchDepthInCallTreeHelp(CallTreeHelp, ClTrNode);
+			PrintIndent(depthForEnd);
+		}
+		ClTrNode->print();
+		#ifdef LOCDEBUG
+			std::cout <<"Adress of CallTreeNode: "<< ClTrNode << '\n';
+		#endif
+	}
+
+	#ifdef DEBUG
+		std::cout << "\033[36m" << *ClTrNode->GetID() << ":\33[33m" << std::endl;
+
+		if(ClTrNode->GetCaller())
+			std::cout << "Caller:" << *(ClTrNode->GetCaller()->GetID())<<" Type: "<< ClTrNode->GetCaller()->GetNodeType() << std::endl;
+		  std::cout << "Callees:" << std::endl;
+			for(CallTreeNode* Callee : *ClTrNode->GetCallees())
+			{
+				std::cout << *Callee->GetID() << " Type: " << Callee->GetNodeType() << std::endl;
+			}
+	#endif
+	for(const auto &CalleePair : *(ClTrNode->GetCallees())){
+		CallTreeNode* Callee = CalleePair.second;
+		if(nodeTypeOfClTr == Function_Decl){
+				PrintCallTreeRecursively(HelpKey, CallTreeHelp, Callee, depth, maxdepth, onlyPattern);
+		}
+		else{
+			PrintCallTreeRecursively(HelpKey, CallTreeHelp, Callee, depth + 1, maxdepth, onlyPattern);
+		}
+	}
+}
+
 /**
  * @brief Prints an indent according to the passed depth.
  *
@@ -146,15 +221,34 @@ void CallTreeVisualisation::PrintRecursiveOnlyPattern(PatternCodeRegion* CodeReg
  **/
 void CallTreeVisualisation::PrintIndent(int depth)
 {
-	int i = 0;
+	if(depth!=0){
+		int i = 0;
 
-	for (; i < depth - 1; i++)
-	{
-		std::cout << "    ";
-	}
+		for (; i < depth - 1; i++)
+		{
+			std::cout << "    ";
+		}
 
-	for (; i < depth; i++)
-	{
-		std::cout << "--> ";
+		for (; i < depth; i++)
+		{
+			std::cout << "--> ";
+		}
 	}
+}
+
+int CallTreeVisualisation::searchDepthInCallTreeHelp(std::vector<std::tuple<int, CallTreeNode*>> &CallTreeHelp, CallTreeNode* EndNode){
+	if(EndNode->GetNodeType()!= Pattern_End){
+		std::cout << "This function should be only used for CallTreeNodes of the Type Pattern_End. Returnning 0 by default." << '\n';
+		return 0;
+	}
+	int largestDepth = 0;
+	int depthOfNode;
+	for(std::tuple<int, CallTreeNode*> tup : CallTreeHelp){
+		if(std::get<1>(tup) == EndNode->getCorrespCallTreeNodeRelation()){
+			depthOfNode = std::get<0>(tup);
+			if(largestDepth <= depthOfNode)
+				largestDepth = depthOfNode;
+		}
+	}
+	return largestDepth;
 }

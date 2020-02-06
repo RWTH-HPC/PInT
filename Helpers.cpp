@@ -36,15 +36,15 @@ std::vector<PatternOccurrence*> PatternHelpers::GetPatternOccurrences(std::vecto
  */
 void GraphAlgorithms::MarkConnectedComponents()
 {
-	std::vector<PatternCodeRegion*> PatternOccs = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
+	std::vector<PatternCodeRegion*> PatternCodeRegs = PatternGraph::GetInstance()->GetAllPatternCodeRegions();
 
 	int ConnectedComponents = 0;
 
-	for (PatternCodeRegion* PatternOcc : PatternOccs)
+	for (PatternCodeRegion* PatternCodeReg : PatternCodeRegs)
 	{
-		if (PatternOcc->GetConnectedComponent() == -1)
+		if (PatternCodeReg->GetConnectedComponent() == -1)
 		{
-			MarkConnectedComponents(PatternOcc, ConnectedComponents);
+			MarkConnectedComponents(PatternCodeReg, ConnectedComponents);
 			ConnectedComponents++;
 		}
 	}
